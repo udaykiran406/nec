@@ -1,0 +1,87 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /nec
+
+spring:
+  application:
+    name: nec-middleware-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/emis?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      initialization-fail-timeout: 0
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  main:
+    allow-bean-definition-overriding: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 50MB
+
+  jackson:
+    default-property-inclusion: NON_NULL
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+      accept-empty-string-as-null-object: false
+
+logging:
+  level:
+    com.emis.ams: INFO
+    com.emis.ams.controller: INFO
+    com.emis.ams.service: INFO
+    com.emis.ams.repository: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+# Admin Registration API Configuration
+admin:
+  registration:
+    api:
+      url: http://api-dev.moeplstate.so/auth/api/v1/users/admin-register
+
+
+# File Storage Configuration
+file:
+  # Upload directory used by the Document Upload API (com.emis.sms.uploads)
+  # Windows local path – sub-folders are created automatically on first upload
+  upload-dir: C:/Users/hp/Downloads/emis-uploads

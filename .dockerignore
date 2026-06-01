@@ -1,0 +1,53 @@
+# Maven
+*~
+*.swp
+*.bak
+*.tmp
+# Temporary files
+
+logs/
+*.log
+# Logs
+
+src/test/
+IntegrationTests/
+# Integration Tests
+
+VALIDATION_DOCUMENTATION.md
+TROUBLESHOOTING_400_ERROR.md
+POSTMAN_SWAGGER_UPDATES.md
+LOGGING_SUMMARY.md
+LOGGING_IMPLEMENTATION.md
+HELP.md
+*.md
+# Documentation
+
+.gitattributes
+.gitignore
+.git/
+# Git
+
+Thumbs.db
+.DS_Store
+# OS
+
+.factorypath
+.classpath
+.project
+.settings/
+.vscode/
+*.ipr
+*.iws
+*.iml
+.idea/
+# IDE
+
+# Maven build output (but keep .mvn wrapper for Docker builds)
+buildNumber.properties
+dependency-reduced-pom.xml
+release.properties
+pom.xml.next
+pom.xml.versionsBackup
+pom.xml.releaseBackup
+pom.xml.tag
+
