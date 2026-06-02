@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<lombok.version>1.18.36</lombok.version>
+		<flowable.version>7.0.0</flowable.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -101,7 +102,12 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-
+		<!-- Flowable Spring Boot Starter (Process Engine only) -->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter-process</artifactId>
+			<version>${flowable.version}</version>
+		</dependency>
     </dependencies>
 
 	<build>
