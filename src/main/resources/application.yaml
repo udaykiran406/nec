@@ -33,6 +33,12 @@ spring:
       max-file-size: 20MB
       max-request-size: 50MB
 
+    # Flowable Engine Configuration
+  flowable:
+      database-schema-update: true
+      history-level: full
+      db-history-used: true
+
   jackson:
     default-property-inclusion: NON_NULL
     serialization:
