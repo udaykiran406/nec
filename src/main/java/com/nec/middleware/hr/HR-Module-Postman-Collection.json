@@ -1,0 +1,1009 @@
+{
+  "info": {
+    "_postman_id": "hr-module-collection",
+    "name": "HR Module - NEC Middleware",
+    "description": "Comprehensive Postman collection for HR Module APIs in NEC Middleware. Includes University Trainee Management, Political Party Agent Management, and Aaqil Management with full CRUD operations, filtering, pagination, and status management.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "University Trainee Management",
+      "item": [
+        {
+          "name": "Create University Trainee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set('trainee_id', jsonData.data.id);",
+                  "        console.log('✓ Trainee ID saved:', jsonData.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"genderId\": 1,\n  \"age\": 25,\n  \"phone\": \"201001234567\",\n  \"email\": \"john.doe@example.com\",\n  \"paymentMethodId\": 1,\n  \"universityId\": 1,\n  \"semester\": \"Fall 2024\",\n  \"faculty\": \"Engineering\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"statusId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/university-trainees/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "university-trainees", "save"]
+            },
+            "description": "Creates a new university trainee record. The response includes the newly created trainee ID which is automatically saved to 'trainee_id'.\n\nRequired Fields:\n- fullName: String (max 120 chars)\n- genderId: Long\n- age: Short (17-60)\n- phone: String (9-15 digits only)\n- email: String (valid email format)\n- paymentMethodId: Long\n- universityId: Long\n- semester: String (max 50 chars)\n- faculty: String (max 100 chars)\n- regionId: Long\n- districtId: Long\n- cityId: Long\n- statusId: Long\n\nOptional Fields:\n- photoUrl: String (max 500 chars)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trainee created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"fullName\": \"John Doe\",\n    \"genderId\": 1,\n    \"age\": 25,\n    \"phone\": \"201001234567\",\n    \"email\": \"john.doe@example.com\",\n    \"paymentMethodId\": 1,\n    \"universityId\": 1,\n    \"semester\": \"Fall 2024\",\n    \"faculty\": \"Engineering\",\n    \"regionId\": 1,\n    \"districtId\": 1,\n    \"cityId\": 1,\n    \"photoUrl\": \"https://example.com/photo.jpg\",\n    \"statusId\": 1,\n    \"isActive\": true,\n    \"createdAt\": \"2026-06-08T10:30:45\",\n    \"createdBy\": null,\n    \"updatedAt\": \"2026-06-08T10:30:45\",\n    \"updatedBy\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update University Trainee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{trainee_id}},\n  \"fullName\": \"Jane Doe Updated\",\n  \"genderId\": 2,\n  \"age\": 26,\n  \"phone\": \"201001234568\",\n  \"email\": \"jane.doe@example.com\",\n  \"paymentMethodId\": 2,\n  \"universityId\": 2,\n  \"semester\": \"Spring 2025\",\n  \"faculty\": \"Medicine\",\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"photoUrl\": \"https://example.com/photo-updated.jpg\",\n  \"statusId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/university-trainees/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "university-trainees", "save"]
+            },
+            "description": "Updates an existing university trainee. Must include 'id' in the request body."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trainee by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains trainee data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/university-trainees/{{trainee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "university-trainees", "{{trainee_id}}"]
+            },
+            "description": "Fetches a single university trainee by ID. Excludes soft-deleted records."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Trainees (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.content).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/university-trainees?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "university-trainees"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Page number (0-indexed)" },
+                { "key": "size", "value": "20", "description": "Records per page (max 100)" },
+                { "key": "universityId", "value": "", "disabled": true, "description": "Filter by university ID (optional)" },
+                { "key": "regionId", "value": "", "disabled": true, "description": "Filter by region ID (optional)" },
+                { "key": "districtId", "value": "", "disabled": true, "description": "Filter by district ID (optional)" },
+                { "key": "cityId", "value": "", "disabled": true, "description": "Filter by city ID (optional)" },
+                { "key": "statusId", "value": "", "disabled": true, "description": "Filter by status ID (optional)" },
+                { "key": "isActive", "value": "", "disabled": true, "description": "Filter by active status true/false (optional)" }
+              ]
+            },
+            "description": "Fetches a paginated list of university trainees with optional filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Trainee Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Status changed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/university-trainees/status/{{trainee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "university-trainees", "status", "{{trainee_id}}"]
+            },
+            "description": "Toggles isActive for a trainee. No request body needed."
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Trainee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Trainee deleted successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/university-trainees/delete/{{trainee_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "university-trainees", "delete", "{{trainee_id}}"]
+            },
+            "description": "Soft-deletes a university trainee. Record is marked deleted but remains in the database."
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing University Trainees in the HR module."
+    },
+    {
+      "name": "Political Party Agent Management",
+      "item": [
+        {
+          "name": "Create Political Party Agent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "});",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set('agent_id', jsonData.data.id);",
+                  "        console.log('✓ Agent ID saved:', jsonData.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"politicalPartyNameId\": 1,\n  \"agentName\": \"Ahmed Hassan\",\n  \"genderId\": 1,\n  \"phone\": \"201001234567\",\n  \"email\": \"ahmed.hassan@example.com\",\n  \"photoUrl\": \"https://example.com/agent-photo.jpg\",\n  \"pollingStationId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/political-party-agents/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "political-party-agents", "save"]
+            },
+            "description": "Creates a new political party agent. Response ID is saved to 'agent_id'.\n\nRequired Fields:\n- politicalPartyNameId: Long\n- agentName: String (max 120 chars)\n- genderId: Long\n- phone: String (9-15 digits only)\n- email: String (valid email format)\n- pollingStationId: Long\n- regionId: Long\n- districtId: Long\n- cityId: Long\n- statusId: Long\n\nOptional Fields:\n- photoUrl: String (max 500 chars)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Political Party Agent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{agent_id}},\n  \"politicalPartyNameId\": 2,\n  \"agentName\": \"Ahmed Hassan Updated\",\n  \"genderId\": 1,\n  \"phone\": \"201001234568\",\n  \"email\": \"ahmed.hassan.updated@example.com\",\n  \"photoUrl\": \"https://example.com/agent-photo-updated.jpg\",\n  \"pollingStationId\": 2,\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"statusId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/political-party-agents/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "political-party-agents", "save"]
+            },
+            "description": "Updates an existing political party agent. Must include 'id' in the request body."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Agent by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains agent data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/political-party-agents/{{agent_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "political-party-agents", "{{agent_id}}"]
+            },
+            "description": "Fetches a single political party agent by ID. Excludes soft-deleted records."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Agents (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.content).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/political-party-agents?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "political-party-agents"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Page number (0-indexed)" },
+                { "key": "size", "value": "20", "description": "Records per page (max 100)" },
+                { "key": "politicalPartyNameId", "value": "", "disabled": true, "description": "Filter by political party ID (optional)" },
+                { "key": "pollingStationId", "value": "", "disabled": true, "description": "Filter by polling station ID (optional)" },
+                { "key": "regionId", "value": "", "disabled": true, "description": "Filter by region ID (optional)" },
+                { "key": "districtId", "value": "", "disabled": true, "description": "Filter by district ID (optional)" },
+                { "key": "cityId", "value": "", "disabled": true, "description": "Filter by city ID (optional)" },
+                { "key": "statusId", "value": "", "disabled": true, "description": "Filter by status ID (optional)" },
+                { "key": "isActive", "value": "", "disabled": true, "description": "Filter by active status true/false (optional)" }
+              ]
+            },
+            "description": "Fetches a paginated list of political party agents with optional filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Agent Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Status changed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/political-party-agents/status/{{agent_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "political-party-agents", "status", "{{agent_id}}"]
+            },
+            "description": "Toggles isActive for an agent. No request body needed."
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Agent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Agent deleted successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/political-party-agents/delete/{{agent_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "political-party-agents", "delete", "{{agent_id}}"]
+            },
+            "description": "Soft-deletes a political party agent. Record remains in database."
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing Political Party Agents in the HR module."
+    },
+    {
+      "name": "Aaqil Management",
+      "item": [
+        {
+          "name": "Create Aaqil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set('aaqil_id', jsonData.data.id);",
+                  "        console.log('✓ Aaqil ID saved:', jsonData.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aaqilTypeId\": 1,\n  \"fullName\": \"Mohamed Ali\",\n  \"genderId\": 1,\n  \"age\": 45,\n  \"phone\": \"252631234567\",\n  \"email\": \"mohamed.ali@example.com\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "aaqils", "save"]
+            },
+            "description": "Creates a new Aaqil (Traditional Leader) record. The response ID is automatically saved to 'aaqil_id'.\n\nRequired Fields:\n- aaqilTypeId: Long\n- fullName: String (max 120 chars)\n- genderId: Long\n- phone: String (9-15 digits only)\n- email: String (valid email format)\n- regionId: Long\n- districtId: Long\n- cityId: Long\n- statusId: Long\n\nOptional Fields:\n- age: Short (17-100)\n\nValidation:\n- Phone and email must be unique across non-deleted records\n- Phone must contain digits only (no letters like 'AB')"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Aaqil created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"aaqilTypeId\": 1,\n    \"fullName\": \"Mohamed Ali\",\n    \"genderId\": 1,\n    \"age\": 45,\n    \"phone\": \"252631234567\",\n    \"email\": \"mohamed.ali@example.com\",\n    \"regionId\": 1,\n    \"districtId\": 1,\n    \"cityId\": 1,\n    \"statusId\": 1,\n    \"isActive\": true,\n    \"createdAt\": \"2026-06-09T10:30:45\",\n    \"createdBy\": null,\n    \"updatedAt\": \"2026-06-09T10:30:45\",\n    \"updatedBy\": null\n  }\n}"
+            },
+            {
+              "name": "Duplicate Phone/Email Error",
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"An aaqil with this email or phone already exists\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "Validation Error - Invalid Phone",
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Phone must contain only digits\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Aaqil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{aaqil_id}},\n  \"aaqilTypeId\": 2,\n  \"fullName\": \"Mohamed Ali Updated\",\n  \"genderId\": 1,\n  \"age\": 46,\n  \"phone\": \"252631234568\",\n  \"email\": \"mohamed.ali.updated@example.com\",\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"statusId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "aaqils", "save"]
+            },
+            "description": "Updates an existing Aaqil record. Must include 'id' in the request body.\n\nNote: Phone and email uniqueness is checked against all other non-deleted records excluding the current record being updated."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Aaqil by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains aaqil data with audit fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.all.keys('id', 'aaqilTypeId', 'fullName', 'genderId', 'age', 'phone', 'email', 'regionId', 'districtId', 'cityId', 'statusId', 'isActive', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/{{aaqil_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "aaqils", "{{aaqil_id}}"]
+            },
+            "description": "Fetches a single Aaqil by ID. Excludes soft-deleted records."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Aaqils (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "    pm.expect(jsonData.data.content).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "aaqils"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Page number (0-indexed)" },
+                { "key": "size", "value": "20", "description": "Records per page (max 100)" },
+                { "key": "aaqilTypeId", "value": "", "disabled": true, "description": "Filter by aaqil type ID (optional)" },
+                { "key": "regionId", "value": "", "disabled": true, "description": "Filter by region ID (optional)" },
+                { "key": "districtId", "value": "", "disabled": true, "description": "Filter by district ID (optional)" },
+                { "key": "cityId", "value": "", "disabled": true, "description": "Filter by city ID (optional)" },
+                { "key": "statusId", "value": "", "disabled": true, "description": "Filter by status ID (optional)" },
+                { "key": "isActive", "value": "", "disabled": true, "description": "Filter by active status true/false (optional)" }
+              ]
+            },
+            "description": "Fetches a paginated list of Aaqils with optional filters. All filter params are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Aaqil Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Status changed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('status');",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains aaqil data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('isActive');",
+                  "    pm.expect(jsonData.data).to.have.property('updatedAt');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/status/{{aaqil_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "aaqils", "status", "{{aaqil_id}}"]
+            },
+            "description": "Toggles isActive for an Aaqil. No request body needed.\n\nNote: If a soft-deleted record is reactivated (isActive → true), isDeleted is also reset to false automatically."
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Aaqil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Aaqil deleted successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/delete/{{aaqil_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hr", "aaqils", "delete", "{{aaqil_id}}"]
+            },
+            "description": "Soft-deletes an Aaqil record. Sets isDeleted=true and isActive=false. Record remains in database and can be reactivated via the Change Status endpoint."
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing Aaqils (Traditional Leaders) in the HR module."
+    },
+    {
+      "name": "Portal User Management",
+      "item": [
+        {
+          "name": "Create Portal User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set('user_id', jsonData.data.id);",
+                  "        console.log('✓ Portal User ID saved:', jsonData.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"john_portal_user\",\n  \"genderId\": 1,\n  \"roleId\": 1,\n  \"phone\": \"201001234567\",\n  \"email\": \"john.user@example.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 1,\n  \"referenceId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/portal/users/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "users", "save"]
+            },
+            "description": "Creates a new Portal User record. The response ID is automatically saved to 'user_id'.\n\nRequired Fields:\n- userName: String (max 150 chars)\n- genderId: Long\n- roleId: Long\n- phone: String (9-20 chars, digits + symbols: +, -, spaces, parentheses)\n- email: String (valid email, max 150 chars)\n- departmentId: Long\n- regionId: Long\n- districtId: Long\n- cityId: Long\n\nOptional Fields:\n- photoPath: String (max 500 chars)\n- faculty: String (max 100 chars)\n- portalUserTypeId: Long\n- referenceId: Long"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Portal User created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"userName\": \"john_portal_user\",\n    \"genderId\": 1,\n    \"roleId\": 1,\n    \"phone\": \"201001234567\",\n    \"email\": \"john.user@example.com\",\n    \"photoPath\": \"https://example.com/photo.jpg\",\n    \"faculty\": \"Engineering\",\n    \"departmentId\": 1,\n    \"regionId\": 1,\n    \"districtId\": 1,\n    \"cityId\": 1,\n    \"portalUserTypeId\": 1,\n    \"referenceId\": 1,\n    \"isActive\": true,\n    \"isDeleted\": false,\n    \"createdAt\": \"2026-06-10T10:30:45\",\n    \"createdBy\": null,\n    \"updatedAt\": \"2026-06-10T10:30:45\",\n    \"updatedBy\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Portal User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{user_id}},\n  \"userName\": \"john_portal_user_updated\",\n  \"genderId\": 2,\n  \"roleId\": 2,\n  \"phone\": \"201001234568\",\n  \"email\": \"john.user.updated@example.com\",\n  \"photoPath\": \"https://example.com/photo-updated.jpg\",\n  \"faculty\": \"Medicine\",\n  \"departmentId\": 2,\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"portalUserTypeId\": 2,\n  \"referenceId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/portal/users/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "users", "save"]
+            },
+            "description": "Updates an existing Portal User. Must include 'id' in the request body."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Portal User by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains user data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/portal/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "users", "{{user_id}}"]
+            },
+            "description": "Fetches a single Portal User by ID. Excludes soft-deleted records."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Portal Users (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "    pm.expect(jsonData.data.content).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/portal/users?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "users"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Page number (0-indexed)" },
+                { "key": "size", "value": "20", "description": "Records per page (max 100)" }
+              ]
+            },
+            "description": "Fetches a paginated list of Portal Users. All filter params are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Portal User Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Status changed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/portal/users/status/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "users", "status", "{{user_id}}"]
+            },
+            "description": "Toggles isActive for a Portal User. No request body needed."
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Portal User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Portal User deleted successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/portal/users/delete/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "users", "delete", "{{user_id}}"]
+            },
+            "description": "Soft-deletes a Portal User. Record remains in database but is marked as deleted."
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing Portal Users."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request setup",
+          "// Add authentication headers or common setup here if needed"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/nec",
+      "type": "string",
+      "description": "Base URL of the NEC Middleware API"
+    },
+    {
+      "key": "trainee_id",
+      "value": "1",
+      "type": "string",
+      "description": "University Trainee ID - auto-set from create response"
+    },
+    {
+      "key": "agent_id",
+      "value": "1",
+      "type": "string",
+      "description": "Political Party Agent ID - auto-set from create response"
+    },
+    {
+      "key": "aaqil_id",
+      "value": "1",
+      "type": "string",
+      "description": "Aaqil ID - auto-set from create response"
+    },
+    {
+      "key": "user_id",
+      "value": "1",
+      "type": "string",
+      "description": "Portal User ID - auto-set from create response"
+    }
+  ]
+}

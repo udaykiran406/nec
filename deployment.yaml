@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academic-mgmt-service
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: academic-mgmt-service
+  template:
+    metadata:
+      labels:
+        app: academic-mgmt-service
+    spec:
+      containers:
+      - name: academic-mgmt
+        image: localhost/academic-mgmt-data:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: dev
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://mysql.database.svc.cluster.local:3306/emis?useSSL=false&serverTimezone=UTC"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: appuser
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: AppUserPwd
+        livenessProbe:
+          httpGet:
+            path: /ams/actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          failureThreshold: 3
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ams/actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /ams/actuator/health
+            port: 8080
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          failureThreshold: 30
+          timeoutSeconds: 5

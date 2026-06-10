@@ -1,0 +1,79 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /ams
+spring:
+  datasource:
+    url: jdbc:mysql://mysql.database.svc.cluster.local:3306/emis?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&createDatabaseIfNotExist=true
+    username: appuser
+    password: AppUserPwd
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      initialization-fail-timeout: 0
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  main:
+    allow-bean-definition-overriding: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 50MB
+
+  jackson:
+    default-property-inclusion: NON_NULL
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+      accept-empty-string-as-null-object: false
+
+logging:
+  level:
+    com.nec.middleware: INFO
+    com.nec.middleware.controller: INFO
+    com.nec.middleware.service: INFO
+    com.nec.middleware.repository: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+# Admin Registration API Configuration
+admin:
+  registration:
+    api:
+      url: https://api-dev.moeplstate.so/auth/api/v1/users/admin-register
+
+
+# File Upload – VM path for dev environment
+file:
+  upload-dir: /opt/app/uploads/aams

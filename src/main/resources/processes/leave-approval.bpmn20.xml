@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.flowable.org/processdef"
+             xsi:schemaLocation="
+               http://www.omg.org/spec/BPMN/20100524/MODEL
+               http://www.omg.org/spec/BPMN/20100524/MODEL/BPMN20.xsd">
+
+    <process id="leaveProcess" name="Leave Approval" isExecutable="true">
+
+        <!-- ── Start ──────────────────────────────────────────────────── -->
+        <startEvent id="start"/>
+        <sequenceFlow sourceRef="start" targetRef="saveLeaveTask"/>
+
+        <!-- ── Step 1: Save Leave Request to DB ───────────────────────── -->
+        <serviceTask id="saveLeaveTask"
+                     name="Save Leave Request"
+                     flowable:delegateExpression="${saveLeaveDelegate}"/>
+        <sequenceFlow sourceRef="saveLeaveTask" targetRef="managerApproval"/>
+
+        <!-- ── Step 2: Manager Approval (human user task) ─────────────── -->
+        <userTask id="managerApproval"
+                  name="Manager Approval"
+                  flowable:assignee="${manager}"/>
+        <sequenceFlow sourceRef="managerApproval" targetRef="managerDecision"/>
+
+        <!-- ── Step 3: Manager Decision Gateway ───────────────────────── -->
+        <exclusiveGateway id="managerDecision" name="Manager Decision"/>
+
+        <!-- Path A: Manager rejected -->
+        <sequenceFlow id="managerRejected"
+                      sourceRef="managerDecision"
+                      targetRef="markRejectedByManager">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${managerApproved == false}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- Path B: Manager approved, short leave (days <= 2) -->
+        <sequenceFlow id="managerApprovedShort"
+                      sourceRef="managerDecision"
+                      targetRef="markApprovedByManager">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${managerApproved == true && days <= 2}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- Path C: Manager approved, long leave (days > 2) — needs HR -->
+        <sequenceFlow id="managerApprovedLong"
+                      sourceRef="managerDecision"
+                      targetRef="hrApproval">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${managerApproved == true && days > 2}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- ── Step 4a: Mark Approved by Manager ──────────────────────── -->
+        <serviceTask id="markApprovedByManager"
+                     name="Mark Approved"
+                     flowable:delegateExpression="${approveLeaveDelegate}"/>
+        <sequenceFlow sourceRef="markApprovedByManager" targetRef="approvedEnd"/>
+
+        <!-- ── Step 4b: Mark Rejected by Manager ──────────────────────── -->
+        <serviceTask id="markRejectedByManager"
+                     name="Mark Rejected"
+                     flowable:delegateExpression="${rejectLeaveDelegate}"/>
+        <sequenceFlow sourceRef="markRejectedByManager" targetRef="rejectedEnd"/>
+
+        <!-- ── Step 5: HR Approval (human user task, long leave only) ─── -->
+        <userTask id="hrApproval"
+                  name="HR Approval"
+                  flowable:assignee="${hr}"/>
+        <sequenceFlow sourceRef="hrApproval" targetRef="hrDecision"/>
+
+        <!-- ── Step 6: HR Decision Gateway ────────────────────────────── -->
+        <exclusiveGateway id="hrDecision" name="HR Decision"/>
+
+        <!-- Path D: HR approved -->
+        <sequenceFlow id="hrApprovedPath"
+                      sourceRef="hrDecision"
+                      targetRef="markApprovedByHr">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hrApproved == true}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- Path E: HR rejected -->
+        <sequenceFlow id="hrRejectedPath"
+                      sourceRef="hrDecision"
+                      targetRef="markRejectedByHr">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hrApproved == false}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- ── Step 7a: Mark Approved by HR ───────────────────────────── -->
+        <serviceTask id="markApprovedByHr"
+                     name="Mark Approved"
+                     flowable:delegateExpression="${approveLeaveDelegate}"/>
+        <sequenceFlow sourceRef="markApprovedByHr" targetRef="approvedEnd"/>
+
+        <!-- ── Step 7b: Mark Rejected by HR ───────────────────────────── -->
+        <serviceTask id="markRejectedByHr"
+                     name="Mark Rejected"
+                     flowable:delegateExpression="${rejectLeaveDelegate}"/>
+        <sequenceFlow sourceRef="markRejectedByHr" targetRef="rejectedEnd"/>
+
+        <!-- ── End Events ──────────────────────────────────────────────── -->
+        <endEvent id="approvedEnd" name="Leave Approved"/>
+        <endEvent id="rejectedEnd" name="Leave Rejected"/>
+
+    </process>
+</definitions>
