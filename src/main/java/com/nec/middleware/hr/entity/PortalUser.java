@@ -25,6 +25,9 @@ public class PortalUser extends AuditableEntity {
     @Column(name = "user_name", nullable = false, length = 150)
     private String userName;
 
+    @Column(name = "code", nullable = false, unique = true, length = 20)
+    private String code;
+
     @Column(name = "gender_id", nullable = false)
     private Long genderId;
 

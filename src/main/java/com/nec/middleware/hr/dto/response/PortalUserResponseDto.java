@@ -13,6 +13,7 @@ public class PortalUserResponseDto {
 
     private Long id;
     private String userName;
+    private String code;
     private Long genderId;
     private Long roleId;
     private String phone;

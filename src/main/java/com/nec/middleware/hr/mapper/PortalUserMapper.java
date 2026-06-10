@@ -61,6 +61,7 @@ public class PortalUserMapper {
     public PortalUserResponseDto toResponseDto(com.nec.middleware.portal.entity.PortalUser entity) {
         return PortalUserResponseDto.builder()
                 .id(entity.getId())
+                .code(entity.getCode())
                 .userName(entity.getUserName())
                 .genderId(entity.getGenderId())
                 .roleId(entity.getRoleId())

@@ -2,7 +2,6 @@ package com.nec.middleware.hr.service.impl;
 
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.exception.ValidationException;
-
 import com.nec.middleware.hr.constant.PortalUserConstants;
 import com.nec.middleware.hr.dto.request.PortalUserListRequestDto;
 import com.nec.middleware.hr.mapper.PortalUserMapper;
@@ -25,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PortalUserServiceImpl implements PortalUserService {
 
+    private static final String CODE_PREFIX = "PU";
+    private static final int    CODE_PAD    = 3;
+
     private final PortalUserRepository repository;
     private final PortalUserMapper mapper;
 
@@ -41,6 +43,8 @@ public class PortalUserServiceImpl implements PortalUserService {
 
             log.info("Creating portal user");
             entity = mapper.toEntity(requestDto);
+            entity.setCode(generateCode());
+
 
         } else {
 
@@ -120,6 +124,21 @@ public class PortalUserServiceImpl implements PortalUserService {
         log.info("Portal user soft deleted with id: {}", id);
     }
 
+// ------------------------------------------------------------------
+    // Code generation
+    // ------------------------------------------------------------------
+
+    /**
+     * Reads the current max numeric suffix stored in the DB and returns the
+     * next code, e.g. if the highest is PU007 this returns PU008.
+     * The call is made inside a @Transactional method, so it is safe under
+     * concurrent load (the subsequent save will fail on the unique constraint
+     * in the extreme race-condition case, which can be retried at the API level).
+     */
+    private String generateCode() {
+        int next = repository.findMaxCodeSequence() + 1;
+        return CODE_PREFIX + String.format("%0" + CODE_PAD + "d", next);
+    }
     // ------------------------------------------------------------------
     // Validation
     // ------------------------------------------------------------------
