@@ -50,6 +50,6 @@ public class AaqilRequestDto {
     private Long statusId;
 
     // Audit — populated from security context in the service layer
-    private Long createdBy;
-    private Long updatedBy;
+    private String createdBy;
+    private String updatedBy;
 }

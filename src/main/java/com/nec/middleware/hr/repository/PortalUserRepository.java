@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.repository;
 
+import com.nec.middleware.hr.entity.PortalUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,24 +11,21 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PortalUserRepository extends JpaRepository<com.nec.middleware.portal.entity.PortalUser, Long> {
+public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
 
     /**
      * Find active (non-deleted) record by id
      */
-    Optional<com.nec.middleware.portal.entity.PortalUser> findByIdAndIsDeletedFalse(Long id);
+    Optional<PortalUser> findByPortalUserIdAndIsActiveTrue(String portalUserId);
+
+    Optional<PortalUser> findByPortalUserIdAndIsDeletedFalse(String portalUserId);
 
     // ------------------------------------------------------------------ Duplicate checks (CREATE)
 
-    boolean existsByPhoneAndIsDeletedFalse(String phone);
+    boolean existsByPhoneAndIsActiveTrue(String phone);
 
-    boolean existsByEmailAndIsDeletedFalse(String email);
+    boolean existsByEmailAndIsActiveTrue(String email);
 
-    // ------------------------------------------------------------------ Duplicate checks (UPDATE — exclude self)
-
-    boolean existsByPhoneAndIsDeletedFalseAndIdNot(String phone, Long id);
-
-    boolean existsByEmailAndIsDeletedFalseAndIdNot(String email, Long id);
 // ------------------------------------------------------------------ Code generation helper
 
     /**
@@ -35,7 +33,7 @@ public interface PortalUserRepository extends JpaRepository<com.nec.middleware.p
      * or 0 if no records exist yet.
      * Example stored codes: PU001, PU002 → returns 2.
      */
-    @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(u.code, 3) AS int)), 0) FROM PortalUser u WHERE u.code LIKE 'PU%'")
+    @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(u.portalUserId, 3) AS int)), 0) FROM PortalUser u WHERE u.portalUserId LIKE 'PU%'")
     int findMaxCodeSequence();
 
     // ------------------------------------------------------------------ Filtered paginated list
@@ -47,28 +45,33 @@ public interface PortalUserRepository extends JpaRepository<com.nec.middleware.p
      * Null parameters are treated as "no filter".
      */
     @Query("""
-            SELECT u FROM PortalUser u
-            WHERE u.isDeleted = false
-              AND (:roleId           IS NULL OR u.roleId           = :roleId)
-              AND (:genderId         IS NULL OR u.genderId         = :genderId)
-              AND (:departmentId     IS NULL OR u.departmentId     = :departmentId)
-              AND (:regionId         IS NULL OR u.regionId         = :regionId)
-              AND (:districtId       IS NULL OR u.districtId       = :districtId)
-              AND (:cityId           IS NULL OR u.cityId           = :cityId)
-              AND (:portalUserTypeId IS NULL OR u.portalUserTypeId = :portalUserTypeId)
-              AND (:referenceId      IS NULL OR u.referenceId      = :referenceId)
-              AND (:isActive         IS NULL OR u.isActive         = :isActive)
-            """)
-    Page<com.nec.middleware.portal.entity.PortalUser> findAllWithFilters(
-            @Param("roleId")           Long roleId,
-            @Param("genderId")         Long genderId,
-            @Param("departmentId")     Long departmentId,
-            @Param("regionId")         Long regionId,
-            @Param("districtId")       Long districtId,
-            @Param("cityId")           Long cityId,
+    SELECT u
+    FROM PortalUser u
+    WHERE u.isDeleted = false
+       AND (:userName IS NULL OR u.userName LIKE %:userName%)
+      AND (:portalUserId IS NULL OR u.portalUserId LIKE %:portalUserId%)
+      AND (:roleId IS NULL OR u.roleId = :roleId)
+      AND (:genderId IS NULL OR u.genderId = :genderId)
+      AND (:universityId IS NULL OR u.universityId = :universityId)
+      AND (:regionId IS NULL OR u.regionId = :regionId)
+      AND (:districtId IS NULL OR u.districtId = :districtId)
+      AND (:cityId IS NULL OR u.cityId = :cityId)
+      AND (:portalUserTypeId IS NULL OR u.portalUserTypeId = :portalUserTypeId)
+      AND (:isActive IS NULL OR u.isActive = :isActive)
+""")
+    Page<PortalUser> findAllWithFilters(
+            @Param("userName") String userName,
+            @Param("portalUserId") String portalUserId,
+            @Param("roleId") Long roleId,
+            @Param("genderId") Long genderId,
+            @Param("universityId") Long universityId,
+            @Param("regionId") Long regionId,
+            @Param("districtId") Long districtId,
+            @Param("cityId") Long cityId,
             @Param("portalUserTypeId") Long portalUserTypeId,
-            @Param("referenceId")      Long referenceId,
-            @Param("isActive")         Boolean isActive,
+            @Param("isActive") Boolean isActive,
             Pageable pageable
     );
+
+
 }

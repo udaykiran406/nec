@@ -1,4 +1,4 @@
-package com.nec.middleware.portal.dto.request;
+package com.nec.middleware.hr.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -12,6 +12,8 @@ public class PortalUserRequestDto {
 
     // null → CREATE, non-null → UPDATE
     private Long id;
+
+    private String portalUserId;
 
     @NotBlank(message = "User name is required")
     @Size(max = 150, message = "User name must not exceed 150 characters")
@@ -39,8 +41,8 @@ public class PortalUserRequestDto {
     @Size(max = 100, message = "Faculty must not exceed 100 characters")
     private String faculty;
 
-    @NotNull(message = "Department is required")
-    private Long departmentId;
+    @NotNull(message = "University is required")
+    private Long universityId;
 
     @NotNull(message = "Region is required")
     private Long regionId;
@@ -53,9 +55,9 @@ public class PortalUserRequestDto {
 
     private Long portalUserTypeId;
 
-    private Long referenceId;
+//    private Long referenceId;
 
     // Audit — populated from security context in the service layer
-    private Long createdBy;
-    private Long updatedBy;
+    private String createdBy;
+    private String updatedBy;
 }

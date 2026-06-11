@@ -1,4 +1,4 @@
-package com.nec.middleware.common.entity;
+package com.nec.middleware.hr.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -32,7 +32,7 @@ public abstract class AuditableEntity {
 
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
-    private Long createdBy;
+    private String createdBy;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -40,7 +40,7 @@ public abstract class AuditableEntity {
 
     @LastModifiedBy
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private String updatedBy;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)

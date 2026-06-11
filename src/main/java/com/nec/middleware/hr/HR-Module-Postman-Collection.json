@@ -732,234 +732,93 @@
       "item": [
         {
           "name": "Create Portal User",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201 Created\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(201);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has success status\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.be.an('object');",
-                  "});",
-                  "",
-                  "if (pm.response.code === 201) {",
-                  "    var jsonData = pm.response.json();",
-                  "    if (jsonData.data && jsonData.data.id) {",
-                  "        pm.environment.set('user_id', jsonData.data.id);",
-                  "        console.log('✓ Portal User ID saved:', jsonData.data.id);",
-                  "    }",
-                  "}"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Accept", "value": "application/json", "type": "text" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userName\": \"john_portal_user\",\n  \"genderId\": 1,\n  \"roleId\": 1,\n  \"phone\": \"201001234567\",\n  \"email\": \"john.user@example.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 1,\n  \"referenceId\": 1\n}"
+              "raw": "{\n  \"userName\": \"john_portal_user\",\n  \"genderId\": 1,\n  \"roleId\": 1,\n  \"phone\": \"252631234567\",\n  \"email\": \"john.user@example.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"universityId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 1,\n  \"createdBy\": 1\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/portal/users/save",
+              "raw": "{{base_url}}/api/portal/saveUser",
               "host": ["{{base_url}}"],
-              "path": ["api", "portal", "users", "save"]
-            },
-            "description": "Creates a new Portal User record. The response ID is automatically saved to 'user_id'.\n\nRequired Fields:\n- userName: String (max 150 chars)\n- genderId: Long\n- roleId: Long\n- phone: String (9-20 chars, digits + symbols: +, -, spaces, parentheses)\n- email: String (valid email, max 150 chars)\n- departmentId: Long\n- regionId: Long\n- districtId: Long\n- cityId: Long\n\nOptional Fields:\n- photoPath: String (max 500 chars)\n- faculty: String (max 100 chars)\n- portalUserTypeId: Long\n- referenceId: Long"
-          },
-          "response": [
-            {
-              "name": "Success Response",
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "json",
-              "header": [{ "key": "Content-Type", "value": "application/json" }],
-              "body": "{\n  \"success\": true,\n  \"message\": \"Portal User created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"userName\": \"john_portal_user\",\n    \"genderId\": 1,\n    \"roleId\": 1,\n    \"phone\": \"201001234567\",\n    \"email\": \"john.user@example.com\",\n    \"photoPath\": \"https://example.com/photo.jpg\",\n    \"faculty\": \"Engineering\",\n    \"departmentId\": 1,\n    \"regionId\": 1,\n    \"districtId\": 1,\n    \"cityId\": 1,\n    \"portalUserTypeId\": 1,\n    \"referenceId\": 1,\n    \"isActive\": true,\n    \"isDeleted\": false,\n    \"createdAt\": \"2026-06-10T10:30:45\",\n    \"createdBy\": null,\n    \"updatedAt\": \"2026-06-10T10:30:45\",\n    \"updatedBy\": null\n  }\n}"
+              "path": ["api", "portal", "saveUser"]
             }
-          ]
+          }
+        },
+        {
+          "name": "Get Portal User by portalUserId",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/portal/{{portal_user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "{{portal_user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Portal Users (Paginated + Filtered)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/portal/getAllPortalUsers?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portal", "getAllPortalUsers"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "userName", "value": "", "disabled": true },
+                { "key": "portalUserId", "value": "", "disabled": true },
+                { "key": "roleId", "value": "", "disabled": true },
+                { "key": "genderId", "value": "", "disabled": true },
+                { "key": "universityId", "value": "", "disabled": true },
+                { "key": "regionId", "value": "", "disabled": true },
+                { "key": "districtId", "value": "", "disabled": true },
+                { "key": "cityId", "value": "", "disabled": true },
+                { "key": "portalUserTypeId", "value": "", "disabled": true },
+                { "key": "isActive", "value": "", "disabled": true }
+              ]
+            }
+          }
         },
         {
           "name": "Update Portal User",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has success status\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.message).to.include('updated');",
-                  "});"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "Accept", "value": "application/json", "type": "text" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": {{user_id}},\n  \"userName\": \"john_portal_user_updated\",\n  \"genderId\": 2,\n  \"roleId\": 2,\n  \"phone\": \"201001234568\",\n  \"email\": \"john.user.updated@example.com\",\n  \"photoPath\": \"https://example.com/photo-updated.jpg\",\n  \"faculty\": \"Medicine\",\n  \"departmentId\": 2,\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"portalUserTypeId\": 2,\n  \"referenceId\": 2\n}"
+              "raw": "{\n  \"userName\": \"john_updated\",\n  \"genderId\": 2,\n  \"roleId\": 2,\n  \"phone\": \"252631234568\",\n  \"email\": \"john.updated@example.com\",\n  \"photoPath\": \"https://example.com/photo-updated.jpg\",\n  \"faculty\": \"Medicine\",\n  \"universityId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 1,\n  \"updatedBy\": 1\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/portal/users/save",
+              "raw": "{{base_url}}/api/portal/update/{{portal_user_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "portal", "users", "save"]
-            },
-            "description": "Updates an existing Portal User. Must include 'id' in the request body."
-          },
-          "response": []
-        },
-        {
-          "name": "Get Portal User by ID",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response contains user data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('id');",
-                  "});"
-                ]
-              }
+              "path": ["api", "portal", "update", "{{portal_user_id}}"]
             }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
-            "url": {
-              "raw": "{{base_url}}/api/portal/users/{{user_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "portal", "users", "{{user_id}}"]
-            },
-            "description": "Fetches a single Portal User by ID. Excludes soft-deleted records."
-          },
-          "response": []
-        },
-        {
-          "name": "Get All Portal Users (Paginated)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response is paginated\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.be.an('object');",
-                  "    pm.expect(jsonData.data.content).to.be.an('array');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
-            "url": {
-              "raw": "{{base_url}}/api/portal/users?page=0&size=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "portal", "users"],
-              "query": [
-                { "key": "page", "value": "0", "description": "Page number (0-indexed)" },
-                { "key": "size", "value": "20", "description": "Records per page (max 100)" }
-              ]
-            },
-            "description": "Fetches a paginated list of Portal Users. All filter params are optional."
-          },
-          "response": []
-        },
-        {
-          "name": "Change Portal User Status",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Status changed successfully\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.message).to.include('status');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
-            "url": {
-              "raw": "{{base_url}}/api/portal/users/status/{{user_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "portal", "users", "status", "{{user_id}}"]
-            },
-            "description": "Toggles isActive for a Portal User. No request body needed."
-          },
-          "response": []
+          }
         },
         {
           "name": "Soft Delete Portal User",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Portal User deleted successfully\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.message).to.include('deleted');",
-                  "});"
-                ]
-              }
-            }
-          ],
           "request": {
-            "method": "POST",
-            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
             "url": {
-              "raw": "{{base_url}}/api/portal/users/delete/{{user_id}}",
+              "raw": "{{base_url}}/api/portal/delete/{{portal_user_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "portal", "users", "delete", "{{user_id}}"]
-            },
-            "description": "Soft-deletes a Portal User. Record remains in database but is marked as deleted."
-          },
-          "response": []
+              "path": ["api", "portal", "delete", "{{portal_user_id}}"]
+            }
+          }
         }
-      ],
-      "description": "All endpoints for managing Portal Users."
+      ]
     }
   ],
   "event": [
@@ -1000,10 +859,10 @@
       "description": "Aaqil ID - auto-set from create response"
     },
     {
-      "key": "user_id",
-      "value": "1",
+      "key": "portal_user_id",
+      "value": "PU001",
       "type": "string",
-      "description": "Portal User ID - auto-set from create response"
+      "description": "Portal User business ID e.g. PU001 — used in GET/UPDATE/DELETE"
     }
   ]
 }

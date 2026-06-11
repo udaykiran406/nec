@@ -11,14 +11,16 @@ import lombok.*;
 @Builder
 public class PortalUserListRequestDto {
 
+    private String portalUserId;
+    private String userName;
     private Long roleId;
     private Long genderId;
-    private Long departmentId;
+    private Long universityId;
     private Long regionId;
     private Long districtId;
     private Long cityId;
     private Long portalUserTypeId;
-    private Long referenceId;
+//    private Long referenceId;
     private Boolean isActive;
 
     // Pagination

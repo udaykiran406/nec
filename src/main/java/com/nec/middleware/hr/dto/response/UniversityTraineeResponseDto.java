@@ -29,8 +29,8 @@ public class UniversityTraineeResponseDto {
     private Long          statusId;
     private Boolean       isActive;
     private Boolean       isDeleted;
-    private Long          createdBy;
+    private String          createdBy;
     private LocalDateTime createdAt;
-    private Long          updatedBy;
+    private String          updatedBy;
     private LocalDateTime updatedAt;
 }

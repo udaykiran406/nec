@@ -1,19 +1,22 @@
 package com.nec.middleware.hr.service;
 
 import com.nec.middleware.hr.dto.request.PortalUserListRequestDto;
-import com.nec.middleware.portal.dto.request.PortalUserRequestDto;
-import com.nec.middleware.portal.dto.response.PortalUserResponseDto;
+
+import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
+import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 import org.springframework.data.domain.Page;
 
 public interface PortalUserService {
 
-    PortalUserResponseDto saveOrUpdate(PortalUserRequestDto requestDto);
+    PortalUserResponseDto createPortalUser(PortalUserRequestDto requestDto);
 
-    PortalUserResponseDto getById(Long id);
+    PortalUserResponseDto getUserByPortalUserId(String portalUserId);
 
-    Page<PortalUserResponseDto> getAll(PortalUserListRequestDto filterDto);
+    Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto filterDto);
 
-    PortalUserResponseDto changeStatus(Long id);
+    PortalUserResponseDto softDelete(String portalUserId);
 
-    void softDelete(Long id);
+
+
+    PortalUserResponseDto updatePortalUser(String portalUserId, PortalUserRequestDto request);
 }

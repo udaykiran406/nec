@@ -1,4 +1,4 @@
-package com.nec.middleware.hr.config;
+package com.nec.middleware.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ import java.util.Optional;
 public class JpaAuditConfig {
 
     @Bean
-    public AuditorAware<Long> auditorProvider() {
-        return () -> Optional.of(1L);
+    public AuditorAware<String> auditorProvider() {
+        return () -> Optional.of("admin");
     }
 }

@@ -1,7 +1,6 @@
-package com.nec.middleware.portal.dto.response;
+package com.nec.middleware.hr.dto.response;
 
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,27 +10,46 @@ import java.time.LocalDateTime;
 @Builder
 public class PortalUserResponseDto {
 
+    // ------------------------------------------------------------------ Identity
     private Long id;
+    private String portalUserId;
     private String userName;
-    private String code;
-    private Long genderId;
-    private Long roleId;
     private String phone;
     private String email;
     private String photoPath;
     private String faculty;
-    private Long departmentId;
-    private Long regionId;
-    private Long districtId;
-    private Long cityId;
-    private Long portalUserTypeId;
-    private Long referenceId;
 
-    // Audit fields
+    // ------------------------------------------------------------------ Lookup FKs (ID + resolved name)
+    private Long genderId;
+    private String genderName;
+
+    private Long roleId;
+    private String roleName;
+
+    private Long portalUserTypeId;
+    private String portalUserTypeName;
+
+    // ------------------------------------------------------------------ Master Data FKs (ID + resolved name)
+    private Long universityId;
+    private String universityName;
+
+    private Long regionId;
+    private String regionName;
+
+    private Long districtId;
+    private String districtName;
+
+    private Long cityId;
+    private String cityName;
+
+//    private Long referenceId;
+//    private String referenceName;
+
+    // ------------------------------------------------------------------ Audit
     private Boolean isActive;
     private Boolean isDeleted;
-    private Long createdBy;
+    private String createdBy;
     private LocalDateTime createdAt;
-    private Long updatedBy;
+    private String updatedBy;
     private LocalDateTime updatedAt;
 }

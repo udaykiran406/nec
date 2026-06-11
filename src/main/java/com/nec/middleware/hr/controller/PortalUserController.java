@@ -3,11 +3,11 @@ package com.nec.middleware.hr.controller;
 import com.nec.middleware.hr.constant.PortalUserConstants;
 
 import com.nec.middleware.hr.dto.request.PortalUserListRequestDto;
+import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 
 import com.nec.middleware.hr.service.PortalUserService;
-import com.nec.middleware.portal.dto.request.PortalUserRequestDto;
-import com.nec.middleware.portal.dto.response.PortalUserResponseDto;
+import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,71 +25,75 @@ import org.springframework.web.bind.annotation.*;
         description = "Portal User Management APIs"
 )
 @RestController
-@RequestMapping("/api/portal/users")
+@RequestMapping("/api/portal")
 @RequiredArgsConstructor
 public class PortalUserController {
 
-    private final PortalUserService service;
+    private final PortalUserService  portalUserService;
 
-    // ------------------------------------------------------------------ POST: Save / Update
+    // ------------------------------------------------------------------ POST: Create
 
-    @Operation(summary = "Save or Update Portal User")
-    @PostMapping("/save")
-    public ResponseEntity<ApiResponse<PortalUserResponseDto>> saveOrUpdate(
+    @Operation(summary = "Create Portal User")
+    @PostMapping("/saveUser")
+    public ResponseEntity<ApiResponse<PortalUserResponseDto>> savePortalUser(
             @Valid @RequestBody PortalUserRequestDto requestDto) {
 
-        PortalUserResponseDto response = service.saveOrUpdate(requestDto);
-
-        boolean isCreate = requestDto.getId() == null;
-        String message   = isCreate
-                ? PortalUserConstants.USER_CREATED
-                : PortalUserConstants.USER_UPDATED;
-
-        return isCreate
-                ? ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(message, response))
-                : ResponseEntity.ok(ApiResponse.success(message, response));
+        PortalUserResponseDto response = portalUserService.createPortalUser(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created(PortalUserConstants.USER_CREATED, response));
     }
 
-    // ------------------------------------------------------------------ GET: By ID
+    // ------------------------------------------------------------------ GET: By portalUserId
 
-    @Operation(summary = "Get Portal User by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PortalUserResponseDto>> getById(@PathVariable Long id) {
+    @Operation(summary = "Get Portal User by Portal User ID")
+    @GetMapping("/{portalUserId}")
+    public ResponseEntity<ApiResponse<PortalUserResponseDto>> getByPortalUserId(
+            @PathVariable String portalUserId) {
+
         return ResponseEntity.ok(
-                ApiResponse.success(PortalUserConstants.USER_FETCHED, service.getById(id)));
+                ApiResponse.success(
+                        PortalUserConstants.USER_FETCHED,
+                        portalUserService.getUserByPortalUserId(portalUserId)));
     }
 
     // ------------------------------------------------------------------ GET: List
 
     @Operation(summary = "Get Paginated & Filtered Portal User List")
-    @GetMapping
-    public ResponseEntity<ApiResponse<Page<PortalUserResponseDto>>> getAll(
+    @GetMapping("/getAllPortalUsers")
+    public ResponseEntity<ApiResponse<Page<PortalUserResponseDto>>> getAllPortalUsers(
             @ModelAttribute PortalUserListRequestDto filterDto) {
 
         return ResponseEntity.ok(
-                ApiResponse.success(PortalUserConstants.USER_LIST_FETCHED, service.getAll(filterDto)));
+                ApiResponse.success(
+                        PortalUserConstants.USER_LIST_FETCHED,
+                        portalUserService.getAllPortalUsers(filterDto)));
     }
 
-    // ------------------------------------------------------------------ POST: Toggle Status
+    // ------------------------------------------------------------------ POST: Update
 
-    @Operation(summary = "Toggle Portal User Active Status")
-    @PostMapping("/status/{id}")
-    public ResponseEntity<ApiResponse<PortalUserResponseDto>> changeStatus(@PathVariable Long id) {
+    @Operation(summary = "Update Portal User")
+    @PostMapping("/update/{portalUserId}")
+    public ResponseEntity<ApiResponse<PortalUserResponseDto>> updatePortalUser(
+            @PathVariable String portalUserId,
+            @Valid @RequestBody PortalUserRequestDto requestDto) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        PortalUserConstants.USER_STATUS_CHANGED,
-                        service.changeStatus(id)));
+                        PortalUserConstants.USER_UPDATED,
+                        portalUserService.updatePortalUser(portalUserId, requestDto)));
     }
 
-    // ------------------------------------------------------------------ POST: Soft Delete
+    // ------------------------------------------------------------------ PATCH: Soft Delete
 
     @Operation(summary = "Soft Delete Portal User")
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<String>> softDelete(@PathVariable Long id) {
+    @PatchMapping("/delete/{portalUserId}")
+    public ResponseEntity<ApiResponse<PortalUserResponseDto>> softDelete(
+            @PathVariable String portalUserId) {
 
-        service.softDelete(id);
         return ResponseEntity.ok(
-                ApiResponse.success(PortalUserConstants.USER_DELETED, null));
+                ApiResponse.success(
+                        PortalUserConstants.USER_DELETED,
+                        portalUserService.softDelete(portalUserId)));
     }
 }
+

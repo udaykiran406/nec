@@ -1,6 +1,6 @@
 package com.nec.middleware.hr.entity;
 
-import com.nec.middleware.common.entity.AuditableEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
