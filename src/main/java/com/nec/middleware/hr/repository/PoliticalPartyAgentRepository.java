@@ -13,15 +13,15 @@ import java.util.Optional;
 @Repository
 public interface PoliticalPartyAgentRepository extends JpaRepository<PoliticalPartyAgent, Long> {
 
-    Optional<PoliticalPartyAgent> findByIdAndIsDeletedFalse(Long id);
+    Optional<PoliticalPartyAgent> findByIdAndIsActiveTrue(Long id);
 
     // Duplicate checks (CREATE)
-    boolean existsByEmailAndIsDeletedFalse(String email);
-    boolean existsByPhoneAndIsDeletedFalse(String phone);
+    boolean existsByEmailAndIsActiveTrue(String email);
+    boolean existsByPhoneAndIsActiveTrue(String phone);
 
     // Duplicate checks (UPDATE — exclude self)
-    boolean existsByEmailAndIsDeletedFalseAndIdNot(String email, Long id);
-    boolean existsByPhoneAndIsDeletedFalseAndIdNot(String phone, Long id);
+    boolean existsByEmailAndIsActiveTrueAndIdNot(String email, Long id);
+    boolean existsByPhoneAndIsActiveTrueAndIdNot(String phone, Long id);
 
     // Code generation helper
     @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(a.code, 3) AS int)), 0) FROM PoliticalPartyAgent a WHERE a.code LIKE 'PA%'")
@@ -29,8 +29,7 @@ public interface PoliticalPartyAgentRepository extends JpaRepository<PoliticalPa
 
     @Query("""
             SELECT a FROM PoliticalPartyAgent a
-            WHERE a.isDeleted = false
-              AND (:politicalPartyNameId IS NULL OR a.politicalPartyNameId = :politicalPartyNameId)
+            WHERE (:politicalPartyNameId IS NULL OR a.politicalPartyNameId = :politicalPartyNameId)
               AND (:pollingStationId     IS NULL OR a.pollingStationId     = :pollingStationId)
               AND (:regionId            IS NULL OR a.regionId             = :regionId)
               AND (:districtId          IS NULL OR a.districtId           = :districtId)

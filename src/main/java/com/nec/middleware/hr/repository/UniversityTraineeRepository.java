@@ -13,15 +13,15 @@ import java.util.Optional;
 @Repository
 public interface UniversityTraineeRepository extends JpaRepository<UniversityTrainee, Long> {
 
-    Optional<UniversityTrainee> findByIdAndIsDeletedFalse(Long id);
+    Optional<UniversityTrainee> findByIdAndIsActiveTrue(Long id);
 
     // Duplicate checks (CREATE)
-    boolean existsByEmailAndIsDeletedFalse(String email);
-    boolean existsByPhoneAndIsDeletedFalse(String phone);
+    boolean existsByEmailAndIsActiveTrue(String email);
+    boolean existsByPhoneAndIsActiveTrue(String phone);
 
     // Duplicate checks (UPDATE — exclude self)
-    boolean existsByEmailAndIsDeletedFalseAndIdNot(String email, Long id);
-    boolean existsByPhoneAndIsDeletedFalseAndIdNot(String phone, Long id);
+    boolean existsByEmailAndIsActiveTrueAndIdNot(String email, Long id);
+    boolean existsByPhoneAndIsActiveTrueAndIdNot(String phone, Long id);
 
     // Code generation helper
     @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(t.code, 3) AS int)), 0) FROM UniversityTrainee t WHERE t.code LIKE 'UT%'")
@@ -29,8 +29,7 @@ public interface UniversityTraineeRepository extends JpaRepository<UniversityTra
 
     @Query("""
             SELECT t FROM UniversityTrainee t
-            WHERE t.isDeleted = false
-              AND (:universityId IS NULL OR t.universityId = :universityId)
+            WHERE (:universityId IS NULL OR t.universityId = :universityId)
               AND (:regionId     IS NULL OR t.regionId     = :regionId)
               AND (:districtId   IS NULL OR t.districtId   = :districtId)
               AND (:cityId       IS NULL OR t.cityId       = :cityId)

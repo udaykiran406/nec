@@ -15,6 +15,7 @@ import com.nec.middleware.hr.repository.PortalUserRepository;
 import com.nec.middleware.hr.service.PortalUserService;
 
 
+import com.nec.middleware.hr.specification.PortalUserSearchSpecification;
 import com.nec.middleware.masterdata.repository.CityRepository;
 import com.nec.middleware.masterdata.repository.DistrictRepository;
 import com.nec.middleware.masterdata.repository.MasterDataRepository;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PortalUserServiceImpl implements PortalUserService {
 
-    private final PortalUserRepository repository;
+    private final PortalUserRepository portalUserrepository;
     private final PortalUserMapper mapper;
     private final MasterDataRepository regionRepository;
     private final DistrictRepository districtRepository;
@@ -50,29 +51,22 @@ public class PortalUserServiceImpl implements PortalUserService {
     public PortalUserResponseDto createPortalUser(PortalUserRequestDto portalUserRequest) {
 
 
-
         log.info("Creating portal user {}", portalUserRequest.getUserName());
         validateDuplicateUser(portalUserRequest);
-
-        PortalUser entity = mapper.toEntity(portalUserRequest);
-
-        entity.setPortalUserId(generateUserId(PortalUserConstants.CODE_PREFIX,PortalUserConstants.CODE_PAD));
-
+        PortalUser portalUserEntity = mapper.portalUserEntity(portalUserRequest);
+        portalUserEntity.setPortalUserId(generateUserId(PortalUserConstants.CODE_PREFIX, PortalUserConstants.CODE_PAD));
         // ---------------- LOOKUPS ----------------
-
-        entity.setGender(
+        portalUserEntity.setGender(
                 genderRepository.findById(portalUserRequest.getGenderId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Gender not found"))
         );
-
-        entity.setRole(
+        portalUserEntity.setRole(
                 roleRepository.findById(portalUserRequest.getRoleId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Role not found"))
         );
-
-        entity.setPortalUserType(
+        portalUserEntity.setPortalUserType(
                 portalUserTypeRepository.findById(
                                 portalUserRequest.getPortalUserTypeId())
                         .orElseThrow(() ->
@@ -80,37 +74,32 @@ public class PortalUserServiceImpl implements PortalUserService {
         );
 // ---------------- MASTER DATA ----------------
 
-        entity.setUniversity(
+        portalUserEntity.setUniversity(
                 universityRepository.findById(
                                 portalUserRequest.getUniversityId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("University not found"))
         );
-
-        entity.setRegion(
+        portalUserEntity.setRegion(
                 regionRepository.findById(
                                 portalUserRequest.getRegionId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Region not found"))
         );
-
-        entity.setDistrict(
+        portalUserEntity.setDistrict(
                 districtRepository.findById(
                                 portalUserRequest.getDistrictId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("District not found"))
         );
-
-        entity.setCity(
+        portalUserEntity.setCity(
                 cityRepository.findById(
                                 portalUserRequest.getCityId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("City not found"))
         );
-
-        PortalUser savedEntity = repository.save(entity);
-
-        return mapper.toResponseDto(savedEntity);
+        PortalUser savedEntity = portalUserrepository.save(portalUserEntity);
+        return mapper.portalUserResponseDto(savedEntity);
     }
 
 
@@ -119,33 +108,27 @@ public class PortalUserServiceImpl implements PortalUserService {
     @Override
     @Transactional(readOnly = true)
     public PortalUserResponseDto getUserByPortalUserId(String portalUserId) {
-        return mapper.toResponseDto(findByPortalUserIdAndIsActive(portalUserId));
+        return mapper.portalUserResponseDto(findByPortalUserIdAndIsActive(portalUserId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto filterDto) {
-        log.info("userName = {}", filterDto.getUserName());
-        log.info("portalUserId = {}", filterDto.getPortalUserId());
-        Pageable pageable = PageRequest.of(
-                filterDto.getPage(),
-                filterDto.getSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+    public Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto request, int page, int size) {
+        log.info("userName = {}", request.getUserName());
+        log.info("portalUserId = {}", request.getPortalUserId());
 
-        return repository.findAllWithFilters(
-                filterDto.getUserName(),
-                filterDto.getPortalUserId(),
-                filterDto.getRoleId(),
-                filterDto.getGenderId(),
-                filterDto.getUniversityId(),
-                filterDto.getRegionId(),
-                filterDto.getDistrictId(),
-                filterDto.getCityId(),
-                filterDto.getPortalUserTypeId(),
-                filterDto.getIsActive(),
-                pageable
-        ).map(mapper::toResponseDto);
+        if (request == null) {
+            request = new PortalUserListRequestDto();
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+        return portalUserrepository.findAll(
+                        PortalUserSearchSpecification.build(request),
+                        pageable)
+                .map(mapper::portalUserResponseDto);
     }
 
 // ------------------------------------------------------------------ UPDATE
@@ -155,14 +138,75 @@ public class PortalUserServiceImpl implements PortalUserService {
     @Transactional
     public PortalUserResponseDto updatePortalUser(
             String portalUserId,
-            PortalUserRequestDto requestDto) {
+            PortalUserRequestDto portalUserRequestDto) {
 
-        PortalUser entity = findByPortalUserId(portalUserId);
-        entity.setUpdatedBy(requestDto.getUpdatedBy());
+        PortalUser portalUser = findByPortalUserIdAndIsActive(portalUserId);
+        if (portalUserRequestDto.getGenderId() != null) {
+            portalUser.setGender(
+                    genderRepository.findById(
+                                    portalUserRequestDto.getGenderId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Gender not found"))
+            );
+        }
 
-        mapper.updateEntity(entity, requestDto);
+        if (portalUserRequestDto.getRoleId() != null) {
+            portalUser.setRole(
+                    roleRepository.findById(
+                                    portalUserRequestDto.getRoleId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Role not found"))
+            );
+        }
+        if (portalUserRequestDto.getPortalUserTypeId() != null) {
+            portalUser.setPortalUserType(
+                    portalUserTypeRepository.findById(
+                                    portalUserRequestDto.getPortalUserTypeId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Portal User Type not found"))
+            );
+        }
 
-        return mapper.toResponseDto(repository.save(entity));
+// ---------------- MASTER DATA ----------------
+
+        if (portalUserRequestDto.getUniversityId() != null) {
+            portalUser.setUniversity(
+                    universityRepository.findById(
+                                    portalUserRequestDto.getUniversityId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("University not found"))
+            );
+        }
+
+        if (portalUserRequestDto.getRegionId() != null) {
+            portalUser.setRegion(
+                    regionRepository.findById(
+                                    portalUserRequestDto.getRegionId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Region not found"))
+            );
+        }
+
+        if (portalUserRequestDto.getDistrictId() != null) {
+            portalUser.setDistrict(
+                    districtRepository.findById(
+                                    portalUserRequestDto.getDistrictId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("District not found"))
+            );
+        }
+
+        if (portalUserRequestDto.getCityId() != null) {
+            portalUser.setCity(
+                    cityRepository.findById(
+                                    portalUserRequestDto.getCityId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("City not found"))
+            );
+        }
+        mapper.updatePortalUserEntity(portalUser, portalUserRequestDto);
+
+        return mapper.portalUserResponseDto(portalUserrepository.save(portalUser));
     }
 
     // ------------------------------------------------------------------ SOFT DELETE
@@ -171,13 +215,12 @@ public class PortalUserServiceImpl implements PortalUserService {
     @Transactional
     public PortalUserResponseDto softDelete(String portalUserId) {
 
-        PortalUser entity = findByPortalUserId(portalUserId);
+        PortalUser entity = findByPortalUserIdAndIsActive(portalUserId);
         entity.setIsActive(false);
-        entity.setIsDeleted(true);
 
         log.info("Changing status for portal user id: {} → isActive=false","isDeleted=true",portalUserId);
 
-        return mapper.toResponseDto(repository.save(entity));
+        return mapper.portalUserResponseDto(portalUserrepository.save(entity));
     }
 
 
@@ -193,7 +236,7 @@ public class PortalUserServiceImpl implements PortalUserService {
      * in the extreme race-condition case, which can be retried at the API level).
      */
     private String generateUserId(String codePrefix, int codePad) {
-        int next = repository.findMaxCodeSequence() + 1;
+        int next = portalUserrepository.findMaxCodeSequence() + 1;
         return codePrefix + String.format("%0" + codePad + "d", next);
     }
     // ------------------------------------------------------------------
@@ -202,7 +245,7 @@ public class PortalUserServiceImpl implements PortalUserService {
 
     private void validateDuplicateUser(PortalUserRequestDto request) {
 
-        if (repository.existsByEmailAndIsActiveTrue(request.getEmail())) {
+        if (portalUserrepository.existsByEmailAndIsActiveTrue(request.getEmail())) {
             throw new ResourceAlreadyExistsException(
                     PortalUserConstants.USER_ALREADY_EXISTS +request.getEmail());
         }
@@ -214,17 +257,8 @@ public class PortalUserServiceImpl implements PortalUserService {
 
     /** Used by GET — excludes inactive records. */
     private PortalUser findByPortalUserIdAndIsActive(String portalUserId) {
-        return repository.findByPortalUserIdAndIsActiveTrue(portalUserId)
+        return portalUserrepository.findByPortalUserIdAndIsActiveTrue(portalUserId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(PortalUserConstants.USER_NOT_FOUND + portalUserId));
     }
-
-    /** Used by UPDATE / SOFT-DELETE — allows acting on any non-deleted record. */
-    private PortalUser findByPortalUserId(String portalUserId) {
-        return repository.findByPortalUserIdAndIsDeletedFalse(portalUserId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(PortalUserConstants.USER_NOT_FOUND + portalUserId));
-    }
-
-
 }

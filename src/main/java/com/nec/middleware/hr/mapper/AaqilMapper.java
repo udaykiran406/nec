@@ -28,7 +28,6 @@ public class AaqilMapper {
                 .build();
 
         entity.setIsActive(Boolean.TRUE);
-        entity.setIsDeleted(Boolean.FALSE);
         entity.setCreatedBy(dto.getCreatedBy());
         entity.setUpdatedBy(dto.getCreatedBy());
 
@@ -71,7 +70,6 @@ public class AaqilMapper {
                 .cityId(entity.getCityId())
                 .statusId(entity.getStatusId())
                 .isActive(entity.getIsActive())
-                .isDeleted(entity.getIsDeleted())
                 .createdBy(entity.getCreatedBy())
                 .createdAt(entity.getCreatedAt())
                 .updatedBy(entity.getUpdatedBy())

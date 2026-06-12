@@ -13,15 +13,15 @@ import java.util.Optional;
 @Repository
 public interface AaqilRepository extends JpaRepository<Aaqil, Long> {
 
-    Optional<Aaqil> findByIdAndIsDeletedFalse(Long id);
+    Optional<Aaqil> findByIdAndIsActiveTrue(Long id);
 
     // Duplicate checks (CREATE)
-    boolean existsByEmailAndIsDeletedFalse(String email);
-    boolean existsByPhoneAndIsDeletedFalse(String phone);
+    boolean existsByEmailAndIsActiveTrue(String email);
+    boolean existsByPhoneAndIsActiveTrue(String phone);
 
     // Duplicate checks (UPDATE — exclude self)
-    boolean existsByEmailAndIsDeletedFalseAndIdNot(String email, Long id);
-    boolean existsByPhoneAndIsDeletedFalseAndIdNot(String phone, Long id);
+    boolean existsByEmailAndIsActiveTrueAndIdNot(String email, Long id);
+    boolean existsByPhoneAndIsActiveTrueAndIdNot(String phone, Long id);
 
     // Code generation helper
     @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(a.code, 3) AS int)), 0) FROM Aaqil a WHERE a.code LIKE 'AA%'")
@@ -29,8 +29,7 @@ public interface AaqilRepository extends JpaRepository<Aaqil, Long> {
 
     @Query("""
             SELECT a FROM Aaqil a
-            WHERE a.isDeleted = false
-              AND (:aaqilTypeId IS NULL OR a.aaqilTypeId = :aaqilTypeId)
+            WHERE (:aaqilTypeId IS NULL OR a.aaqilTypeId = :aaqilTypeId)
               AND (:regionId    IS NULL OR a.regionId    = :regionId)
               AND (:districtId  IS NULL OR a.districtId  = :districtId)
               AND (:cityId      IS NULL OR a.cityId      = :cityId)

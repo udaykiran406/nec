@@ -43,7 +43,7 @@ public class PortalUser extends AuditableEntity {
     @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "email", nullable = false, length = 150)
+    @Column(name = "email", nullable = false,unique = true,length = 150)
     private String email;
 
     @Column(name = "photo_path", length = 500)
@@ -54,80 +54,30 @@ public class PortalUser extends AuditableEntity {
 
     // ------------------------------------------------------------------ LOOKUP FKs
 
-    /**
-     * FK → nec_lkp_gender.id
-     * Stored column: gender_id
-     */
-    @Column(name = "gender_id", nullable = false, insertable = false, updatable = false)
-    private Long genderId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gender_id", nullable = false)
     private Genders gender;
 
-    /**
-     * FK → nec_lkp_roles.id
-     * Stored column: role_id
-     */
-    @Column(name = "role_id", nullable = false, insertable = false, updatable = false)
-    private Long roleId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     private Roles role;
-
-    /**
-     * FK → nec_lkp_portal_user_types.id
-     * Stored column: portal_user_type_id
-     */
-    @Column(name = "portal_user_type_id", insertable = false, updatable = false)
-    private Long portalUserTypeId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portal_user_type_id")
     private PortalUserTypes portalUserType;
 
     // ------------------------------------------------------------------ MASTER DATA FKs
 
-    /**
-     * FK → nec_universities.id
-     * Stored column: university_id
-     */
-    @Column(name = "university_id", nullable = false, insertable = false, updatable = false)
-    private Long universityId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", nullable = false)
     private MasterDataUniversity university;
-
-    /**
-     * FK → nec_regions.id
-     * Stored column: region_id
-     */
-    @Column(name = "region_id", nullable = false, insertable = false, updatable = false)
-    private Long regionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id", nullable = false)
     private MasterDataRegion region;
 
-    /**
-     * FK → nec_districts.id
-     * Stored column: district_id
-     */
-    @Column(name = "district_id", nullable = false, insertable = false, updatable = false)
-    private Long districtId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)
     private MasterDataDistrict district;
-
-    /**
-     * FK → nec_cities.id
-     * Stored column: city_id
-     */
-    @Column(name = "city_id", nullable = false, insertable = false, updatable = false)
-    private Long cityId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
