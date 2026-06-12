@@ -5,7 +5,7 @@ import com.nec.middleware.Lookups.repository.LookupPaymentMethodsRepository;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.exception.ValidationException;
 import com.nec.middleware.hr.constant.UniversityTraineeConstants;
-import com.nec.middleware.hr.dto.request.UniversityTraineeListRequestDto;
+import com.nec.middleware.hr.dto.request.UniversityTraineeFilterRequestDto;
 import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
 import com.nec.middleware.hr.dto.response.UniversityTraineeResponseDto;
 import com.nec.middleware.hr.entity.UniversityTrainee;
@@ -31,8 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
-    private final UniversityTraineeRepository repository;
-    private final UniversityTraineeMapper mapper;
+    private final UniversityTraineeRepository universityTraineerepository;
+    private final UniversityTraineeMapper universityTraineeMapper;
 
     // ---- Lookup repositories (mirrors PortalUserServiceImpl) ----
     private final LookupGenderRepository genderRepository;
@@ -54,50 +54,50 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
         validateTrainee(requestDto);
 
-        UniversityTrainee entity = mapper.toEntity(requestDto);
-        entity.setUniversityTraineeId(generateTraineeId(UniversityTraineeConstants.CODE_PREFIX, UniversityTraineeConstants.CODE_PAD));
+        UniversityTrainee universityTraineeEntity = universityTraineeMapper.toEntity(requestDto);
+        universityTraineeEntity.setUniversityTraineeId(generateTraineeId(UniversityTraineeConstants.CODE_PREFIX, UniversityTraineeConstants.CODE_PAD));
 
         // LOOKUPS
-        entity.setGender(
+        universityTraineeEntity.setGender(
                 genderRepository.findById(requestDto.getGenderId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Gender not found"))
         );
 
-        entity.setPaymentMethod(
+        universityTraineeEntity.setPaymentMethod(
                 paymentMethodRepository.findById(requestDto.getPaymentMethodId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Payment method not found"))
         );
 
         // MASTER DATA
-        entity.setUniversity(
+        universityTraineeEntity.setUniversity(
                 universityRepository.findById(requestDto.getUniversityId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("University not found"))
         );
 
-        entity.setRegion(
+        universityTraineeEntity.setRegion(
                 regionRepository.findById(requestDto.getRegionId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Region not found"))
         );
 
-        entity.setDistrict(
+        universityTraineeEntity.setDistrict(
                 districtRepository.findById(requestDto.getDistrictId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("District not found"))
         );
 
-        entity.setCity(
+        universityTraineeEntity.setCity(
                 cityRepository.findById(requestDto.getCityId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("City not found"))
         );
 
-        UniversityTrainee savedEntity = repository.save(entity);
+        UniversityTrainee savedEntity = universityTraineerepository.save(universityTraineeEntity);
 
-        return mapper.toResponseDto(savedEntity);
+        return universityTraineeMapper.toResponseDto(savedEntity);
     }
 
 
@@ -109,13 +109,13 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
         log.info("Updating university trainee id: {}", universityTraineeId);
 
-        UniversityTrainee entity =
-                findByUniversityTraineeIdAndIsActive(universityTraineeId);
+        UniversityTrainee universityTrainee =
+                findByUniversityTraineeId(universityTraineeId);
 
-        mapper.updateEntity(entity, requestDto);
-        validateTraineeForUpdate(requestDto, entity.getId());
+        universityTraineeMapper.updateUniversityTraineeEntity(universityTrainee, requestDto);
+        validateTraineeForUpdate(requestDto, universityTrainee.getId());
         if (requestDto.getGenderId() != null) {
-            entity.setGender(
+            universityTrainee.setGender(
                     genderRepository.findById(requestDto.getGenderId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("Gender not found"))
@@ -123,7 +123,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         }
 
         if (requestDto.getPaymentMethodId() != null) {
-            entity.setPaymentMethod(
+            universityTrainee.setPaymentMethod(
                     paymentMethodRepository.findById(requestDto.getPaymentMethodId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("Payment method not found"))
@@ -131,7 +131,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         }
 
         if (requestDto.getUniversityId() != null) {
-            entity.setUniversity(
+            universityTrainee.setUniversity(
                     universityRepository.findById(requestDto.getUniversityId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("University not found"))
@@ -139,7 +139,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         }
 
         if (requestDto.getRegionId() != null) {
-            entity.setRegion(
+            universityTrainee.setRegion(
                     regionRepository.findById(requestDto.getRegionId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("Region not found"))
@@ -147,7 +147,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         }
 
         if (requestDto.getDistrictId() != null) {
-            entity.setDistrict(
+            universityTrainee.setDistrict(
                     districtRepository.findById(requestDto.getDistrictId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("District not found"))
@@ -155,16 +155,16 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         }
 
         if (requestDto.getCityId() != null) {
-            entity.setCity(
+            universityTrainee.setCity(
                     cityRepository.findById(requestDto.getCityId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("City not found"))
             );
         }
 
-        UniversityTrainee updatedEntity = repository.save(entity);
+        UniversityTrainee updatedEntity = universityTraineerepository.save(universityTrainee);
 
-        return mapper.toResponseDto(updatedEntity);
+        return universityTraineeMapper.toResponseDto(updatedEntity);
     }
 
 
@@ -173,8 +173,8 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
     public UniversityTraineeResponseDto getTraineeByUniversityTraineeId(
             String universityTraineeId) {
 
-        return mapper.toResponseDto(
-                findByUniversityTraineeIdAndIsActive(universityTraineeId)
+        return universityTraineeMapper.toResponseDto(
+                findByUniversityTraineeId(universityTraineeId)
         );
     }
 
@@ -185,12 +185,12 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
     @Override
     @Transactional(readOnly = true)
     public Page<UniversityTraineeResponseDto> getAllUniversityTrainees(
-            UniversityTraineeListRequestDto request,
+            UniversityTraineeFilterRequestDto request,
             int page,
             int size) {
 
         if (request == null) {
-            request = new UniversityTraineeListRequestDto();
+            request = new UniversityTraineeFilterRequestDto();
         }
 
         Pageable pageable = PageRequest.of(
@@ -199,11 +199,11 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return repository.findAll(
-                        UniversityTraineeSearchSpecification.build(request),
+        return universityTraineerepository.findAll(
+                        UniversityTraineeSearchSpecification.buildSpecification(request),
                         pageable
                 )
-                .map(mapper::toResponseDto);
+                .map(universityTraineeMapper::toResponseDto);
     }
 
     // ------------------------------------------------------------------ CHANGE STATUS
@@ -218,19 +218,18 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
                 findByUniversityTraineeId(universityTraineeId);
 
         entity.setIsActive(isActive);
-        entity.setIsDeleted(!isActive);
 
         log.info("Changing trainee status: {} -> isActive={}",
                 universityTraineeId,
                 isActive);
 
-        return mapper.toResponseDto(repository.save(entity));
+        return universityTraineeMapper.toResponseDto(universityTraineerepository.save(entity));
     }
 
     // ------------------------------------------------------------------ CODE GENERATION
 
     private String generateTraineeId(String codePrefix, int codePad) {
-        int next = repository.findMaxCodeSequence() + 1;
+        int next = universityTraineerepository.findMaxCodeSequence() + 1;
         return codePrefix + String.format("%0" + codePad + "d", next);
     }
 
@@ -238,13 +237,13 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
     private void validateTrainee(UniversityTraineeRequestDto dto) {
 
-        if (repository.existsByEmailAndIsActiveTrue(dto.getEmail())) {
+        if (universityTraineerepository.existsByEmail(dto.getEmail())) {
             throw new ValidationException(
                     UniversityTraineeConstants.TRAINEE_ALREADY_EXISTS
             );
         }
 
-        if (repository.existsByPhoneAndIsActiveTrue(dto.getPhone())) {
+        if (universityTraineerepository.existsByPhone(dto.getPhone())) {
             throw new ValidationException(
                     UniversityTraineeConstants.TRAINEE_ALREADY_EXISTS
             );
@@ -255,14 +254,14 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
             UniversityTraineeRequestDto dto,
             Long id) {
 
-        if (repository.existsByEmailAndIsActiveTrueAndIdNot(
+        if (universityTraineerepository.existsByEmailAndIsActiveTrueAndIdNot(
                 dto.getEmail(), id)) {
             throw new ValidationException(
                     UniversityTraineeConstants.TRAINEE_ALREADY_EXISTS
             );
         }
 
-        if (repository.existsByPhoneAndIsActiveTrueAndIdNot(
+        if (universityTraineerepository.existsByPhoneAndIsActiveTrueAndIdNot(
                 dto.getPhone(), id)) {
             throw new ValidationException(
                     UniversityTraineeConstants.TRAINEE_ALREADY_EXISTS
@@ -272,22 +271,10 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
     // ------------------------------------------------------------------ HELPERS
 
-    private UniversityTrainee findByUniversityTraineeIdAndIsActive(
-            String universityTraineeId) {
-
-        return repository.findByUniversityTraineeIdAndIsActiveTrue(
-                universityTraineeId
-        ).orElseThrow(() ->
-                new ResourceNotFoundException(
-                        UniversityTraineeConstants.TRAINEE_NOT_FOUND
-                                + universityTraineeId
-                ));
-    }
-
     private UniversityTrainee findByUniversityTraineeId(
             String universityTraineeId) {
 
-        return repository.findByUniversityTraineeId(
+        return universityTraineerepository.findByUniversityTraineeId(
                 universityTraineeId
         ).orElseThrow(() ->
                 new ResourceNotFoundException(

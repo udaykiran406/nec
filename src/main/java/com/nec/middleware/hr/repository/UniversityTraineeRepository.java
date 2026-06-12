@@ -26,9 +26,9 @@ public interface UniversityTraineeRepository extends
     );
 
     // Duplicate checks (CREATE)
-    boolean existsByEmailAndIsActiveTrue(String email);
+    boolean existsByEmail(String email);
 
-    boolean existsByPhoneAndIsActiveTrue(String phone);
+    boolean existsByPhone(String phone);
 
     // Duplicate checks (UPDATE)
     boolean existsByEmailAndIsActiveTrueAndIdNot(

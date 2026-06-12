@@ -13,7 +13,7 @@ public final class PortalUserSearchSpecification {
     private PortalUserSearchSpecification() {
     }
 
-    public static Specification<PortalUser> build(
+    public static Specification<PortalUser> buildSpecification(
             PortalUserListRequestDto request) {
 
         return (root, query, criteriaBuilder) -> {

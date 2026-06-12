@@ -26,24 +26,22 @@ public class UniversityTraineeMapper {
      * FK associations (gender, paymentMethod, etc.) are set by the service
      * layer immediately after this call — mirrors portalUserEntity() in PortalUserMapper.
      */
-    public UniversityTrainee toEntity(UniversityTraineeRequestDto dto) {
-        UniversityTrainee entity = UniversityTrainee.builder()
-                .fullName(dto.getFullName())
-                .age(dto.getAge())
-                .phone(dto.getPhone())
-                .email(dto.getEmail())
-                .semester(dto.getSemester())
-                .faculty(dto.getFaculty())
-                .photoUrl(dto.getPhotoUrl())
-                .statusId(dto.getStatusId())
+    public UniversityTrainee toEntity(UniversityTraineeRequestDto universityTraineeRequestDto) {
+        UniversityTrainee universityTraineeEntity = UniversityTrainee.builder()
+                .fullName(universityTraineeRequestDto.getFullName())
+                .age(universityTraineeRequestDto.getAge())
+                .phone(universityTraineeRequestDto.getPhone())
+                .email(universityTraineeRequestDto.getEmail())
+                .semester(universityTraineeRequestDto.getSemester())
+                .faculty(universityTraineeRequestDto.getFaculty())
+                .photoUrl(universityTraineeRequestDto.getPhotoUrl())
+                .statusId(universityTraineeRequestDto.getStatusId())
                 .build();
 
-        entity.setIsActive(Boolean.TRUE);
-        entity.setIsDeleted(Boolean.FALSE);
-        entity.setCreatedBy(dto.getCreatedBy());
-        entity.setUpdatedBy(dto.getCreatedBy());
-
-        return entity;
+        universityTraineeEntity.setIsActive(Boolean.TRUE);
+        universityTraineeEntity.setCreatedBy(universityTraineeRequestDto.getCreatedBy());
+        universityTraineeEntity.setUpdatedBy(universityTraineeRequestDto.getCreatedBy());
+        return universityTraineeEntity;
     }
 
     // ------------------------------------------------------------------
@@ -55,17 +53,17 @@ public class UniversityTraineeMapper {
      * FK associations are handled separately in the service layer.
      * {@code universityTraineeId} is immutable and deliberately excluded.
      */
-    public void updateEntity(UniversityTrainee entity, UniversityTraineeRequestDto dto) {
+    public void updateUniversityTraineeEntity(UniversityTrainee UniversityTraineEntity, UniversityTraineeRequestDto universityTraineeRequesDto) {
 
-        if (dto.getFullName()  != null) entity.setFullName(dto.getFullName());
-        if (dto.getAge()       != null) entity.setAge(dto.getAge());
-        if (dto.getPhone()     != null) entity.setPhone(dto.getPhone());
-        if (dto.getEmail()     != null) entity.setEmail(dto.getEmail());
-        if (dto.getSemester()  != null) entity.setSemester(dto.getSemester());
-        if (dto.getFaculty()   != null) entity.setFaculty(dto.getFaculty());
-        if (dto.getPhotoUrl()  != null) entity.setPhotoUrl(dto.getPhotoUrl());
-        if (dto.getStatusId()  != null) entity.setStatusId(dto.getStatusId());
-        if (dto.getUpdatedBy() != null) entity.setUpdatedBy(dto.getUpdatedBy());
+        if (universityTraineeRequesDto.getFullName()  != null) UniversityTraineEntity.setFullName(universityTraineeRequesDto.getFullName());
+        if (universityTraineeRequesDto.getAge()       != null) UniversityTraineEntity.setAge(universityTraineeRequesDto.getAge());
+        if (universityTraineeRequesDto.getPhone()     != null) UniversityTraineEntity.setPhone(universityTraineeRequesDto.getPhone());
+        if (universityTraineeRequesDto.getEmail()     != null) UniversityTraineEntity.setEmail(universityTraineeRequesDto.getEmail());
+        if (universityTraineeRequesDto.getSemester()  != null) UniversityTraineEntity.setSemester(universityTraineeRequesDto.getSemester());
+        if (universityTraineeRequesDto.getFaculty()   != null) UniversityTraineEntity.setFaculty(universityTraineeRequesDto.getFaculty());
+        if (universityTraineeRequesDto.getPhotoUrl()  != null) UniversityTraineEntity.setPhotoUrl(universityTraineeRequesDto.getPhotoUrl());
+        if (universityTraineeRequesDto.getStatusId()  != null) UniversityTraineEntity.setStatusId(universityTraineeRequesDto.getStatusId());
+        if (universityTraineeRequesDto.getUpdatedBy() != null) UniversityTraineEntity.setUpdatedBy(universityTraineeRequesDto.getUpdatedBy());
     }
 
     // ------------------------------------------------------------------
@@ -82,71 +80,70 @@ public class UniversityTraineeMapper {
      *   "paymentMethod": { "id": 2, "value": "Cash"      }
      * </pre>
      */
-    public UniversityTraineeResponseDto toResponseDto(UniversityTrainee entity) {
+    public UniversityTraineeResponseDto toResponseDto(UniversityTrainee universityTraineEentity) {
         return UniversityTraineeResponseDto.builder()
                 // Identity
-                .id(entity.getId())
-                .universityTraineeId(entity.getUniversityTraineeId())
-                .fullName(entity.getFullName())
-                .age(entity.getAge())
-                .phone(entity.getPhone())
-                .email(entity.getEmail())
-                .semester(entity.getSemester())
-                .faculty(entity.getFaculty())
-                .photoUrl(entity.getPhotoUrl())
-                .statusId(entity.getStatusId())
+                .id(universityTraineEentity.getId())
+                .universityTraineeId(universityTraineEentity.getUniversityTraineeId())
+                .fullName(universityTraineEentity.getFullName())
+                .age(universityTraineEentity.getAge())
+                .phone(universityTraineEentity.getPhone())
+                .email(universityTraineEentity.getEmail())
+                .semester(universityTraineEentity.getSemester())
+                .faculty(universityTraineEentity.getFaculty())
+                .photoUrl(universityTraineEentity.getPhotoUrl())
+                .statusId(universityTraineEentity.getStatusId())
 
                 // Lookup FKs → IdValueDto (lazy-loaded via @ManyToOne)
-                .gender(entity.getGender() != null
+                .gender(universityTraineEentity.getGender() != null
                         ? IdValueDto.builder()
-                          .id(entity.getGender().getId())
-                          .value(entity.getGender().getValue())
+                          .id(universityTraineEentity.getGender().getId())
+                          .value(universityTraineEentity.getGender().getValue())
                           .build()
                         : null)
 
-                .paymentMethod(entity.getPaymentMethod() != null
+                .paymentMethod(universityTraineEentity.getPaymentMethod() != null
                         ? IdValueDto.builder()
-                          .id(entity.getPaymentMethod().getId())
-                          .value(entity.getPaymentMethod().getValue())
+                          .id(universityTraineEentity.getPaymentMethod().getId())
+                          .value(universityTraineEentity.getPaymentMethod().getValue())
                           .build()
                         : null)
 
                 // Master Data FKs → IdValueDto (lazy-loaded via @ManyToOne)
-                .university(entity.getUniversity() != null
+                .university(universityTraineEentity.getUniversity() != null
                         ? IdValueDto.builder()
-                          .id(entity.getUniversity().getId())
-                          .value(entity.getUniversity().getUniversityName())
+                          .id(universityTraineEentity.getUniversity().getId())
+                          .value(universityTraineEentity.getUniversity().getUniversityName())
                           .build()
                         : null)
 
-                .region(entity.getRegion() != null
+                .region(universityTraineEentity.getRegion() != null
                         ? IdValueDto.builder()
-                          .id(entity.getRegion().getId())
-                          .value(entity.getRegion().getRegionName())
+                          .id(universityTraineEentity.getRegion().getId())
+                          .value(universityTraineEentity.getRegion().getRegionName())
                           .build()
                         : null)
 
-                .district(entity.getDistrict() != null
+                .district(universityTraineEentity.getDistrict() != null
                         ? IdValueDto.builder()
-                          .id(entity.getDistrict().getId())
-                          .value(entity.getDistrict().getDistrictName())
+                          .id(universityTraineEentity.getDistrict().getId())
+                          .value(universityTraineEentity.getDistrict().getDistrictName())
                           .build()
                         : null)
 
-                .city(entity.getCity() != null
+                .city(universityTraineEentity.getCity() != null
                         ? IdValueDto.builder()
-                          .id(entity.getCity().getId())
-                          .value(entity.getCity().getCityName())
+                          .id(universityTraineEentity.getCity().getId())
+                          .value(universityTraineEentity.getCity().getCityName())
                           .build()
                         : null)
 
                 // Audit
-                .isActive(entity.getIsActive())
-                .isDeleted(entity.getIsDeleted())
-                .createdBy(entity.getCreatedBy())
-                .createdAt(entity.getCreatedAt())
-                .updatedBy(entity.getUpdatedBy())
-                .updatedAt(entity.getUpdatedAt())
+                .isActive(universityTraineEentity.getIsActive())
+                .createdBy(universityTraineEentity.getCreatedBy())
+                .createdAt(universityTraineEentity.getCreatedAt())
+                .updatedBy(universityTraineEentity.getUpdatedBy())
+                .updatedAt(universityTraineEentity.getUpdatedAt())
                 .build();
     }
 }

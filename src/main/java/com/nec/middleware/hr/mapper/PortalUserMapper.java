@@ -122,10 +122,8 @@ public class PortalUserMapper {
                           .build()
                         : null)
 
-
                 // Audit
                 .isActive(entity.getIsActive())
-                .isDeleted(entity.getIsDeleted())
                 .createdBy(entity.getCreatedBy())
                 .createdAt(entity.getCreatedAt())
                 .updatedBy(entity.getUpdatedBy())

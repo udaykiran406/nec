@@ -1,7 +1,7 @@
 package com.nec.middleware.hr.controller;
 
 import com.nec.middleware.hr.constant.UniversityTraineeConstants;
-import com.nec.middleware.hr.dto.request.UniversityTraineeListRequestDto;
+import com.nec.middleware.hr.dto.request.UniversityTraineeFilterRequestDto;
 import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.dto.response.UniversityTraineeResponseDto;
@@ -22,26 +22,26 @@ import org.springframework.web.bind.annotation.*;
         description = "University Trainee Management APIs"
 )
 @RestController
-@RequestMapping("/api/hr/university-trainees")
+@RequestMapping("/api/hr/universityTrainee")
 @RequiredArgsConstructor
 public class UniversityTraineeController {
 
-    private final UniversityTraineeService service;
+    private final UniversityTraineeService universityTraineeService;
 
     // ------------------------------------------------------------------ CREATE
 
     @Operation(summary = "Create University Trainee")
     @PostMapping
-    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> create(
+    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> createUniversityTrainee(
             @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
 
-        UniversityTraineeResponseDto response =
-                service.createTrainee(requestDto);
+        UniversityTraineeResponseDto universityTraineeResponse =
+                universityTraineeService.createTrainee(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
                         UniversityTraineeConstants.TRAINEE_CREATED,
-                        response
+                        universityTraineeResponse
                 ));
     }
 
@@ -49,12 +49,12 @@ public class UniversityTraineeController {
 
     @Operation(summary = "Update University Trainee")
     @PatchMapping("/{universityTraineeId}")
-    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> update(
+    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> updateUniversityTrainee(
             @PathVariable String universityTraineeId,
             @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
 
         UniversityTraineeResponseDto response =
-                service.updateTrainee(
+                universityTraineeService.updateTrainee(
                         universityTraineeId,
                         requestDto
                 );
@@ -75,7 +75,7 @@ public class UniversityTraineeController {
             @PathVariable String universityTraineeId) {
 
         UniversityTraineeResponseDto response =
-                service.getTraineeByUniversityTraineeId(
+                universityTraineeService.getTraineeByUniversityTraineeId(
                         universityTraineeId
                 );
 
@@ -91,13 +91,13 @@ public class UniversityTraineeController {
 
     @Operation(summary = "Get All University Trainees")
     @PostMapping("/getAllUniversityTrainees")
-    public ResponseEntity<ApiResponse<Page<UniversityTraineeResponseDto>>> getAll(
-            @RequestBody(required = false) UniversityTraineeListRequestDto request,
+    public ResponseEntity<ApiResponse<Page<UniversityTraineeResponseDto>>> getAllUniversityTrainee(
+            @RequestBody(required = false) UniversityTraineeFilterRequestDto request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Page<UniversityTraineeResponseDto> response =
-                service.getAllUniversityTrainees(
+                universityTraineeService.getAllUniversityTrainees(
                         request,
                         page,
                         size
@@ -115,12 +115,12 @@ public class UniversityTraineeController {
 
     @Operation(summary = "Change University Trainee Status")
     @PatchMapping("/{universityTraineeId}/status")
-    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> changeStatus(
+    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> changeUniversityTraineeStatus(
             @PathVariable String universityTraineeId,
             @RequestParam Boolean isActive) {
 
         UniversityTraineeResponseDto response =
-                service.changeStatus(
+                universityTraineeService.changeStatus(
                         universityTraineeId,
                         isActive
                 );

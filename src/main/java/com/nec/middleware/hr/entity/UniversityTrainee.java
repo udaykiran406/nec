@@ -44,10 +44,10 @@ public class UniversityTrainee extends AuditableEntity {
     @Column(name = "age", nullable = false)
     private Short age;
 
-    @Column(name = "phone", nullable = false, length = 30)
+    @Column(name = "phone", nullable = false, unique = true,length = 30)
     private String phone;
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email", nullable = false, unique = true,length = 100)
     private String email;
 
     @Column(name = "semester", nullable = false, length = 50)

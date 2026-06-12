@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
         description = "Portal User Management APIs"
 )
 @RestController
-@RequestMapping("/api/portal")
+@RequestMapping("/api/hr/portalUser")
 @RequiredArgsConstructor
 public class PortalUserController {
 
