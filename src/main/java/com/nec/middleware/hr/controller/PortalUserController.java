@@ -59,20 +59,21 @@ public class PortalUserController {
     // ------------------------------------------------------------------ GET: List
 
     @Operation(summary = "Get Paginated & Filtered Portal User List")
-    @GetMapping("/getAllPortalUsers")
+    @PostMapping("/getAllPortalUsers")
     public ResponseEntity<ApiResponse<Page<PortalUserResponseDto>>> getAllPortalUsers(
-            @ModelAttribute PortalUserListRequestDto filterDto) {
+            @RequestBody(required = false) PortalUserListRequestDto filterDto,@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         PortalUserConstants.USER_LIST_FETCHED,
-                        portalUserService.getAllPortalUsers(filterDto)));
+                        portalUserService.getAllPortalUsers(filterDto,page,size)));
     }
 
     // ------------------------------------------------------------------ POST: Update
 
     @Operation(summary = "Update Portal User")
-    @PostMapping("/update/{portalUserId}")
+    @PatchMapping("/update/{portalUserId}")
     public ResponseEntity<ApiResponse<PortalUserResponseDto>> updatePortalUser(
             @PathVariable String portalUserId,
             @Valid @RequestBody PortalUserRequestDto requestDto) {

@@ -96,10 +96,6 @@ public class AaqilServiceImpl implements AaqilService {
         boolean newStatus = !entity.getIsActive();
         entity.setIsActive(newStatus);
 
-        if (newStatus) {
-            entity.setIsDeleted(false);
-        }
-
         log.info("Changing status for aaqil id: {} → isActive={}", id, newStatus);
 
         return mapper.toResponseDto(repository.save(entity));
@@ -112,7 +108,6 @@ public class AaqilServiceImpl implements AaqilService {
     public void softDelete(Long id) {
 
         Aaqil entity = findById(id);
-        entity.setIsDeleted(true);
         entity.setIsActive(false);
 
         repository.save(entity);
@@ -136,15 +131,15 @@ public class AaqilServiceImpl implements AaqilService {
 
         if (dto.getId() == null) {
 
-            if (repository.existsByEmailAndIsDeletedFalse(dto.getEmail()) ||
-                    repository.existsByPhoneAndIsDeletedFalse(dto.getPhone())) {
+            if (repository.existsByEmailAndIsActiveTrue(dto.getEmail()) ||
+                    repository.existsByPhoneAndIsActiveTrue(dto.getPhone())) {
                 throw new ValidationException(AaqilConstants.AAQIL_ALREADY_EXISTS);
             }
 
         } else {
 
-            if (repository.existsByEmailAndIsDeletedFalseAndIdNot(dto.getEmail(), dto.getId()) ||
-                    repository.existsByPhoneAndIsDeletedFalseAndIdNot(dto.getPhone(), dto.getId())) {
+            if (repository.existsByEmailAndIsActiveTrueAndIdNot(dto.getEmail(), dto.getId()) ||
+                    repository.existsByPhoneAndIsActiveTrueAndIdNot(dto.getPhone(), dto.getId())) {
                 throw new ValidationException(AaqilConstants.AAQIL_ALREADY_EXISTS);
             }
         }
@@ -155,7 +150,7 @@ public class AaqilServiceImpl implements AaqilService {
     // ------------------------------------------------------------------
 
     private Aaqil findByIdAndNotDeleted(Long id) {
-        return repository.findByIdAndIsDeletedFalse(id)
+        return repository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(AaqilConstants.AAQIL_NOT_FOUND + id));
     }

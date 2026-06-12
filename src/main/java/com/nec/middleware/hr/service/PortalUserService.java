@@ -12,11 +12,9 @@ public interface PortalUserService {
 
     PortalUserResponseDto getUserByPortalUserId(String portalUserId);
 
-    Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto filterDto);
+    Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto filterDto, int pageNumber,int pageSize);
 
     PortalUserResponseDto softDelete(String portalUserId);
-
-
 
     PortalUserResponseDto updatePortalUser(String portalUserId, PortalUserRequestDto request);
 }

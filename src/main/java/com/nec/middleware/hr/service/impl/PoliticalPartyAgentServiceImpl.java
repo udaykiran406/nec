@@ -97,10 +97,6 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         boolean newStatus = !entity.getIsActive();
         entity.setIsActive(newStatus);
 
-        if (newStatus) {
-            entity.setIsDeleted(false);
-        }
-
         log.info("Changing status for political party agent id: {} → isActive={}", id, newStatus);
 
         return mapper.toResponseDto(repository.save(entity));
@@ -113,7 +109,6 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     public void softDelete(Long id) {
 
         PoliticalPartyAgent entity = findById(id);
-        entity.setIsDeleted(true);
         entity.setIsActive(false);
 
         repository.save(entity);
@@ -137,15 +132,15 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
 
         if (dto.getId() == null) {
 
-            if (repository.existsByEmailAndIsDeletedFalse(dto.getEmail()) ||
-                    repository.existsByPhoneAndIsDeletedFalse(dto.getPhone())) {
+            if (repository.existsByEmailAndIsActiveTrue(dto.getEmail()) ||
+                    repository.existsByPhoneAndIsActiveTrue(dto.getPhone())) {
                 throw new ValidationException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
             }
 
         } else {
 
-            if (repository.existsByEmailAndIsDeletedFalseAndIdNot(dto.getEmail(), dto.getId()) ||
-                    repository.existsByPhoneAndIsDeletedFalseAndIdNot(dto.getPhone(), dto.getId())) {
+            if (repository.existsByEmailAndIsActiveTrueAndIdNot(dto.getEmail(), dto.getId()) ||
+                    repository.existsByPhoneAndIsActiveTrueAndIdNot(dto.getPhone(), dto.getId())) {
                 throw new ValidationException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
             }
         }
@@ -156,7 +151,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     // ------------------------------------------------------------------
 
     private PoliticalPartyAgent findByIdAndNotDeleted(Long id) {
-        return repository.findByIdAndIsDeletedFalse(id)
+        return repository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(PoliticalPartyAgentConstants.AGENT_NOT_FOUND + id));
     }

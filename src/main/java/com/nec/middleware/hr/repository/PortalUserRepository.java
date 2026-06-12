@@ -4,6 +4,7 @@ import com.nec.middleware.hr.entity.PortalUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,14 +12,13 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
+public interface PortalUserRepository extends JpaRepository<PortalUser, Long> , JpaSpecificationExecutor<PortalUser> {
 
     /**
      * Find active (non-deleted) record by id
      */
-    Optional<PortalUser> findByPortalUserIdAndIsActiveTrue(String portalUserId);
 
-    Optional<PortalUser> findByPortalUserIdAndIsDeletedFalse(String portalUserId);
+    Optional<PortalUser> findByPortalUserIdAndIsActiveTrue(String portalUserId);
 
     // ------------------------------------------------------------------ Duplicate checks (CREATE)
 
@@ -44,34 +44,32 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
      * Returns non-deleted portal users matching all provided optional filters.
      * Null parameters are treated as "no filter".
      */
-    @Query("""
-    SELECT u
-    FROM PortalUser u
-    WHERE u.isDeleted = false
-       AND (:userName IS NULL OR u.userName LIKE %:userName%)
-      AND (:portalUserId IS NULL OR u.portalUserId LIKE %:portalUserId%)
-      AND (:roleId IS NULL OR u.roleId = :roleId)
-      AND (:genderId IS NULL OR u.genderId = :genderId)
-      AND (:universityId IS NULL OR u.universityId = :universityId)
-      AND (:regionId IS NULL OR u.regionId = :regionId)
-      AND (:districtId IS NULL OR u.districtId = :districtId)
-      AND (:cityId IS NULL OR u.cityId = :cityId)
-      AND (:portalUserTypeId IS NULL OR u.portalUserTypeId = :portalUserTypeId)
-      AND (:isActive IS NULL OR u.isActive = :isActive)
-""")
-    Page<PortalUser> findAllWithFilters(
-            @Param("userName") String userName,
-            @Param("portalUserId") String portalUserId,
-            @Param("roleId") Long roleId,
-            @Param("genderId") Long genderId,
-            @Param("universityId") Long universityId,
-            @Param("regionId") Long regionId,
-            @Param("districtId") Long districtId,
-            @Param("cityId") Long cityId,
-            @Param("portalUserTypeId") Long portalUserTypeId,
-            @Param("isActive") Boolean isActive,
-            Pageable pageable
-    );
+//    @Query("""
+//            SELECT p
+//            FROM PortalUser p
+//            WHERE (:userName IS NULL OR LOWER(p.userName) LIKE LOWER(CONCAT('%', :userName, '%')))
+//            AND (:portalUserId IS NULL OR p.portalUserId LIKE CONCAT('%', :portalUserId, '%'))
+//            AND (:genderId IS NULL OR p.gender.id = :genderId)
+//            AND (:roleId IS NULL OR p.role.id = :roleId)
+//            AND (:universityId IS NULL OR p.university.id = :universityId)
+//            AND (:regionId IS NULL OR p.region.id = :regionId)
+//            AND (:districtId IS NULL OR p.district.id = :districtId)
+//            AND (:cityId IS NULL OR p.city.id = :cityId)
+//            AND (:portalUserTypeId IS NULL OR p.portalUserType.id = :portalUserTypeId)
+//            AND (:isActive IS NULL OR p.isActive = :isActive)
+//            """)
+//    Page<PortalUser> findAllPortalUsersWithFilters(
+//            @Param("userName") String userName,
+//            @Param("portalUserId") String portalUserId,
+//            @Param("genderId") Long genderId,
+//            @Param("roleId") Long roleId,
+//            @Param("universityId") Long universityId,
+//            @Param("regionId") Long regionId,
+//            @Param("districtId") Long districtId,
+//            @Param("cityId") Long cityId,
+//            @Param("portalUserTypeId") Long portalUserTypeId,
+//            @Param("isActive") Boolean isActive,
+//            Pageable pageable);
 
 
 }
