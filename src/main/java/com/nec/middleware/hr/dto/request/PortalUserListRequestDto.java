@@ -15,7 +15,6 @@ public class PortalUserListRequestDto {
     private String userName;
     private Long roleId;
     private Long genderId;
-    private Long universityId;
     private Long regionId;
     private Long districtId;
     private Long cityId;

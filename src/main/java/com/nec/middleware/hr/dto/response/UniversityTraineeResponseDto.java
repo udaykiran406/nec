@@ -4,6 +4,18 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Every lookup and master-data FK is returned as an {@link IdValueDto}:
+ *
+ * <pre>
+ * "gender":        { "id": 1, "value": "Male"      },
+ * "paymentMethod": { "id": 2, "value": "Cash"       },
+ * "university":    { "id": 3, "value": "UOK"        },
+ * "region":        { "id": 4, "value": "Mogadishu"  },
+ * "district":      { "id": 5, "value": "Hodan"      },
+ * "city":          { "id": 6, "value": "Hyderabad"  }
+ * </pre>
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,26 +23,36 @@ import java.time.LocalDateTime;
 @Builder
 public class UniversityTraineeResponseDto {
 
-    private Long          id;
-    private String        code;
-    private String        fullName;
-    private Long          genderId;
-    private Short         age;
-    private String        phone;
-    private String        email;
-    private Long          paymentMethodId;
-    private Long          universityId;
-    private String        semester;
-    private String        faculty;
-    private Long          regionId;
-    private Long          districtId;
-    private Long          cityId;
-    private String        photoUrl;
-    private Long          statusId;
+    // ------------------------------------------------------------------ Identity
+    private Long   id;
+
+    /** Business key — e.g. UT001. Mirrors portalUserId in PortalUserResponseDto. */
+    private String universityTraineeId;
+
+    private String fullName;
+    private Short  age;
+    private String phone;
+    private String email;
+    private String semester;
+    private String faculty;
+    private String photoUrl;
+    private Long   statusId;
+
+    // ------------------------------------------------------------------ Lookup FKs → IdValueDto
+    private IdValueDto gender;
+    private IdValueDto paymentMethod;
+
+    // ------------------------------------------------------------------ Master Data FKs → IdValueDto
+    private IdValueDto university;
+    private IdValueDto region;
+    private IdValueDto district;
+    private IdValueDto city;
+
+    // ------------------------------------------------------------------ Audit
     private Boolean       isActive;
     private Boolean       isDeleted;
-    private String          createdBy;
+    private String        createdBy;
     private LocalDateTime createdAt;
-    private String          updatedBy;
+    private String        updatedBy;
     private LocalDateTime updatedAt;
 }
