@@ -58,14 +58,6 @@ public final class PortalUserSearchSpecification {
                 );
             }
 
-            if (request.getUniversityId() != null) {
-                predicates.add(
-                        criteriaBuilder.equal(
-                                root.get("university").get("id"),
-                                request.getUniversityId())
-                );
-            }
-
             if (request.getRegionId() != null) {
                 predicates.add(
                         criteriaBuilder.equal(

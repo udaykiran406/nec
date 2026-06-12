@@ -87,14 +87,15 @@ public class PortalUserController {
     // ------------------------------------------------------------------ PATCH: Soft Delete
 
     @Operation(summary = "Soft Delete Portal User")
-    @PatchMapping("/delete/{portalUserId}")
-    public ResponseEntity<ApiResponse<PortalUserResponseDto>> softDelete(
-            @PathVariable String portalUserId) {
+    @PatchMapping("/changeStatus/{portalUserId}")
+    public ResponseEntity<ApiResponse<PortalUserResponseDto>> changeStatus(
+            @PathVariable String portalUserId,
+            @RequestParam boolean IsActive) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        PortalUserConstants.USER_DELETED,
-                        portalUserService.softDelete(portalUserId)));
+                        PortalUserConstants.USER_STATUS_CHANGED,
+                        portalUserService.changeStatus(portalUserId,IsActive)));
     }
 }
 

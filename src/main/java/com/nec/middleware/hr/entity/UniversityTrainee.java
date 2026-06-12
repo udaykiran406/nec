@@ -1,9 +1,26 @@
 package com.nec.middleware.hr.entity;
 
-
+import com.nec.middleware.Lookups.entity.Genders;
+import com.nec.middleware.Lookups.entity.PaymentMethods;
+import com.nec.middleware.masterdata.entity.MasterDataCity;
+import com.nec.middleware.masterdata.entity.MasterDataDistrict;
+import com.nec.middleware.masterdata.entity.MasterDataRegion;
+import com.nec.middleware.masterdata.entity.MasterDataUniversity;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Maps to: nec_hr_university_trainees
+ *
+ * universityTraineeId  → business key, auto-generated (e.g. UT001, UT002 …)
+ *                         mirrors portalUserId in PortalUser.
+ *
+ * All FK columns store raw Long ids; name resolution is done in the
+ * service layer by querying the respective lookup / master-data repositories.
+ *
+ * Audit fields (isActive, isDeleted, createdBy, createdAt, updatedBy, updatedAt)
+ * are inherited from {@link AuditableEntity}.
+ */
 @Entity
 @Table(name = "nec_hr_university_trainees")
 @Getter
@@ -17,14 +34,12 @@ public class UniversityTrainee extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "code", nullable = false, unique = true, length = 20)
-    private String code;
+    /** Business key — generated once at creation, never changed. e.g. UT001 */
+    @Column(name = "university_trainee_id", nullable = false, unique = true, length = 20)
+    private String universityTraineeId;
 
     @Column(name = "full_name", nullable = false, length = 120)
     private String fullName;
-
-    @Column(name = "gender_id", nullable = false)
-    private Long genderId;
 
     @Column(name = "age", nullable = false)
     private Short age;
@@ -35,30 +50,43 @@ public class UniversityTrainee extends AuditableEntity {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @Column(name = "payment_method_id", nullable = false)
-    private Long paymentMethodId;
-
-    @Column(name = "university_id", nullable = false)
-    private Long universityId;
-
     @Column(name = "semester", nullable = false, length = 50)
     private String semester;
 
     @Column(name = "faculty", nullable = false, length = 100)
     private String faculty;
 
-    @Column(name = "region_id", nullable = false)
-    private Long regionId;
-
-    @Column(name = "district_id", nullable = false)
-    private Long districtId;
-
-    @Column(name = "city_id", nullable = false)
-    private Long cityId;
-
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
 
     @Column(name = "status_id", nullable = false)
     private Long statusId;
+    // ------------------------------------------------------------------ LOOKUPS FKs
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gender_id", nullable = false)
+    private Genders gender;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_method_id", nullable = false)
+    private PaymentMethods paymentMethod;
+
+// ------------------------------------------------------------------ MASTER DATA FKs
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "university_id", nullable = false)
+    private MasterDataUniversity university;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", nullable = false)
+    private MasterDataRegion region;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id", nullable = false)
+    private MasterDataDistrict district;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false)
+    private MasterDataCity city;
+
+
 }

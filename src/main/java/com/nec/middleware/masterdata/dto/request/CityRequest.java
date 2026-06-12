@@ -28,9 +28,9 @@ public class CityRequest {
     @Pattern(regexp = "^(Active|Inactive)$", message = "Status must be 'Active' or 'Inactive'")
     private String status;
 
-    @Min(value = 1, message = "createdBy must be a positive number")
-    private Long createdBy;
 
-    @Min(value = 1, message = "updatedBy must be a positive number")
-    private Long updatedBy;
+    private String createdBy;
+
+
+    private String updatedBy;
 }

@@ -3,6 +3,7 @@ package com.nec.middleware.hr.entity;
 import com.nec.middleware.Lookups.entity.Genders;
 import com.nec.middleware.Lookups.entity.PortalUserTypes;
 import com.nec.middleware.Lookups.entity.Roles;
+import com.nec.middleware.hr.Enum.MasterData;
 import com.nec.middleware.masterdata.entity.*;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,6 +53,7 @@ public class PortalUser extends AuditableEntity {
     @Column(name = "faculty", length = 100)
     private String faculty;
 
+
     // ------------------------------------------------------------------ LOOKUP FKs
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -65,11 +67,15 @@ public class PortalUser extends AuditableEntity {
     @JoinColumn(name = "portal_user_type_id")
     private PortalUserTypes portalUserType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "master_data_type", nullable = false)
+    private MasterData masterData;
+
+    @Column(name="masterdata_id",nullable = false)
+    private Long masterdataId;
     // ------------------------------------------------------------------ MASTER DATA FKs
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "university_id", nullable = false)
-    private MasterDataUniversity university;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id", nullable = false)

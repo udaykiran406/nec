@@ -27,9 +27,9 @@ public class WarehouseSubStoreResponse {
 
     private String status;
 
-    private Long createdBy;
+    private String createdBy;
 
-    private Long updatedBy;
+    private String updatedBy;
 
     private LocalDateTime createdAt;
 

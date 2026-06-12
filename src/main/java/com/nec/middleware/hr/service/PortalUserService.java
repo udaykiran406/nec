@@ -14,7 +14,7 @@ public interface PortalUserService {
 
     Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto filterDto, int pageNumber,int pageSize);
 
-    PortalUserResponseDto softDelete(String portalUserId);
+    PortalUserResponseDto changeStatus(String portalUserId,Boolean isActive);
 
     PortalUserResponseDto updatePortalUser(String portalUserId, PortalUserRequestDto request);
 }

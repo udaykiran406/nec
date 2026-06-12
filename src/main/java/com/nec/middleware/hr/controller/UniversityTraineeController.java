@@ -1,9 +1,9 @@
 package com.nec.middleware.hr.controller;
 
-import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.constant.UniversityTraineeConstants;
 import com.nec.middleware.hr.dto.request.UniversityTraineeListRequestDto;
 import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
+import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.dto.response.UniversityTraineeResponseDto;
 import com.nec.middleware.hr.service.UniversityTraineeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,91 +28,108 @@ public class UniversityTraineeController {
 
     private final UniversityTraineeService service;
 
-    // ------------------------------------------------------------------ POST: Create
+    // ------------------------------------------------------------------ CREATE
 
-    /**
-     * POST /api/hr/university-trainees
-     * Creates a new university trainee record.
-     * send id for update
-     */
-    @Operation(
-            summary = "Save or Update University Trainee"
-    )
-    @PostMapping("/save")
-    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> saveOrUpdate(
+    @Operation(summary = "Create University Trainee")
+    @PostMapping
+    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> create(
             @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
 
         UniversityTraineeResponseDto response =
-                service.saveOrUpdate(requestDto);
+                service.createTrainee(requestDto);
 
-        boolean isCreate = requestDto.getId() == null;
-        String message   = isCreate
-                ? UniversityTraineeConstants.TRAINEE_CREATED
-                : UniversityTraineeConstants.TRAINEE_UPDATED;
-
-        return isCreate
-                ? ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(message, response))
-                : ResponseEntity.ok(ApiResponse.success(message, response));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created(
+                        UniversityTraineeConstants.TRAINEE_CREATED,
+                        response
+                ));
     }
 
-    // ------------------------------------------------------------------ GET: By ID
+    // ------------------------------------------------------------------ UPDATE
 
-    /**
-     * GET /api/hr/university-trainees/{id}
-     * Fetches a single trainee by id (excludes soft-deleted).
-     */
-    @Operation(summary = "Get University Trainee by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> getById(@PathVariable Long id) {
-        UniversityTraineeResponseDto response = service.getById(id);
-        return ResponseEntity.ok(ApiResponse.success(UniversityTraineeConstants.TRAINEE_FETCHED, response));
+    @Operation(summary = "Update University Trainee")
+    @PatchMapping("/{universityTraineeId}")
+    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> update(
+            @PathVariable String universityTraineeId,
+            @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
+
+        UniversityTraineeResponseDto response =
+                service.updateTrainee(
+                        universityTraineeId,
+                        requestDto
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        UniversityTraineeConstants.TRAINEE_UPDATED,
+                        response
+                )
+        );
     }
 
-    // ------------------------------------------------------------------ GET: List
+    // ------------------------------------------------------------------ GET BY BUSINESS ID
 
-    /**
-     * GET /api/hr/university-trainees
-     * Paginated + filtered list. All query params optional.
-     * Params: universityId, regionId, districtId, cityId, statusId, isActive, page, size
-     */
-    @Operation(summary = "Get Paginated & Filtered University Trainee List")
-    @GetMapping
+    @Operation(summary = "Get University Trainee by University Trainee ID")
+    @GetMapping("/{universityTraineeId}")
+    public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> getByUniversityTraineeId(
+            @PathVariable String universityTraineeId) {
+
+        UniversityTraineeResponseDto response =
+                service.getTraineeByUniversityTraineeId(
+                        universityTraineeId
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        UniversityTraineeConstants.TRAINEE_FETCHED,
+                        response
+                )
+        );
+    }
+
+    // ------------------------------------------------------------------ GET ALL
+
+    @Operation(summary = "Get All University Trainees")
+    @PostMapping("/getAllUniversityTrainees")
     public ResponseEntity<ApiResponse<Page<UniversityTraineeResponseDto>>> getAll(
-            @ModelAttribute UniversityTraineeListRequestDto filterDto) {
+            @RequestBody(required = false) UniversityTraineeListRequestDto request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        Page<UniversityTraineeResponseDto> page = service.getAll(filterDto);
-        return ResponseEntity.ok(ApiResponse.success(UniversityTraineeConstants.TRAINEE_LIST_FETCHED, page));
+        Page<UniversityTraineeResponseDto> response =
+                service.getAllUniversityTrainees(
+                        request,
+                        page,
+                        size
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        UniversityTraineeConstants.TRAINEE_LIST_FETCHED,
+                        response
+                )
+        );
     }
 
-    // ------------------------------------------------------------------ POST: Status Change (soft-delete)
+    // ------------------------------------------------------------------ CHANGE STATUS
 
-    /**
-     * POST /api/hr/university-trainees/status/{id}
-     * Changes the active flag.
-     * If isActive = false → record is soft-deleted (is_deleted = true).
-     */
-    @Operation(summary = "Toggle University Trainee Active Status")
-    @PostMapping("/status/{id}")
+    @Operation(summary = "Change University Trainee Status")
+    @PatchMapping("/{universityTraineeId}/status")
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> changeStatus(
-            @PathVariable Long id) {
+            @PathVariable String universityTraineeId,
+            @RequestParam Boolean isActive) {
 
-        UniversityTraineeResponseDto response = service.changeStatus(id);
+        UniversityTraineeResponseDto response =
+                service.changeStatus(
+                        universityTraineeId,
+                        isActive
+                );
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         UniversityTraineeConstants.TRAINEE_STATUS_CHANGED,
-                        response));
-    }
-
-    @Operation(summary = "Soft Delete University Trainee")
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<String>> softDelete(
-            @PathVariable Long id) {
-
-        service.softDelete(id);
-
-        return ResponseEntity.ok(
-                ApiResponse.success(UniversityTraineeConstants.TRAINEE_DELETED,null)
+                        response
+                )
         );
     }
 }

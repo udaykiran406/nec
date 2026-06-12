@@ -40,7 +40,7 @@ public class WarehouseSubStoreRequest {
     @Pattern(regexp = "^(Active|Inactive)$", message = "Status must be 'Active' or 'Inactive'")
     private String status;
 
-    private Long createdBy;
+    private String createdBy;
 
-    private Long updatedBy;
+    private String updatedBy;
 }
