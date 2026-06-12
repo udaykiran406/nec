@@ -33,11 +33,17 @@ public class TrainingClass extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "class_code", nullable = false, unique = true, length = 20)
+    private String classCode;
+
     @Column(name = "class_name", nullable = false, length = 150)
     private String className;
 
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
+
+    @Column(name = "location", nullable = false, length = 200)
+    private String location;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -88,6 +94,8 @@ public class TrainingClass extends AuditableEntity {
      */
     @Column(name = "district_id", nullable = false, insertable = false, updatable = false)
     private Long districtId;
+
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)

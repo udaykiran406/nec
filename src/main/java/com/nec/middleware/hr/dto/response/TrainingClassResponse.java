@@ -12,8 +12,12 @@ public class TrainingClassResponse {
 
     private Long id;
 
+    private String classCode;
+
     private String className;
     private Integer capacity;
+    private String location;
+
     private String description;
     private String preRequests;
 
@@ -28,6 +32,8 @@ public class TrainingClassResponse {
     // District
     private Long districtId;
     private String districtName;
+
+
 
     // City
     private Long cityId;
@@ -47,7 +53,7 @@ public class TrainingClassResponse {
 
     // Audit
     private Boolean isActive;
-    private Boolean isDeleted;
+
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

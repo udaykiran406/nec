@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 public class TrainingClassRequest {
 
-    private Long id; // null = create, present = update
+
 
     @NotBlank(message = "Class name is required")
     private String className;
@@ -29,6 +29,9 @@ public class TrainingClassRequest {
 
     @NotNull(message = "District is required")
     private Long districtId;
+
+    @NotBlank(message = "Location is required")
+    private String location;
 
     @NotNull(message = "City is required")
     private Long cityId;

@@ -15,6 +15,7 @@ public class TrainingClassMapper {
 
         return TrainingClassResponse.builder()
                 .id(entity.getId())
+                .classCode(entity.getClassCode())
                 .className(entity.getClassName())
                 .capacity(entity.getCapacity())
 
@@ -26,6 +27,10 @@ public class TrainingClassMapper {
 
                 .districtId(entity.getDistrictId())
                 .districtName(entity.getDistrict().getDistrictName())
+
+                .location(entity.getLocation())
+                .description(entity.getDescription())
+                .preRequests(entity.getPreRequests())
 
                 .cityId(entity.getCityId())
                 .cityName(entity.getCity().getCityName())
@@ -40,7 +45,7 @@ public class TrainingClassMapper {
                 .statusName(entity.getStatus().getValue())
 
                 .isActive(entity.getIsActive())
-                .isDeleted(entity.getIsDeleted())
+
 
                 .createdBy(entity.getCreatedBy())
                 .createdAt(entity.getCreatedAt())
