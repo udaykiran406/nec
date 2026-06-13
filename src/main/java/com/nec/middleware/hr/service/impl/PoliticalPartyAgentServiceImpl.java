@@ -5,6 +5,7 @@ import com.nec.middleware.Lookups.repository.ThirdPartyStatusRepository;
 import com.nec.middleware.exception.DuplicateResourceException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.constant.PoliticalPartyAgentConstants;
+import com.nec.middleware.hr.constant.PortalUserConstants;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentRequestDto;
 import com.nec.middleware.hr.dto.response.PoliticalPartyAgentResponseDto;
@@ -28,8 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentService {
 
-    private static final String CODE_PREFIX = "PA";
-    private static final int    CODE_PAD    = 3;   // PA001, PA002 …
+ // PA001, PA002 …
 
     private final PoliticalPartyAgentRepository politicalPartyAgentRepository;
     private final PoliticalPartyAgentMapper politicalPartyAgentMapper;
@@ -51,7 +51,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         validateAgent(politicalPartyAgentRequestDto);
         log.info("Creating political party agent. AgentName: {}",politicalPartyAgentRequestDto.getAgentName());
         PoliticalPartyAgent politicalPartyAgentEntity = politicalPartyAgentMapper.toPoliticalPartyAgentEntity(politicalPartyAgentRequestDto);
-        politicalPartyAgentEntity.setPoliticalPartyAgentUserId(generateUserID());
+        politicalPartyAgentEntity.setPoliticalPartyAgentUserId(generateUserID(PoliticalPartyAgentConstants.CODE_PREFIX, PoliticalPartyAgentConstants.CODE_PAD));
 
         politicalPartyAgentEntity.setPollingStation(
                 pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId()).orElseThrow(
@@ -158,9 +158,9 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     // Code generation
     // ------------------------------------------------------------------
 
-    private String generateUserID() {
-        int next = politicalPartyAgentRepository.findMaxCodeSequence() + 1;
-        return CODE_PREFIX + String.format("%0" + CODE_PAD + "d", next);
+    private String generateUserID(String codePrefix, int codePad)  {
+            int next = politicalPartyAgentRepository.findMaxCodeSequence() + 1;
+            return codePrefix + String.format("%0" + codePad + "d", next);
     }
 
     // ------------------------------------------------------------------
