@@ -2,6 +2,7 @@ package com.nec.middleware.hr.service.impl;
 
 import com.nec.middleware.Lookups.repository.LookupGenderRepository;
 import com.nec.middleware.Lookups.repository.ThirdPartyStatusRepository;
+import com.nec.middleware.exception.DuplicateResourceException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.constant.PoliticalPartyAgentConstants;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
@@ -47,7 +48,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     @Transactional
     public PoliticalPartyAgentResponseDto savePartyAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
 
-//        validateAgent(politicalPartyAgentRequestDto);
+        validateAgent(politicalPartyAgentRequestDto);
         log.info("Creating political party agent. AgentName: {}",politicalPartyAgentRequestDto.getAgentName());
         PoliticalPartyAgent politicalPartyAgentEntity = politicalPartyAgentMapper.toPoliticalPartyAgentEntity(politicalPartyAgentRequestDto);
         politicalPartyAgentEntity.setPoliticalPartyAgentUserId(generateUserID());
@@ -127,6 +128,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         return politicalPartyAgentMapper.politicalPartyResponseDto(
                 politicalPartyAgentRepository.save(politicalPartyAgentRepository.save(partyAgent)));
     }
+    //-------------------------------------------------------------Update
     @Override
     @Transactional
     public PoliticalPartyAgentResponseDto updatePoliticalPartyAgent(
@@ -136,11 +138,21 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         PoliticalPartyAgent politicalPartyAgent =
                 findByAgentUserId(agentUserId);
 
-        updatePoliticalPartyAgents(politicalPartyAgent, politicalPartyAgentRequestDto);
+        validateAgentForUpdate(
+                politicalPartyAgentRequestDto,
+                politicalPartyAgent.getId()
+        );
+
+        updatePoliticalPartyAgents(
+                politicalPartyAgent,
+                politicalPartyAgentRequestDto
+        );
 
         politicalPartyAgentRepository.save(politicalPartyAgent);
 
-        return politicalPartyAgentMapper.politicalPartyResponseDto(politicalPartyAgent);
+        return politicalPartyAgentMapper.politicalPartyResponseDto(
+                politicalPartyAgent
+        );
     }
     // ------------------------------------------------------------------
     // Code generation
@@ -157,10 +169,26 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
 
     private void validateAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequest) {
 
-//            if (politicalPartyAgentRepository.existsByEmail(politicalPartyAgentRequest.getEmail()) ||
-//                    politicalPartyAgentRepository.existsByPhone(politicalPartyAgentRequest.getPhone())) {
-//                throw new DuplicateResourceException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS+" with email"+ politicalPartyAgentRequest.getEmail());
-//            }
+            if (politicalPartyAgentRepository.existsByEmail(politicalPartyAgentRequest.getEmail()) ||
+                    politicalPartyAgentRepository.existsByPhone(politicalPartyAgentRequest.getPhone())) {
+                throw new DuplicateResourceException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
+            }
+    }
+
+    private void validateAgentForUpdate(
+            PoliticalPartyAgentRequestDto request,
+            Long id) {
+
+        if (politicalPartyAgentRepository.existsByEmailAndIdNot(
+                request.getEmail(), id)
+                ||
+                politicalPartyAgentRepository.existsByPhoneAndIdNot(
+                        request.getPhone(), id)) {
+
+            throw new DuplicateResourceException(
+                    PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS
+            );
+        }
     }
 
 

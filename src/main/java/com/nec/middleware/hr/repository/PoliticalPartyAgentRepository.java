@@ -20,6 +20,13 @@ public interface PoliticalPartyAgentRepository extends JpaRepository<PoliticalPa
     // Duplicate checks (CREATE)
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
+
+    // For Update
+    boolean existsByEmailAndIdNot(String email, Long id);
+
+    boolean existsByPhoneAndIdNot(String phone, Long id);
+
+
     Optional<PoliticalPartyAgent> findByPoliticalPartyAgentUserId(String agentUserId);
 
     // Code generation helper

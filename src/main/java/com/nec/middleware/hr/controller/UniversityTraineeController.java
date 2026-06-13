@@ -31,7 +31,7 @@ public class UniversityTraineeController {
     // ------------------------------------------------------------------ CREATE
 
     @Operation(summary = "Create University Trainee")
-    @PostMapping
+    @PostMapping("/saveTrainee")
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> createUniversityTrainee(
             @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
 

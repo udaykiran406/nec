@@ -102,6 +102,8 @@ public class PoliticalPartyAgentMapper {
                 .isActive(politicalPartyAgent.getIsActive())
                 .createdBy(politicalPartyAgent.getCreatedBy())
                 .updatedBy(politicalPartyAgent.getUpdatedBy())
+                .updatedBy(politicalPartyAgent.getUpdatedBy())
+                .updatedAt(politicalPartyAgent.getUpdatedAt())
                 .build();
 
 

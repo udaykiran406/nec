@@ -2,6 +2,7 @@ package com.nec.middleware.hr.service.impl;
 
 import com.nec.middleware.Lookups.repository.LookupGenderRepository;
 import com.nec.middleware.Lookups.repository.LookupPaymentMethodsRepository;
+import com.nec.middleware.exception.DuplicateResourceException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.exception.ValidationException;
 import com.nec.middleware.hr.constant.UniversityTraineeConstants;
@@ -52,7 +53,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
         log.info("Creating university trainee");
 
-//        validateTrainee(requestDto);
+        validateTrainee(requestDto);
 
         UniversityTrainee universityTraineeEntity = universityTraineeMapper.toEntity(requestDto);
         universityTraineeEntity.setUniversityTraineeId(generateTraineeId(UniversityTraineeConstants.CODE_PREFIX, UniversityTraineeConstants.CODE_PAD));
@@ -235,14 +236,14 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
     // ------------------------------------------------------------------ VALIDATION
 
-//    private void validateTrainee(UniversityTraineeRequestDto dto) {
-//
-//        if (universityTraineerepository.existsByEmail(dto.getEmail()) || universityTraineerepository.existsByPhone(dto.getEmail())) {
-//            throw new DuplicateResourceException(
-//                    UniversityTraineeConstants.TRAINEE_ALREADY_EXISTS
-//            );
-//        }
-//    }
+    private void validateTrainee(UniversityTraineeRequestDto dto) {
+
+        if (universityTraineerepository.existsByEmail(dto.getEmail()) || universityTraineerepository.existsByPhone(dto.getEmail())) {
+            throw new DuplicateResourceException(
+                    UniversityTraineeConstants.TRAINEE_ALREADY_EXISTS
+            );
+        }
+    }
 
     private void validateTraineeForUpdate(
             UniversityTraineeRequestDto dto,

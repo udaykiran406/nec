@@ -73,12 +73,6 @@ public class GlobalExceptionHandler {
         log.warn("DTO validation error: {}", firstError);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, firstError, body);
     }
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDataIntegrityViolation(
-            DataIntegrityViolationException ex) {
-        log.warn("unique constraint exception: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.CONFLICT, "Email or Mobile Number already Exists", null);
-    }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiResponse<Object>> handleCustomValidationException(ValidationException ex) {

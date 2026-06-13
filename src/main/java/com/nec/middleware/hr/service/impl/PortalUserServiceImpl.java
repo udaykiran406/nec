@@ -3,6 +3,7 @@ package com.nec.middleware.hr.service.impl;
 import com.nec.middleware.Lookups.repository.LookupGenderRepository;
 import com.nec.middleware.Lookups.repository.LookupPortalUserTypeRepository;
 import com.nec.middleware.Lookups.repository.LookupRoleRepository;
+import com.nec.middleware.exception.DuplicateResourceException;
 import com.nec.middleware.exception.ResourceAlreadyExistsException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.Enum.MasterData;
@@ -56,7 +57,7 @@ public class PortalUserServiceImpl implements PortalUserService {
 
 
         log.info("Creating portal user {}", portalUserRequest.getUserName());
-//        validateDuplicateUser(portalUserRequest);
+        validateDuplicateUser(portalUserRequest);
         PortalUser portalUserEntity = portalUserMapper.portalUserEntity(portalUserRequest);
         portalUserEntity.setPortalUserId(generateUserId(PortalUserConstants.CODE_PREFIX, PortalUserConstants.CODE_PAD));
         // ---------------- LOOKUPS ----------------
@@ -180,6 +181,10 @@ public class PortalUserServiceImpl implements PortalUserService {
             PortalUserRequestDto portalUserRequestDto) {
 
         PortalUser portalUser = findByPortalUserId(portalUserId);
+        validateDuplicateUserForUpdate(
+                portalUserRequestDto,
+                portalUser.getId()
+        );
         if (portalUserRequestDto.getGenderId() != null) {
             portalUser.setGender(
                     genderRepository.findById(
@@ -312,26 +317,35 @@ public class PortalUserServiceImpl implements PortalUserService {
     // Validation
     // ------------------------------------------------------------------
 
-//    private void validateDuplicateUser(PortalUserRequestDto request) {
-//
-//        if (portalUserrepository.existsByEmail(request.getEmail()) || portalUserrepository.existsByPhone(request.getPhone())) {
-//            throw new DuplicateResourceException(
-//                    PortalUserConstants.USER_ALREADY_EXISTS + " with email "+request.getEmail());
-//        }
-//    }
+    private void validateDuplicateUser(PortalUserRequestDto request) {
 
+        if (portalUserrepository.existsByEmail(request.getEmail()) || portalUserrepository.existsByPhone(request.getPhone())) {
+            throw new DuplicateResourceException(
+                    PortalUserConstants.USER_ALREADY_EXISTS);
+        }
+
+    }
+
+    private void validateDuplicateUserForUpdate(
+            PortalUserRequestDto request,
+            Long id) {
+
+        if (request.getEmail() != null &&
+                portalUserrepository.existsByEmailAndIdNot(
+                        request.getEmail(), id)) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        if (request.getPhone() != null &&
+                portalUserrepository.existsByPhoneAndIdNot(
+                        request.getPhone(), id)) {
+            throw new DuplicateResourceException("Phone already exists");
+        }
+    }
     // ------------------------------------------------------------------
     // Private Helpers
     // ------------------------------------------------------------------
 
-    /**
-     * Used by GET — excludes inactive records.
-     */
-    private PortalUser findByPortalUserIdAndIsActive(String portalUserId) {
-        return portalUserrepository.findByPortalUserIdAndIsActiveTrue(portalUserId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(PortalUserConstants.USER_NOT_FOUND + portalUserId));
-    }
 
     private PortalUser findByPortalUserId(String portalUserId) {
         return portalUserrepository.findByPortalUserId(portalUserId)
@@ -356,25 +370,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         };
     }
 
-// to get the name of master data id
-    private String getMasterDataName(MasterData masterData, Long masterdataId) {
-        return switch (masterData) {
-            case UNIVERSITY -> universityRepository.findById(masterdataId)
-                    .map(MasterDataUniversity::getUniversityName)
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("University not found"));
 
-            case POLITICAL_PARTY -> politicalPartyRepository.findById(masterdataId)
-                    .map(MasterDataPoliticalParty::getPartyName)
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Political party not found"));
-
-            case AAQIL -> aaqilRepository.findById(masterdataId)
-                    .map(MasterDataAaqilType::getValue)
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Aaqil not found"));
-        };
-    }
 
     /**
      * Resolves the human-readable name/value for the given master data type and id,
