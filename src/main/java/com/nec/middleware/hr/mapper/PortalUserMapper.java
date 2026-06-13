@@ -1,7 +1,7 @@
 package com.nec.middleware.hr.mapper;
 
 import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
-import com.nec.middleware.hr.dto.response.IdValueDto;
+import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 import com.nec.middleware.hr.entity.PortalUser;
 
@@ -13,18 +13,18 @@ public class PortalUserMapper {
     /**
      * Map RequestDto → new Entity (for CREATE)
      */
-    public PortalUser portalUserEntity(PortalUserRequestDto dto) {
+    public PortalUser portalUserEntity(PortalUserRequestDto portalUserRequestDto) {
         PortalUser portalUserEntity = PortalUser.builder()
-                .userName(dto.getUserName())
-                .phone(dto.getPhone())
-                .email(dto.getEmail())
-                .photoPath(dto.getPhotoPath())
-                .faculty(dto.getFaculty())
+                .userName(portalUserRequestDto.getUserName())
+                .phone(portalUserRequestDto.getPhone())
+                .email(portalUserRequestDto.getEmail())
+                .photoPath(portalUserRequestDto.getPhotoPath())
+                .faculty(portalUserRequestDto.getFaculty())
                 .build();
 
         portalUserEntity.setIsActive(Boolean.TRUE);
-        portalUserEntity.setCreatedBy(dto.getCreatedBy());
-        portalUserEntity.setUpdatedBy(dto.getCreatedBy());
+        portalUserEntity.setCreatedBy(portalUserRequestDto.getCreatedBy());
+        portalUserEntity.setUpdatedBy(portalUserRequestDto.getCreatedBy());
 
         return portalUserEntity;
     }
@@ -122,10 +122,8 @@ public class PortalUserMapper {
                           .build()
                         : null)
 
-
                 // Audit
                 .isActive(entity.getIsActive())
-                .isDeleted(entity.getIsDeleted())
                 .createdBy(entity.getCreatedBy())
                 .createdAt(entity.getCreatedAt())
                 .updatedBy(entity.getUpdatedBy())

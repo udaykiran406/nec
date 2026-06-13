@@ -21,9 +21,9 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> , 
     Optional<PortalUser> findByPortalUserId(String portalUserId);
     // ------------------------------------------------------------------ Duplicate checks (CREATE)
 
-    boolean existsByPhoneAndIsActiveTrue(String phone);
+    boolean existsByPhone(String phone);
 
-    boolean existsByEmailAndIsActiveTrue(String email);
+    boolean existsByEmail(String email);
 
 // ------------------------------------------------------------------ Code generation helper
 
@@ -34,11 +34,5 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> , 
      */
     @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(u.portalUserId, 3) AS int)), 0) FROM PortalUser u WHERE u.portalUserId LIKE 'PU%'")
     int findMaxCodeSequence();
-
-
-
-
-
-
 
 }

@@ -1,7 +1,5 @@
 package com.nec.middleware.hr.dto.request;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 
 @Getter
@@ -9,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PortalUserListRequestDto {
+public class PortalUserFilterRequestDto {
 
     private String portalUserId;
     private String userName;

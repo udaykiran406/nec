@@ -1,6 +1,9 @@
 package com.nec.middleware.hr.entity;
 
 
+import com.nec.middleware.Lookups.entity.Genders;
+import com.nec.middleware.Lookups.entity.ThirdPartyStatus;
+import com.nec.middleware.masterdata.entity.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,39 +20,43 @@ public class PoliticalPartyAgent extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "code", nullable = false, unique = true, length = 20)
-    private String code;
-
-    @Column(name = "political_party_name_id", nullable = false)
-    private Long politicalPartyNameId;
+    @Column(name = "political_party_user_id", nullable = false, unique = true, length = 20)
+    private String politicalPartyAgentUserId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "political_party_name_id", nullable = false)
+    private MasterDataPoliticalParty politicalPartyName;
 
     @Column(name = "agent_name", nullable = false, length = 120)
     private String agentName;
 
-    @Column(name = "gender_id", nullable = false)
-    private Long genderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gender_id", nullable = false)
+    private Genders gender;
 
-    @Column(name = "phone", nullable = false, length = 30)
+    @Column(name = "phone", nullable = false, unique = true,length = 30)
     private String phone;
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email",unique = true ,nullable = false, length = 100)
     private String email;
 
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "polling_station_id", nullable = false)
+    private MasterDataPollingStation pollingStation;
 
-    @Column(name = "polling_station_id", nullable = false)
-    private Long pollingStationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", nullable = false)
+    private MasterDataRegion region;
 
-    @Column(name = "region_id", nullable = false)
-    private Long regionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id", nullable = false)
+    private MasterDataDistrict district;
 
-    @Column(name = "district_id", nullable = false)
-    private Long districtId;
-
-    @Column(name = "city_id", nullable = false)
-    private Long cityId;
-
-    @Column(name = "status_id", nullable = false)
-    private Long statusId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false)
+    private MasterDataCity city;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_id", nullable = false)
+    private ThirdPartyStatus status;
 }

@@ -1,20 +1,22 @@
 package com.nec.middleware.hr.service;
 
-import com.nec.middleware.hr.dto.request.PoliticalPartyAgentListRequestDto;
+import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentRequestDto;
+import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
 import com.nec.middleware.hr.dto.response.PoliticalPartyAgentResponseDto;
+import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 import org.springframework.data.domain.Page;
 
 
 public interface PoliticalPartyAgentService {
 
-    PoliticalPartyAgentResponseDto saveOrUpdate(PoliticalPartyAgentRequestDto requestDto);
+    PoliticalPartyAgentResponseDto savePartyAgent(PoliticalPartyAgentRequestDto requestDto);
 
-    PoliticalPartyAgentResponseDto getById(Long id);
+    PoliticalPartyAgentResponseDto getPolticalPartyAgentById(String partyAgentUserId);
 
-    Page<PoliticalPartyAgentResponseDto> getAll(PoliticalPartyAgentListRequestDto filterDto);
+    Page<PoliticalPartyAgentResponseDto> getAllPartyAgents(PoliticalPartyAgentFilterRequestDto filterDto, int page, int size);
 
-    PoliticalPartyAgentResponseDto changeStatus(Long id);
+    PoliticalPartyAgentResponseDto changeStatus(String partyAgentUserId, Boolean isActiveFlag);
+    PoliticalPartyAgentResponseDto updatePoliticalPartyAgent(String partyAgentUserId,PoliticalPartyAgentRequestDto requestDto);
 
-    void softDelete(Long id);
 }

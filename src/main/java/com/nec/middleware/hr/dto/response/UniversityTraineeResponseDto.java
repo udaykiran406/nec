@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.dto.response;
 
+import com.nec.middleware.dto.IdValueDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
