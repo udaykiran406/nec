@@ -7,9 +7,9 @@ import com.nec.middleware.exception.ResourceAlreadyExistsException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.Enum.MasterData;
 import com.nec.middleware.hr.constant.PortalUserConstants;
-import com.nec.middleware.hr.dto.request.PortalUserListRequestDto;
+import com.nec.middleware.hr.dto.request.PortalUserFilterRequestDto;
 import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
-import com.nec.middleware.hr.dto.response.IdValueDto;
+import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 import com.nec.middleware.hr.entity.PortalUser;
 import com.nec.middleware.hr.mapper.PortalUserMapper;
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PortalUserServiceImpl implements PortalUserService {
 
     private final PortalUserRepository portalUserrepository;
-    private final PortalUserMapper mapper;
+    private final PortalUserMapper portalUserMapper;
     private final MasterDataRepository regionRepository;
     private final DistrictRepository districtRepository;
     private final CityRepository cityRepository;
@@ -56,8 +56,8 @@ public class PortalUserServiceImpl implements PortalUserService {
 
 
         log.info("Creating portal user {}", portalUserRequest.getUserName());
-        validateDuplicateUser(portalUserRequest);
-        PortalUser portalUserEntity = mapper.portalUserEntity(portalUserRequest);
+//        validateDuplicateUser(portalUserRequest);
+        PortalUser portalUserEntity = portalUserMapper.portalUserEntity(portalUserRequest);
         portalUserEntity.setPortalUserId(generateUserId(PortalUserConstants.CODE_PREFIX, PortalUserConstants.CODE_PAD));
         // ---------------- LOOKUPS ----------------
         portalUserEntity.setGender(
@@ -111,7 +111,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         PortalUser savedEntity = portalUserrepository.save(portalUserEntity);
 
         PortalUserResponseDto response =
-                mapper.portalUserResponseDto(savedEntity);
+                portalUserMapper.portalUserResponseDto(savedEntity);
 
         // Enrich masterData as IdValueDto: { id: masterdataId, value: "University Name / Party Name / Aaqil Value" }
         response.setMasterData(
@@ -128,7 +128,7 @@ public class PortalUserServiceImpl implements PortalUserService {
     public PortalUserResponseDto getUserByPortalUserId(String portalUserId) {
         PortalUser portalUser =findByPortalUserId(portalUserId);
         PortalUserResponseDto portalUserResponse =
-                mapper.portalUserResponseDto(portalUser);
+                portalUserMapper.portalUserResponseDto(portalUser);
 
         portalUserResponse.setMasterData(
                 buildMasterDataIdValueDto(
@@ -142,11 +142,11 @@ public class PortalUserServiceImpl implements PortalUserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PortalUserResponseDto> getAllPortalUsers(PortalUserListRequestDto request, int page, int size) {
+    public Page<PortalUserResponseDto> getAllPortalUsers(PortalUserFilterRequestDto request, int page, int size) {
 
 
         if (request == null) {
-            request = new PortalUserListRequestDto();
+            request = new PortalUserFilterRequestDto();
         }
 
         Pageable pageable = PageRequest.of(
@@ -158,7 +158,7 @@ public class PortalUserServiceImpl implements PortalUserService {
                         pageable)
                 .map(entity -> {
                     PortalUserResponseDto portalUserResponseDto =
-                            mapper.portalUserResponseDto(entity);
+                            portalUserMapper.portalUserResponseDto(entity);
 
                     portalUserResponseDto.setMasterData(
                             buildMasterDataIdValueDto(
@@ -258,12 +258,12 @@ public class PortalUserServiceImpl implements PortalUserService {
                                     new ResourceNotFoundException("City not found"))
             );
         }
-        mapper.updatePortalUserEntity(portalUser, portalUserRequestDto);
+        portalUserMapper.updatePortalUserEntity(portalUser, portalUserRequestDto);
 
         PortalUser updatedEntity = portalUserrepository.save(portalUser);
 
         PortalUserResponseDto prtalUserResponse =
-                mapper.portalUserResponseDto(updatedEntity);
+                portalUserMapper.portalUserResponseDto(updatedEntity);
 
         // Enrich masterData as IdValueDto
         prtalUserResponse.setMasterData(
@@ -279,17 +279,17 @@ public class PortalUserServiceImpl implements PortalUserService {
     @Transactional
     public PortalUserResponseDto changeStatus(String portalUserId, Boolean isActive) {
 
-        PortalUser entity = findByPortalUserId(portalUserId);
+        PortalUser portalUser = findByPortalUserId(portalUserId);
 
-        entity.setIsActive(isActive);
+        portalUser.setIsActive(isActive);
 
-        log.info("Changing status for portal user id: {} -> isActive={}, isDeleted={}",
+        log.info("Changing status for portal user id: {} -> isActive={}",
                 portalUserId,
-                isActive,
-                !isActive);
+                isActive
+        );
 
-        return mapper.portalUserResponseDto(
-                portalUserrepository.save(entity));
+        return portalUserMapper.portalUserResponseDto(
+                portalUserrepository.save(portalUser));
     }
 
 
@@ -312,13 +312,13 @@ public class PortalUserServiceImpl implements PortalUserService {
     // Validation
     // ------------------------------------------------------------------
 
-    private void validateDuplicateUser(PortalUserRequestDto request) {
-
-        if (portalUserrepository.existsByEmail(request.getEmail())) {
-            throw new ResourceAlreadyExistsException(
-                    PortalUserConstants.USER_ALREADY_EXISTS + request.getEmail());
-        }
-    }
+//    private void validateDuplicateUser(PortalUserRequestDto request) {
+//
+//        if (portalUserrepository.existsByEmail(request.getEmail()) || portalUserrepository.existsByPhone(request.getPhone())) {
+//            throw new DuplicateResourceException(
+//                    PortalUserConstants.USER_ALREADY_EXISTS + " with email "+request.getEmail());
+//        }
+//    }
 
     // ------------------------------------------------------------------
     // Private Helpers

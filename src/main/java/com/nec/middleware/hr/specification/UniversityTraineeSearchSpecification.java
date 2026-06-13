@@ -14,7 +14,7 @@ import java.util.List;
  * Mirrors {@code PortalUserSearchSpecification} exactly — all filters are
  * optional and null values are ignored.
  */
-public final class UniversityTraineeSearchSpecification {
+public class UniversityTraineeSearchSpecification {
 
     private UniversityTraineeSearchSpecification() {}
 

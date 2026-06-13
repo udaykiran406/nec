@@ -3,6 +3,7 @@ package com.nec.middleware.exception;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -71,6 +72,12 @@ public class GlobalExceptionHandler {
 
         log.warn("DTO validation error: {}", firstError);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, firstError, body);
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex) {
+        log.warn("unique constraint exception: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.CONFLICT, "Email or Mobile Number already Exists", null);
     }
 
     @ExceptionHandler(ValidationException.class)

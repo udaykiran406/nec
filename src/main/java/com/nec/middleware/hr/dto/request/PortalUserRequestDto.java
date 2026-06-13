@@ -1,6 +1,5 @@
 package com.nec.middleware.hr.dto.request;
 
-import com.nec.middleware.hr.Enum.MasterData;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

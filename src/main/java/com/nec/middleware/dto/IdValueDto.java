@@ -1,4 +1,4 @@
-package com.nec.middleware.hr.dto.response;
+package com.nec.middleware.dto;
 
 import lombok.*;
 

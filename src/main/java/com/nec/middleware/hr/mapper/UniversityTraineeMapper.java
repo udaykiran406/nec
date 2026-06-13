@@ -1,7 +1,7 @@
 package com.nec.middleware.hr.mapper;
 
 import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
-import com.nec.middleware.hr.dto.response.IdValueDto;
+import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.hr.dto.response.UniversityTraineeResponseDto;
 import com.nec.middleware.hr.entity.UniversityTrainee;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * Mirrors {@code PortalUserMapper} exactly:
  *  - toEntity()       — scalar fields only; FK associations set by service
  *  - updateEntity()   — merges non-null scalar fields
- *  - toResponseDto()  — reads lazy-loaded associations directly from the entity
+ *  - politicalPartyResponseDto()  — reads lazy-loaded associations directly from the entity
  *                       and converts each to an {@link IdValueDto}
  */
 @Component

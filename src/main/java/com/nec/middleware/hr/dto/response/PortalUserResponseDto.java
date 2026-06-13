@@ -1,6 +1,6 @@
 package com.nec.middleware.hr.dto.response;
 
-import com.nec.middleware.hr.Enum.MasterData;
+import com.nec.middleware.dto.IdValueDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 public class PortalUserResponseDto {
 
     // ------------------------------------------------------------------ Identity
-    private Long   id;
+    private Long id;
     private String portalUserId;
     private String userName;
     private String phone;
@@ -37,33 +37,44 @@ public class PortalUserResponseDto {
     private String faculty;
 
     // ------------------------------------------------------------------ Lookup FKs → IdValueDto
-    /** nec_lkp_genders */
+    /**
+     * nec_lkp_genders
+     */
     private IdValueDto gender;
 
-    /** nec_lkp_roles */
+    /**
+     * nec_lkp_roles
+     */
     private IdValueDto role;
 
-    /** nec_lkp_portal_user_types */
+    /**
+     * nec_lkp_portal_user_types
+     */
     private IdValueDto portalUserType;
 
     // ------------------------------------------------------------------ Master Data FKs → IdValueDto
     private IdValueDto masterData;
 
 
-    /** nec_regions */
+    /**
+     * nec_regions
+     */
     private IdValueDto region;
 
-    /** nec_districts */
+    /**
+     * nec_districts
+     */
     private IdValueDto district;
 
-    /** nec_cities */
+    /**
+     * nec_cities
+     */
     private IdValueDto city;
 
     // ------------------------------------------------------------------ Audit
-    private Boolean       isActive;
-    private Boolean       isDeleted;
-    private String        createdBy;
+    private Boolean isActive;
+    private String createdBy;
     private LocalDateTime createdAt;
-    private String        updatedBy;
+    private String updatedBy;
     private LocalDateTime updatedAt;
 }
