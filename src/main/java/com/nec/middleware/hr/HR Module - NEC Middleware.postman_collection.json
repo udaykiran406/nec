@@ -1054,6 +1054,322 @@
         }
       ],
       "description": "All endpoints for managing Political Party Agents in the HR module."
+    },
+    {
+      "name": "Aaqil Management",
+      "item": [
+        {
+          "name": "Create Aaqil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal(201);",
+                  "    pm.expect(jsonData.message).to.eql(\"Aaqil created successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "    pm.expect(jsonData.data).to.have.property(\"aaqilId\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.aaqilId) {",
+                  "        pm.environment.set(\"aaqil_id\", jsonData.data.aaqilId);",
+                  "        console.log(\"✓ Aaqil ID saved:\", jsonData.data.aaqilId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aaqilTypeId\": 1,\n  \"fullName\": \"Mohamed Ali\",\n  \"genderId\": 1,\n  \"age\": 45,\n  \"phone\": \"252634567890\",\n  \"email\": \"mohamed@example.com\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1,\n  \"createdBy\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/save",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "aaqils",
+                "save"
+              ]
+            },
+            "description": "Creates a new Aaqil (Traditional Leader) record. The generated aaqilId (e.g. AA001) is automatically saved to the 'aaqil_id' environment variable.\n\nRequired fields:\n- aaqilTypeId: Aaqil type lookup ID\n- fullName: Full name (max 120 chars)\n- genderId: Gender lookup ID\n- age: Age (17–100)\n- phone: Phone number (9–30 chars)\n- email: Valid email (max 100 chars)\n- regionId, districtId, cityId: Location IDs\n- statusId: Status lookup ID\n\nOptional:\n- createdBy: Audit field"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Aaqil by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains aaqil data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal(200);",
+                  "    pm.expect(jsonData.message).to.eql(\"Aaqil fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"aaqilId\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/{{aaqil_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "aaqils",
+                "{{aaqil_id}}"
+              ]
+            },
+            "description": "Fetches a single Aaqil by their business ID (e.g. AA001)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Aaqils (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal(200);",
+                  "    pm.expect(jsonData.message).to.eql(\"Aaqils fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"totalElements\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"totalPages\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"number\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"size\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/getAll?page=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "aaqils",
+                "getAll"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Page number (0-indexed)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Records per page (default 10)"
+                }
+              ]
+            },
+            "description": "Returns a paginated list of Aaqils. Optional filter parameters can be appended as query params.\n\nAvailable filter query params (all optional):\n- aaqilId: Business ID (e.g. AA001)\n- aaqilTypeId: Aaqil type ID\n- fullName: Name search\n- genderId: Gender ID\n- regionId, districtId, cityId: Location IDs\n- statusId: Status ID\n- isActive: true / false\n- phone, email: Contact filters\n\nPagination:\n- page: 0-indexed page number (default 0)\n- size: Page size (default 10)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Aaqil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Aaqil updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal(200);",
+                  "    pm.expect(jsonData.message).to.eql(\"Aaqil updated successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"aaqilId\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"updatedAt\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aaqilTypeId\": 1,\n  \"fullName\": \"Mohamed Ali Updated\",\n  \"genderId\": 1,\n  \"age\": 46,\n  \"phone\": \"252634567891\",\n  \"email\": \"mohamed.updated@example.com\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1,\n  \"updatedBy\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/{{aaqil_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "aaqils",
+                "{{aaqil_id}}"
+              ]
+            },
+            "description": "Updates an existing Aaqil by their business ID (e.g. AA001).\n\nAll fields are optional — send only what needs to change."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Aaqil Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Status changed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal(200);",
+                  "    pm.expect(jsonData.message).to.eql(\"Aaqil status updated successfully\");",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "    pm.expect(jsonData.data).to.have.property(\"isActive\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hr/aaqils/status/{{aaqil_id}}?isActive=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "aaqils",
+                "status",
+                "{{aaqil_id}}"
+              ],
+              "query": [
+                {
+                  "key": "isActive",
+                  "value": "false",
+                  "description": "Set to true to activate, false to deactivate"
+                }
+              ]
+            },
+            "description": "Activates or deactivates an Aaqil.\n\nQuery parameter:\n- isActive=true  → activates the aaqil\n- isActive=false → deactivates the aaqil\n\nNote: Parameter name is 'isActive' (case-sensitive)."
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing Aaqil (Traditional Leaders) in the HR module."
     }
   ],
   "event": [
@@ -1081,13 +1397,13 @@
     },
     {
       "key": "agent_id",
-      "value": "1",
-      "description": "Political Party Agent ID (database ID) - auto-set from create response"
+      "value": "PA001",
+      "description": "Political Party Agent Business ID (e.g., PA001) - auto-set from create response"
     },
     {
       "key": "aaqil_id",
-      "value": "1",
-      "description": "Aaqil ID (database ID) - auto-set from create response"
+      "value": "AA001",
+      "description": "Aaqil Business ID (e.g., AA001) - auto-set from create response"
     },
     {
       "key": "portal_user_id",

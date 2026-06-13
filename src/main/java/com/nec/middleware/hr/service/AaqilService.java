@@ -1,19 +1,26 @@
 package com.nec.middleware.hr.service;
 
-import com.nec.middleware.hr.dto.request.AaqilListRequestDto;
+import com.nec.middleware.hr.dto.request.AaqilFilterRequestDto;
 import com.nec.middleware.hr.dto.request.AaqilRequestDto;
 import com.nec.middleware.hr.dto.response.AaqilResponseDto;
 import org.springframework.data.domain.Page;
 
 public interface AaqilService {
 
-    AaqilResponseDto saveOrUpdate(AaqilRequestDto requestDto);
+    AaqilResponseDto saveAaqil(AaqilRequestDto aaqilRequestDto);
 
-    AaqilResponseDto getById(Long id);
+    AaqilResponseDto getAaqilById(String aaqilCode);
 
-    Page<AaqilResponseDto> getAll(AaqilListRequestDto filterDto);
+    Page<AaqilResponseDto> getAllAaqils(
+            AaqilFilterRequestDto filterDto,
+            int page,
+            int size
+    );
 
-    AaqilResponseDto changeStatus(Long id);
+    AaqilResponseDto changeStatus(String aaqilCode, Boolean isActiveFlag);
 
-    void softDelete(Long id);
+    AaqilResponseDto updateAaqil(
+            String aaqilCode,
+            AaqilRequestDto aaqilRequestDto
+    );
 }

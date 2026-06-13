@@ -1,10 +1,13 @@
 package com.nec.middleware.hr.controller;
 
 import com.nec.middleware.hr.constant.AaqilConstants;
-import com.nec.middleware.hr.dto.request.AaqilListRequestDto;
+import com.nec.middleware.hr.constant.PoliticalPartyAgentConstants;
+import com.nec.middleware.hr.dto.request.AaqilFilterRequestDto;
 import com.nec.middleware.hr.dto.request.AaqilRequestDto;
+import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
 import com.nec.middleware.hr.dto.response.AaqilResponseDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
+import com.nec.middleware.hr.dto.response.PoliticalPartyAgentResponseDto;
 import com.nec.middleware.hr.service.AaqilService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,66 +31,96 @@ public class AaqilController {
 
     private final AaqilService service;
 
-    // ------------------------------------------------------------------ POST: Save / Update
+    // ------------------------------------------------------------------ SAVE
 
-    @Operation(summary = "Save or Update Aaqil")
+    @Operation(summary = "Create Aaqil")
     @PostMapping("/save")
-    public ResponseEntity<ApiResponse<AaqilResponseDto>> saveOrUpdate(
+    public ResponseEntity<ApiResponse<AaqilResponseDto>> saveAaqil(
             @Valid @RequestBody AaqilRequestDto requestDto) {
 
-        AaqilResponseDto response = service.saveOrUpdate(requestDto);
+        AaqilResponseDto response = service.saveAaqil(requestDto);
 
-        boolean isCreate = requestDto.getId() == null;
-        String message   = isCreate
-                ? AaqilConstants.AAQIL_CREATED
-                : AaqilConstants.AAQIL_UPDATED;
-
-        return isCreate
-                ? ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(message, response))
-                : ResponseEntity.ok(ApiResponse.success(message, response));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created(
+                        AaqilConstants.AAQIL_CREATED,
+                        response
+                ));
     }
 
-    // ------------------------------------------------------------------ GET: By ID
+    // ------------------------------------------------------------------ UPDATE
 
-    @Operation(summary = "Get Aaqil by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<AaqilResponseDto>> getById(@PathVariable Long id) {
+    @Operation(summary = "Update Aaqil")
+    @PatchMapping("/{aaqilId}")
+    public ResponseEntity<ApiResponse<AaqilResponseDto>> updateAaqil(
+            @PathVariable String aaqilId,
+            @Valid @RequestBody AaqilRequestDto requestDto) {
+
         return ResponseEntity.ok(
-                ApiResponse.success(AaqilConstants.AAQIL_FETCHED, service.getById(id)));
+                ApiResponse.success(
+                        AaqilConstants.AAQIL_UPDATED,
+                        service.updateAaqil(
+                                aaqilId,
+                                requestDto
+                        )
+                )
+        );
     }
 
-    // ------------------------------------------------------------------ GET: List
+    // ------------------------------------------------------------------ GET BY ID
+
+    @Operation(summary = "Get Aaqil by Aaqil ID")
+    @GetMapping("/{aaqilId}")
+    public ResponseEntity<ApiResponse<AaqilResponseDto>> getAaqilById(
+            @PathVariable String aaqilId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        AaqilConstants.AAQIL_FETCHED,
+                        service.getAaqilById(aaqilId)
+                )
+        );
+    }
+
+    // ------------------------------------------------------------------ GET ALL
 
     @Operation(summary = "Get Paginated & Filtered Aaqil List")
-    @GetMapping
-    public ResponseEntity<ApiResponse<Page<AaqilResponseDto>>> getAll(
-            @ModelAttribute AaqilListRequestDto filterDto) {
+    @PostMapping("/getAll")
+    public ResponseEntity<ApiResponse<Page<AaqilResponseDto>>> getAllAaqils(
+            @RequestBody(required = false) AaqilFilterRequestDto filterDto,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<AaqilResponseDto> response =
+                service.getAllAaqils(
+                        filterDto,
+                        page,
+                        size
+                );
 
         return ResponseEntity.ok(
-                ApiResponse.success(AaqilConstants.AAQIL_LIST_FETCHED, service.getAll(filterDto)));
+                ApiResponse.success(
+                       AaqilConstants.AAQIL_LIST_FETCHED,
+                        response
+                )
+        );
     }
 
-    // ------------------------------------------------------------------ POST: Toggle Status
+    // ------------------------------------------------------------------ CHANGE STATUS
 
-    @Operation(summary = "Toggle Aaqil Active Status")
-    @PostMapping("/status/{id}")
-    public ResponseEntity<ApiResponse<AaqilResponseDto>> changeStatus(@PathVariable Long id) {
+    @Operation(summary = "Change Aaqil Status")
+    @PatchMapping("/status/{aaqilId}")
+    public ResponseEntity<ApiResponse<AaqilResponseDto>> changeStatus(
+            @PathVariable String aaqilId,
+            @RequestParam Boolean isActive) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         AaqilConstants.AAQIL_STATUS_CHANGED,
-                        service.changeStatus(id)));
-    }
-
-    // ------------------------------------------------------------------ POST: Soft Delete
-
-    @Operation(summary = "Soft Delete Aaqil")
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<String>> softDelete(@PathVariable Long id) {
-
-        service.softDelete(id);
-        return ResponseEntity.ok(
-                ApiResponse.success(AaqilConstants.AAQIL_DELETED, null));
+                        service.changeStatus(
+                                aaqilId,
+                                isActive
+                        )
+                )
+        );
     }
 }
-
