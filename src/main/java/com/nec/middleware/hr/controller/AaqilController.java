@@ -29,22 +29,20 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AaqilController {
 
-    private final AaqilService service;
+    private final AaqilService aaqilservice;
 
     // ------------------------------------------------------------------ SAVE
 
     @Operation(summary = "Create Aaqil")
     @PostMapping("/save")
-    public ResponseEntity<ApiResponse<AaqilResponseDto>> saveAaqil(
+    public ResponseEntity<ApiResponse<AaqilResponseDto>> createAaqil(
             @Valid @RequestBody AaqilRequestDto requestDto) {
 
-        AaqilResponseDto response = service.saveAaqil(requestDto);
-
+        AaqilResponseDto response = aaqilservice.saveAaqil(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
                         AaqilConstants.AAQIL_CREATED,
-                        response
-                ));
+                        response));
     }
 
     // ------------------------------------------------------------------ UPDATE
@@ -58,12 +56,9 @@ public class AaqilController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         AaqilConstants.AAQIL_UPDATED,
-                        service.updateAaqil(
+                        aaqilservice.updateAaqil(
                                 aaqilId,
-                                requestDto
-                        )
-                )
-        );
+                                requestDto)));
     }
 
     // ------------------------------------------------------------------ GET BY ID
@@ -76,7 +71,7 @@ public class AaqilController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         AaqilConstants.AAQIL_FETCHED,
-                        service.getAaqilById(aaqilId)
+                        aaqilservice.getAaqilById(aaqilId)
                 )
         );
     }
@@ -84,14 +79,14 @@ public class AaqilController {
     // ------------------------------------------------------------------ GET ALL
 
     @Operation(summary = "Get Paginated & Filtered Aaqil List")
-    @PostMapping("/getAll")
+    @PostMapping("/getAllAaqils")
     public ResponseEntity<ApiResponse<Page<AaqilResponseDto>>> getAllAaqils(
             @RequestBody(required = false) AaqilFilterRequestDto filterDto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Page<AaqilResponseDto> response =
-                service.getAllAaqils(
+                aaqilservice.getAllAaqils(
                         filterDto,
                         page,
                         size
@@ -101,12 +96,9 @@ public class AaqilController {
                 ApiResponse.success(
                        AaqilConstants.AAQIL_LIST_FETCHED,
                         response
-                )
-        );
+                ));
     }
-
     // ------------------------------------------------------------------ CHANGE STATUS
-
     @Operation(summary = "Change Aaqil Status")
     @PatchMapping("/status/{aaqilId}")
     public ResponseEntity<ApiResponse<AaqilResponseDto>> changeStatus(
@@ -116,11 +108,8 @@ public class AaqilController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         AaqilConstants.AAQIL_STATUS_CHANGED,
-                        service.changeStatus(
+                        aaqilservice.changeStatus(
                                 aaqilId,
-                                isActive
-                        )
-                )
-        );
+                                isActive)));
     }
 }

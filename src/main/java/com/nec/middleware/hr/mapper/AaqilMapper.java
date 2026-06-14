@@ -49,7 +49,6 @@ public class AaqilMapper {
      */
     public AaqilResponseDto toResponseDto(Aaqil entity) {
         return AaqilResponseDto.builder()
-                .id(entity.getId())
                 .aaqilId(entity.getAaqilId())
                 .fullName(entity.getFullName())
                 .age(entity.getAge())

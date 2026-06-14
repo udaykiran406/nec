@@ -12,28 +12,27 @@ import java.time.LocalDateTime;
 @Builder
 public class AaqilResponseDto {
 
-    private Long          id;
-    private String        aaqilId;
+    private String aaqilId;
 
-    private String        fullName;
-    private Short         age;
-    private String        phone;
-    private String        email;
+    private String fullName;
+    private Short age;
+    private String phone;
+    private String email;
 
     // ------------------------------------------------------------------ Lookups → IdValueDto
-    private IdValueDto    aaqilType;
-    private IdValueDto    gender;
-    private IdValueDto    status;
+    private IdValueDto aaqilType;
+    private IdValueDto gender;
+    private IdValueDto status;
 
     // ------------------------------------------------------------------ Master Data → IdValueDto
-    private IdValueDto    region;
-    private IdValueDto    district;
-    private IdValueDto    city;
+    private IdValueDto region;
+    private IdValueDto district;
+    private IdValueDto city;
 
     // ------------------------------------------------------------------ Audit
-    private Boolean       isActive;
-    private String        createdBy;
+    private Boolean isActive;
+    private String createdBy;
     private LocalDateTime createdAt;
-    private String        updatedBy;
+    private String updatedBy;
     private LocalDateTime updatedAt;
 }

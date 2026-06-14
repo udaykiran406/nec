@@ -24,9 +24,6 @@ import java.time.LocalDateTime;
 @Builder
 public class UniversityTraineeResponseDto {
 
-    // ------------------------------------------------------------------ Identity
-    private Long   id;
-
     /** Business key — e.g. UT001. Mirrors portalUserId in PortalUserResponseDto. */
     private String universityTraineeId;
 

@@ -12,10 +12,7 @@ public interface AaqilService {
     AaqilResponseDto getAaqilById(String aaqilCode);
 
     Page<AaqilResponseDto> getAllAaqils(
-            AaqilFilterRequestDto filterDto,
-            int page,
-            int size
-    );
+            AaqilFilterRequestDto filterDto,int page,int size);
 
     AaqilResponseDto changeStatus(String aaqilCode, Boolean isActiveFlag);
 
