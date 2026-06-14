@@ -2,6 +2,8 @@ package com.nec.middleware.hr.service.impl;
 
 import com.nec.middleware.Lookups.repository.TrainingManagementStatusRepository;
 import com.nec.middleware.Lookups.repository.TrainingTypeRepository;
+import com.nec.middleware.exception.ResourceAlreadyExistsException;
+import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.constant.TrainingClassConstants;
 import com.nec.middleware.hr.dto.request.TrainingClassListRequestDto;
 import com.nec.middleware.hr.dto.request.TrainingClassRequest;
@@ -11,11 +13,7 @@ import com.nec.middleware.hr.mapper.TrainingClassMapper;
 import com.nec.middleware.hr.repository.TrainingClassRepository;
 import com.nec.middleware.hr.service.TrainingClassService;
 import com.nec.middleware.hr.specification.TrainingClassSearchSpecification;
-import com.nec.middleware.masterdata.repository.CityRepository;
-import com.nec.middleware.masterdata.repository.DistrictRepository;
-import com.nec.middleware.masterdata.repository.HrTrainerTotRepository;
-import com.nec.middleware.masterdata.repository.MasterDataRepository;
-import com.nec.middleware.masterdata.repository.UniversityRepository;
+import com.nec.middleware.masterdata.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,7 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,55 +44,46 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     private final HrTrainerTotRepository hrTrainerTotRepository;
 
     @Override
-    public TrainingClassResponse create(TrainingClassRequest request) {
+    public TrainingClassResponse createTrainingClass(TrainingClassRequest request) {
 
-        if (trainingClassRepository.existsByClassNameIgnoreCaseAndIsActiveTrue(request.getClassName())) {
-            throw new RuntimeException("Training class name already exists");
+        if (trainingClassRepository.existsByClassNameIgnoreCase(request.getClassName())) {
+            throw new ResourceAlreadyExistsException("Training class name already exists");
         }
 
-        TrainingClass entity = new TrainingClass();
-
-        entity.setClassCode(
-                generateClassCode(
-                        TrainingClassConstants.CODE_PREFIX,
-                        TrainingClassConstants.CODE_PAD
-                )
-        );
-
-        populateTrainingClass(entity, request);
-
-        TrainingClass savedEntity = trainingClassRepository.save(entity);
-
-        return trainingClassMapper.toResponse(savedEntity);
+        TrainingClass savedEntity = trainingClassRepository.save(toTrainingClassEntity(request));
+        return trainingClassMapper.toTrainingClassResponse(savedEntity);
     }
 
+
     @Override
-    public TrainingClassResponse update(String classCode, TrainingClassRequest request) {
+    public TrainingClassResponse updateTrainingClass(String classCode, TrainingClassRequest request) {
 
-        TrainingClass entity = trainingClassRepository.findByClassCodeAndIsActiveTrue(classCode)
-                .orElseThrow(() -> new RuntimeException("Training class not found"));
+        TrainingClass entity = trainingClassRepository.findByClassCode(classCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Training class not found"));
 
-        if (trainingClassRepository.existsByClassNameIgnoreCaseAndIsActiveTrueAndClassCodeNot(
+        //this check is to ensure that when updating,
+        //if in case the the classname is already assigned to another code no updation should happen
+        if (trainingClassRepository.existsByClassNameIgnoreCaseAndClassCodeNot(
                 request.getClassName(),
                 classCode
         )) {
-            throw new RuntimeException("Training class name already exists");
+            throw new ResourceAlreadyExistsException("Training class name already exists");
         }
 
         populateTrainingClass(entity, request);
 
         TrainingClass updatedEntity = trainingClassRepository.save(entity);
 
-        return trainingClassMapper.toResponse(updatedEntity);
+        return trainingClassMapper.toTrainingClassResponse(updatedEntity);
     }
 
     @Override
-    public TrainingClassResponse getByClassCode(String classCode) {
+    public TrainingClassResponse getTrainingClassByClassCode(String classCode) {
 
-        TrainingClass entity = trainingClassRepository.findByClassCodeAndIsActiveTrue(classCode)
-                .orElseThrow(() -> new RuntimeException("Training class not found"));
+        TrainingClass entity = trainingClassRepository.findByClassCode(classCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Training class not found"));
 
-        return trainingClassMapper.toResponse(entity);
+        return trainingClassMapper.toTrainingClassResponse(entity);
     }
 
     @Override
@@ -122,10 +110,10 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                         TrainingClassSearchSpecification.build(request),
                         pageable
                 )
-                .map(trainingClassMapper::toResponse);
+                .map(trainingClassMapper::toTrainingClassResponse);
     }
     @Override
-    public TrainingClassResponse updateStatus(String classCode, Boolean isActive) {
+    public TrainingClassResponse updateTrainingClassStatus(String classCode, Boolean isActive) {
 
         TrainingClass entity = trainingClassRepository.findByClassCode(classCode)
                 .orElseThrow(() -> new RuntimeException("Training class not found"));
@@ -134,7 +122,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
         TrainingClass updatedEntity = trainingClassRepository.save(entity);
 
-        return trainingClassMapper.toResponse(updatedEntity);
+        return trainingClassMapper.toTrainingClassResponse(updatedEntity);
     }
 
     private void populateTrainingClass(
@@ -142,57 +130,120 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             TrainingClassRequest request
     ) {
 
+        //are these fileds compulsory sent in update request..?
         entity.setClassName(request.getClassName());
         entity.setCapacity(request.getCapacity());
         entity.setLocation(request.getLocation());
         entity.setDescription(request.getDescription());
         entity.setPreRequests(request.getPreRequests());
+        entity.setUpdatedBy(request.getUpdatedBy());
 
-        entity.setTrainingType(
+        if (request.getTrainingTypeId() != null) {
+            entity.setTrainingType(
+                    trainingTypeRepository.findById(request.getTrainingTypeId())
+                            .orElseThrow(() -> new RuntimeException("Training type not found"))
+            );
+        }
+
+        if (request.getRegionId() != null) {
+            entity.setRegion(
+                    masterDataRepository.findByIdAndIsDeleted(request.getRegionId(), NOT_DELETED_SHORT)
+                            .orElseThrow(() -> new RuntimeException("Region not found"))
+            );
+        }
+
+        if (request.getDistrictId() != null) {
+            entity.setDistrict(
+                    districtRepository.findByIdAndIsDeleted(request.getDistrictId(), NOT_DELETED_SHORT)
+                            .orElseThrow(() -> new RuntimeException("District not found"))
+            );
+        }
+
+        if (request.getCityId() != null) {
+            entity.setCity(
+                    cityRepository.findByIdAndIsDeleted(request.getCityId(), NOT_DELETED_SHORT)
+                            .orElseThrow(() -> new RuntimeException("City not found"))
+            );
+        }
+
+        if (request.getUniversityId() != null) {
+            entity.setUniversity(
+                    universityRepository.findByIdAndIsDeleted(request.getUniversityId(), NOT_DELETED_SHORT)
+                            .orElseThrow(() -> new RuntimeException("University not found"))
+            );
+        }
+
+        if (request.getTrainerTotId() != null) {
+            entity.setTrainerTot(
+                    hrTrainerTotRepository.findByIdAndIsDeleted(
+                                    request.getTrainerTotId(),
+                                    NOT_DELETED_BOOLEAN
+                            )
+                            .orElseThrow(() -> new RuntimeException("Trainer TOT not found"))
+            );
+        }
+
+        if (request.getStatusId() != null) {
+            entity.setStatus(
+                    trainingManagementStatusRepository.findById(request.getStatusId())
+                            .orElseThrow(() -> new RuntimeException("Training status not found"))
+            );
+        }
+
+    }
+
+
+    private TrainingClass toTrainingClassEntity(TrainingClassRequest request) {
+
+        TrainingClass trainingClassEntity = trainingClassMapper.toTrainingClassEntity(request);
+        trainingClassEntity.setClassCode(generateClassCode(TrainingClassConstants.CODE_PREFIX, TrainingClassConstants.CODE_PAD));
+
+        trainingClassEntity.setTrainingType(
                 trainingTypeRepository.findById(request.getTrainingTypeId())
-                        .orElseThrow(() -> new RuntimeException("Training type not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("Training type not found"))
         );
 
-        entity.setStatus(
+        trainingClassEntity.setStatus(
                 trainingManagementStatusRepository.findById(request.getStatusId())
-                        .orElseThrow(() -> new RuntimeException("Training status not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("Training status not found"))
         );
 
-        entity.setRegion(
+        trainingClassEntity.setRegion(
                 masterDataRepository.findByIdAndIsDeleted(request.getRegionId(), NOT_DELETED_SHORT)
-                        .orElseThrow(() -> new RuntimeException("Region not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("Region not found"))
         );
 
-        entity.setDistrict(
+        trainingClassEntity.setDistrict(
                 districtRepository.findByIdAndIsDeleted(request.getDistrictId(), NOT_DELETED_SHORT)
-                        .orElseThrow(() -> new RuntimeException("District not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("District not found"))
         );
 
-        entity.setCity(
+        trainingClassEntity.setCity(
                 cityRepository.findByIdAndIsDeleted(request.getCityId(), NOT_DELETED_SHORT)
-                        .orElseThrow(() -> new RuntimeException("City not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("City not found"))
         );
 
-        entity.setUniversity(
+        trainingClassEntity.setUniversity(
                 universityRepository.findByIdAndIsDeleted(request.getUniversityId(), NOT_DELETED_SHORT)
-                        .orElseThrow(() -> new RuntimeException("University not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("University not found"))
         );
 
-        entity.setTrainerTot(
+        trainingClassEntity.setTrainerTot(
                 hrTrainerTotRepository.findByIdAndIsDeleted(
                                 request.getTrainerTotId(),
                                 NOT_DELETED_BOOLEAN
                         )
-                        .orElseThrow(() -> new RuntimeException("Trainer TOT not found"))
+                        .orElseThrow(() -> new ResourceNotFoundException("Trainer TOT not found"))
         );
+
+        return trainingClassEntity;
     }
 
-    private String generateClassCode(
-            String codePrefix,
-            int codePad
-    ) {
+
+    private String generateClassCode(String codePrefix, int codePad) {
         int next = trainingClassRepository.findMaxCodeSequence() + 1;
 
         return codePrefix + String.format("%0" + codePad + "d", next);
     }
+
 }

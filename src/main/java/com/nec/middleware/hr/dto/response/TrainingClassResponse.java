@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.dto.response;
 
+import com.nec.middleware.dto.IdValueDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,34 +23,25 @@ public class TrainingClassResponse {
     private String preRequests;
 
     // Training Type
-    private Long trainingTypeId;
-    private String trainingTypeName;
+    private IdValueDto trainingType;
 
     // Region
-    private Long regionId;
-    private String regionName;
+    private IdValueDto region;
 
     // District
-    private Long districtId;
-    private String districtName;
-
-
+    private IdValueDto district;
 
     // City
-    private Long cityId;
-    private String cityName;
+    private IdValueDto city;
 
     // University
-    private Long universityId;
-    private String universityName;
+    private IdValueDto university;
 
     // Trainer TOT
-    private Long trainerTotId;
-    private String trainerTotName;
+    private IdValueDto trainerTot;
 
     // Status
-    private Long statusId;
-    private String statusName;
+    private IdValueDto status;
 
     // Audit
     private Boolean isActive;

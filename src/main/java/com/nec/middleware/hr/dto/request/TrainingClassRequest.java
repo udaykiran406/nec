@@ -13,7 +13,6 @@ import lombok.*;
 public class TrainingClassRequest {
 
 
-
     @NotBlank(message = "Class name is required")
     private String className;
 
@@ -48,4 +47,8 @@ public class TrainingClassRequest {
     private String description;
 
     private String preRequests;
+
+    private String createdBy;
+
+    private String updatedBy;
 }

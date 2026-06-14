@@ -5,17 +5,15 @@ import com.nec.middleware.hr.dto.request.TrainingClassRequest;
 import com.nec.middleware.hr.dto.response.TrainingClassResponse;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface TrainingClassService {
 
-    TrainingClassResponse create(TrainingClassRequest request);
+    TrainingClassResponse createTrainingClass(TrainingClassRequest request);
 
-    TrainingClassResponse update(String classCode, TrainingClassRequest request);
+    TrainingClassResponse updateTrainingClass(String classCode, TrainingClassRequest request);
 
-    TrainingClassResponse getByClassCode(String classCode);
+    TrainingClassResponse getTrainingClassByClassCode(String classCode);
 
     Page<TrainingClassResponse> getAllTrainingClasses(TrainingClassListRequestDto filterDto, int pageNumber, int pageSize);
 
-    TrainingClassResponse updateStatus(String classCode, Boolean isActive);
+    TrainingClassResponse updateTrainingClassStatus(String classCode, Boolean isActive);
 }

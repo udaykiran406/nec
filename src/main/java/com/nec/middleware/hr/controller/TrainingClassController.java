@@ -16,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @Tag(
         name = "Training Classes",
@@ -35,7 +33,7 @@ public class TrainingClassController {
     public ResponseEntity<ApiResponse<TrainingClassResponse>> createTrainingClass(
             @Valid @RequestBody TrainingClassRequest request) {
 
-        TrainingClassResponse response = trainingClassService.create(request);
+        TrainingClassResponse response = trainingClassService.createTrainingClass(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
@@ -53,20 +51,20 @@ public class TrainingClassController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         TrainingClassConstants.CLASS_UPDATED,
-                        trainingClassService.update(classCode, request)
+                        trainingClassService.updateTrainingClass(classCode, request)
                 )
         );
     }
 
     @Operation(summary = "Get Training Class by Class Code")
     @GetMapping("/{classCode}")
-    public ResponseEntity<ApiResponse<TrainingClassResponse>> getByClassCode(
+    public ResponseEntity<ApiResponse<TrainingClassResponse>> getTrainingClassByClassCode(
             @PathVariable String classCode) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         TrainingClassConstants.CLASS_FETCHED,
-                        trainingClassService.getByClassCode(classCode)
+                        trainingClassService.getTrainingClassByClassCode(classCode)
                 )
         );
     }
@@ -88,14 +86,14 @@ public class TrainingClassController {
 
     @Operation(summary = "Activate or Deactivate Training Class")
     @PatchMapping("/status/{classCode}")
-    public ResponseEntity<ApiResponse<TrainingClassResponse>> updateStatus(
+    public ResponseEntity<ApiResponse<TrainingClassResponse>> updateTrainingClassStatus(
             @PathVariable String classCode,
             @RequestParam Boolean isActive) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         TrainingClassConstants.CLASS_STATUS_UPDATED,
-                        trainingClassService.updateStatus(classCode, isActive)
+                        trainingClassService.updateTrainingClassStatus(classCode, isActive)
                 )
         );
     }

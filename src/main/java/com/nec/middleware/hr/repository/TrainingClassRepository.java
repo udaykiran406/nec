@@ -13,13 +13,11 @@ public interface TrainingClassRepository
         extends JpaRepository<TrainingClass, Long>,
         JpaSpecificationExecutor<TrainingClass> {
 
-    Optional<TrainingClass> findByClassCodeAndIsActiveTrue(String classCode);
-
     Optional<TrainingClass> findByClassCode(String classCode);
 
-    boolean existsByClassNameIgnoreCaseAndIsActiveTrue(String className);
+    boolean existsByClassNameIgnoreCase(String className);
 
-    boolean existsByClassNameIgnoreCaseAndIsActiveTrueAndClassCodeNot(
+    boolean existsByClassNameIgnoreCaseAndClassCodeNot(
             String className,
             String classCode
     );
