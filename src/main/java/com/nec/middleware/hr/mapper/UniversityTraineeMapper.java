@@ -83,7 +83,6 @@ public class UniversityTraineeMapper {
     public UniversityTraineeResponseDto toResponseDto(UniversityTrainee universityTraineEentity) {
         return UniversityTraineeResponseDto.builder()
                 // Identity
-                .id(universityTraineEentity.getId())
                 .universityTraineeId(universityTraineEentity.getUniversityTraineeId())
                 .fullName(universityTraineEentity.getFullName())
                 .age(universityTraineEentity.getAge())

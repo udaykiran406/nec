@@ -71,7 +71,6 @@ public class PortalUserMapper {
     public PortalUserResponseDto portalUserResponseDto(PortalUser entity) {
         return PortalUserResponseDto.builder()
                 // Identity
-                .id(entity.getId())
                 .portalUserId(entity.getPortalUserId())
                 .userName(entity.getUserName())
                 .phone(entity.getPhone())

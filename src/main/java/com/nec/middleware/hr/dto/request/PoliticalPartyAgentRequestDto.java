@@ -11,7 +11,7 @@ import lombok.*;
 public class PoliticalPartyAgentRequestDto {
 
     // null → CREATE, non-null → UPDATE
-    private Long id;
+    private String politicalPartyAgentUserId;
 
     @NotNull(message = "Political party is required")
     private Long politicalPartyNameId;

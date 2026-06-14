@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 public class PortalUserResponseDto {
 
     // ------------------------------------------------------------------ Identity
-    private Long id;
     private String portalUserId;
     private String userName;
     private String phone;

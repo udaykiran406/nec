@@ -11,7 +11,7 @@ public final class UniversityTraineeConstants {
     public static final String TRAINEE_LIST_FETCHED    = "University trainees fetched successfully";
     public static final String TRAINEE_FETCHED         = "University trainee fetched successfully";
     public static final String TRAINEE_ALREADY_EXISTS= "A trainee with the same email or phone already exists";
-    public static final String TRAINEE_DELETED         = "University trainee deleted successfully";
+
 
     public static final String CODE_PREFIX = "UT";
     public static final int    CODE_PAD    = 3;

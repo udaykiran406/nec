@@ -11,5 +11,8 @@ public final class PoliticalPartyAgentConstants {
     public static final String AGENT_LIST_FETCHED   = "Political party agents fetched successfully";
     public static final String AGENT_FETCHED        = "Political party agent fetched successfully";
     public static final String AGENT_ALREADY_EXISTS = "A political party agent with this email or phone already exists";
-    public static final String AGENT_DELETED        = "Political party agent deleted successfully";
+
+
+    public static final String CODE_PREFIX = "PA";
+    public static final int    CODE_PAD    = 3;
 }

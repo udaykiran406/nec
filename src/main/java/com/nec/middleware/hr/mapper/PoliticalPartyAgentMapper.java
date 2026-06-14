@@ -52,7 +52,6 @@ public class PoliticalPartyAgentMapper {
      */
     public PoliticalPartyAgentResponseDto politicalPartyResponseDto(PoliticalPartyAgent politicalPartyAgent) {
         return PoliticalPartyAgentResponseDto.builder()
-                .id(politicalPartyAgent.getId())
                 .politicalPartyAgentUserId(politicalPartyAgent.getPoliticalPartyAgentUserId())
                 .agentName(politicalPartyAgent.getAgentName())
                 .phone(politicalPartyAgent.getPhone())
@@ -102,6 +101,8 @@ public class PoliticalPartyAgentMapper {
                 .isActive(politicalPartyAgent.getIsActive())
                 .createdBy(politicalPartyAgent.getCreatedBy())
                 .updatedBy(politicalPartyAgent.getUpdatedBy())
+                .updatedBy(politicalPartyAgent.getUpdatedBy())
+                .updatedAt(politicalPartyAgent.getUpdatedAt())
                 .build();
 
 

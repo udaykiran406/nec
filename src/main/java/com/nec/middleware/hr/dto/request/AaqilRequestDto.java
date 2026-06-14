@@ -10,8 +10,7 @@ import lombok.*;
 @Builder
 public class AaqilRequestDto {
 
-    // null → CREATE, non-null → UPDATE
-    private Long id;
+    private String aaqilId;
 
     @NotNull(message = "Aaqil type is required")
     private Long aaqilTypeId;

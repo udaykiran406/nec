@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.controller;
 
+
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.constant.PoliticalPartyAgentConstants;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
@@ -54,16 +55,26 @@ public class PoliticalPartyAgentController {
     }
 
     // ------------------------------------------------------------------ GET: List
-    @Operation(summary = "Get Paginated & Filtered Political Party Agents")
-    @GetMapping
-    public ResponseEntity<ApiResponse<Page<PoliticalPartyAgentResponseDto>>> getAllPolticalPartyAgent(
-            @RequestBody(required = false) PoliticalPartyAgentFilterRequestDto filterDto, @RequestParam(defaultValue = "0") int page,
+    @Operation(summary = "Get All Political Party Agents")
+    @PostMapping("/getAllPoliticalPartyAgents")
+    public ResponseEntity<ApiResponse<Page<PoliticalPartyAgentResponseDto>>> getAllPoliticalPartyAgent(
+            @RequestBody(required = false) PoliticalPartyAgentFilterRequestDto filterDto,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+
+        Page<PoliticalPartyAgentResponseDto> response =
+                politicalPartyAgentService.getAllPartyAgents(
+                        filterDto,
+                        page,
+                        size
+                );
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         PoliticalPartyAgentConstants.AGENT_LIST_FETCHED,
-                        politicalPartyAgentService.getAllPartyAgents(filterDto,page ,size )));
+                        response
+                )
+        );
     }
 
     // ------------------------------------------------------------------ POST: Soft Delete
@@ -71,11 +82,11 @@ public class PoliticalPartyAgentController {
     @PatchMapping("/changeStatus/{partyAgentUserId}")
     public ResponseEntity<ApiResponse<PoliticalPartyAgentResponseDto>> changeStatus(
             @PathVariable String partyAgentUserId,
-            @RequestParam Boolean isActiveFlag) {
+            @RequestParam Boolean isActive) {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         PoliticalPartyAgentConstants.AGENT_STATUS_CHANGED,
-                        politicalPartyAgentService.changeStatus(partyAgentUserId,isActiveFlag)));
+                        politicalPartyAgentService.changeStatus(partyAgentUserId,isActive)));
     }
 
     @Operation(summary = "Update Political Party Agent")

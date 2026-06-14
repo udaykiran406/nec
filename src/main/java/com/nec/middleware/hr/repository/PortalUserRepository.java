@@ -17,13 +17,18 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> , 
      * Find active (non-deleted) record by id
      */
 
-    Optional<PortalUser> findByPortalUserIdAndIsActiveTrue(String portalUserId);
+
     Optional<PortalUser> findByPortalUserId(String portalUserId);
     // ------------------------------------------------------------------ Duplicate checks (CREATE)
 
     boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
+
+    //--------------------------------------------------------------For Update
+    boolean existsByEmailAndIdNot(String email, Long id);
+
+    boolean existsByPhoneAndIdNot(String phone, Long id);
 
 // ------------------------------------------------------------------ Code generation helper
 

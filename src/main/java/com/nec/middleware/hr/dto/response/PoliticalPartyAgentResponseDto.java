@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Builder
 public class PoliticalPartyAgentResponseDto {
 
-    private Long id;
     private String politicalPartyAgentUserId;
     private IdValueDto politicalPartyName;
     private String agentName;

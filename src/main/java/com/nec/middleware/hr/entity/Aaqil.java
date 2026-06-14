@@ -1,6 +1,11 @@
 package com.nec.middleware.hr.entity;
 
-
+import com.nec.middleware.Lookups.entity.Genders;
+import com.nec.middleware.Lookups.entity.ThirdPartyStatus;
+import com.nec.middleware.masterdata.entity.MasterDataAaqilType;
+import com.nec.middleware.masterdata.entity.MasterDataCity;
+import com.nec.middleware.masterdata.entity.MasterDataDistrict;
+import com.nec.middleware.masterdata.entity.MasterDataRegion;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,36 +22,47 @@ public class Aaqil extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "code", nullable = false, unique = true, length = 20)
-    private String code;
-
-    @Column(name = "aaqil_type_id", nullable = false)
-    private Long aaqilTypeId;
+    /** Business key — generated once at creation, never changed. e.g. AA001 */
+    @Column(name = "aaqil_id", nullable = false, unique = true, length = 20)
+    private String aaqilId;
 
     @Column(name = "full_name", nullable = false, length = 120)
     private String fullName;
 
-    @Column(name = "gender_id", nullable = false)
-    private Long genderId;
-
     @Column(name = "age")
     private Short age;
 
-    @Column(name = "phone", nullable = false, length = 30)
+    @Column(name = "phone", nullable = false, unique = true, length = 30)
     private String phone;
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "region_id", nullable = false)
-    private Long regionId;
+    // ------------------------------------------------------------------ LOOKUPS FKs
 
-    @Column(name = "district_id", nullable = false)
-    private Long districtId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aaqil_type_id", nullable = false)
+    private MasterDataAaqilType aaqilType;
 
-    @Column(name = "city_id", nullable = false)
-    private Long cityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gender_id", nullable = false)
+    private Genders gender;
 
-    @Column(name = "status_id", nullable = false)
-    private Long statusId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_id", nullable = false)
+    private ThirdPartyStatus status;
+
+    // ------------------------------------------------------------------ MASTER DATA FKs
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", nullable = false)
+    private MasterDataRegion region;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id", nullable = false)
+    private MasterDataDistrict district;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false)
+    private MasterDataCity city;
 }
