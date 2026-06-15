@@ -13,12 +13,12 @@ import java.time.LocalDate;
 @Builder
 public class TemporaryContractResponseDto {
 
-    private String contractNo;
+
     private String contractId;
     private String employerName;
 
     private String employeeName;
-
+    private String contactNo;
     private IdValueDto contractType;
 
     private LocalDate startDate;

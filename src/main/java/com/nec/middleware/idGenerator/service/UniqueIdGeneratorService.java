@@ -21,7 +21,7 @@ public class UniqueIdGeneratorService {
 
         IdGenerator generator =
                 idGeneratorRepository
-                        .findByModuleCode(moduleCode.name())
+                        .findByModuleCode(moduleCode)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Module configuration not found"));
@@ -32,6 +32,6 @@ public class UniqueIdGeneratorService {
 
         idGeneratorRepository.save(generator);
 
-        return prefix +nextNumber;
+        return prefix +String.format("%03d", nextNumber);
     }
 }

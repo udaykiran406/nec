@@ -58,8 +58,7 @@ public final class MasterDataConstants {
             "A bank account with this account number already exists: ";
     public static final String DUPLICATE_DEPLOYMENT_ROLE_NAME =
             "A deployment role with this name already exists: ";
-    public static final String DUPLICATE_AAQIL_TYPE_CODE =
-            "Aaqil Type code already exists: ";
+
     public static final String DUPLICATE_TRAINER_TOT_CODE =
             "Trainer TOT code already exists: ";
 

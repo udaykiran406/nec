@@ -29,6 +29,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), null);
     }
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateResourceException(
+            DuplicateResourceException ex) {
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                null
+        );
+    }
 
     // ------------------------------------------------------------------ 302
     @ExceptionHandler(ResourceAlreadyExistsException.class)

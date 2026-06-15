@@ -1,0 +1,265 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Lookups - NEC Middleware",
+    "description": "Postman collection for Lookup Management APIs in NEC Middleware. Supports retrieving all active lookup tables, fetching values by table name, and adding/editing lookup values dynamically.\n\nLookup table names follow the pattern: nec_lkp_<name>\nExamples: nec_lkp_gender, nec_lkp_roles, nec_lkp_payment_methods, nec_lkp_status, nec_lkp_contract_types",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Lookup Management",
+      "item": [
+        {
+          "name": "Get All Active Lookup Tables",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains lookup table list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "",
+                  "    pm.expect(jsonData.success).to.equal(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Lookup table names retrieved successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        pm.environment.set(\"lookup_table_name\", jsonData.data[0].tableName);",
+                  "        console.log(\"✓ First lookup table name saved:\", jsonData.data[0].tableName);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/lookups",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "lookups"]
+            },
+            "description": "Returns a list of all active lookup table names registered in the system.\n\nResponse shape:\n{\n  \"success\": true,\n  \"message\": \"Lookup table names retrieved successfully\",\n  \"data\": [\n    { \"id\": 1, \"tableName\": \"nec_lkp_gender\", \"isActive\": 1 },\n    { \"id\": 2, \"tableName\": \"nec_lkp_roles\", \"isActive\": 1 }\n  ]\n}\n\nUse the returned tableName values to call the 'Get Lookup Values by Table Name' endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Lookup Values by Table Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains lookup values\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "",
+                  "    pm.expect(jsonData.success).to.equal(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Lookup values retrieved successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        pm.environment.set(\"lookup_value_id\", jsonData.data[0].id);",
+                  "        console.log(\"✓ First lookup value ID saved:\", jsonData.data[0].id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/lookups/{{lookup_table_name}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "lookups", "{{lookup_table_name}}"]
+            },
+            "description": "Fetches all lookup values for a given active lookup table.\n\nPath variable:\n- tableName: The lookup table name (must follow pattern nec_lkp_<name>)\n\nCommon table names:\n  nec_lkp_gender\n  nec_lkp_roles\n  nec_lkp_payment_methods\n  nec_lkp_status\n  nec_lkp_contract_types\n  nec_lkp_contract_payment_types\n  nec_lkp_deployment_types\n  nec_lkp_deployment_status\n  nec_lkp_training_types\n  nec_lkp_certification_types\n\nResponse shape:\n{\n  \"success\": true,\n  \"message\": \"Lookup values retrieved successfully\",\n  \"data\": [\n    { \"id\": 1, \"code\": \"LKP001\", \"value\": \"Male\", \"description\": null, \"isActive\": 1, \"displayOrder\": 1 },\n    { \"id\": 2, \"code\": \"LKP002\", \"value\": \"Female\", \"description\": null, \"isActive\": 1, \"displayOrder\": 2 }\n  ]\n}"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Lookup Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Lookup value created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "",
+                  "    pm.expect(jsonData.success).to.equal(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Lookup value created successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"code\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"value\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"lookup_value_id\", jsonData.data.id);",
+                  "        console.log(\"✓ New Lookup Value ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableName\": \"nec_lkp_gender\",\n  \"value\": \"Other\",\n  \"description\": \"Non-binary or unspecified gender\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/lookups",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "lookups"]
+            },
+            "description": "Creates a new lookup value in the specified table.\n\nLeave 'id' out (or set to null) to CREATE a new value.\n\nRequired fields:\n- tableName: Active lookup table (pattern: nec_lkp_<name>)\n- value: The display value (must be unique within the table)\n- isActive: 1 (active) or 0 (inactive)\n\nOptional:\n- description: Additional context\n- displayOrder: Integer for ordering (auto-assigned if omitted)\n\nA 'code' is automatically generated in the format LKPxxx."
+          },
+          "response": []
+        },
+        {
+          "name": "Edit Lookup Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Lookup value updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "",
+                  "    pm.expect(jsonData.success).to.equal(true);",
+                  "    pm.expect(jsonData.message).to.eql(\"Lookup value updated successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"value\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{lookup_value_id}},\n  \"tableName\": \"nec_lkp_gender\",\n  \"value\": \"Other (Updated)\",\n  \"description\": \"Updated description\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/lookups",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "lookups"]
+            },
+            "description": "Edits an existing lookup value. Provide 'id' to UPDATE.\n\nRequired fields:\n- id: The ID of the lookup value to update\n- tableName: The lookup table name the value belongs to\n- value: The updated display value (must be unique within the table)\n- isActive: 1 (active) or 0 (inactive)\n\nOptional:\n- description: Updated description\n- displayOrder: Updated display order"
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing Lookup tables and their values. The same POST /api/v1/lookups endpoint handles both Add (id=null) and Edit (id=non-null) operations."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request setup"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/nec",
+      "description": "Base URL of the NEC Middleware API"
+    },
+    {
+      "key": "lookup_table_name",
+      "value": "nec_lkp_gender",
+      "description": "Lookup table name - auto-set from Get All Lookup Tables response"
+    },
+    {
+      "key": "lookup_value_id",
+      "value": "1",
+      "description": "Lookup value ID - auto-set from Get Values or Add Value response"
+    }
+  ]
+}

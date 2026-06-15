@@ -41,9 +41,6 @@ import com.nec.middleware.masterdata.repository.BankAccountRepository;
 import com.nec.middleware.masterdata.dto.response.DeploymentRoleResponse;
 import com.nec.middleware.masterdata.entity.MasterDataDeploymentRole;
 import com.nec.middleware.masterdata.repository.DeploymentRoleRepository;
-import com.nec.middleware.masterdata.dto.response.AaqilTypeResponse;
-import com.nec.middleware.masterdata.entity.MasterDataAaqilType;
-import com.nec.middleware.masterdata.repository.AaqilTypeRepository;
 import com.nec.middleware.masterdata.dto.response.HrTrainerTotResponse;
 import com.nec.middleware.masterdata.entity.MasterDataHrTrainerTot;
 import com.nec.middleware.masterdata.repository.HrTrainerTotRepository;
@@ -73,7 +70,6 @@ public class MasterDataServiceImpl implements MasterDataService {
     private final PoliticalPartyRepository politicalPartyRepository;
     private final BankAccountRepository bankAccountRepository;
     private final DeploymentRoleRepository deploymentRoleRepository;
-    private final AaqilTypeRepository aaqilTypeRepository;
     private final HrTrainerTotRepository hrTrainerTotRepository;
 
     // =========================================================================
@@ -1175,100 +1171,6 @@ public class MasterDataServiceImpl implements MasterDataService {
                 .collect(Collectors.toList());
     }
 
-    // =========================================================================
-// AAQIL TYPE METHODS
-// =========================================================================
-
-    @Override
-    @Transactional
-    public AaqilTypeResponse saveAaqilType(AaqilTypeRequest request) {
-
-        if (request.getId() == null) {
-            return createAaqilType(request);
-        }
-
-        return updateAaqilType(request);
-    }
-
-    private AaqilTypeResponse createAaqilType(AaqilTypeRequest request) {
-
-        boolean exists =
-                aaqilTypeRepository.existsByCodeIgnoreCaseAndIsDeleted(
-                        request.getCode(),
-                        false);
-
-        if (exists) {
-            throw new DuplicateException(
-                    MasterDataConstants.DUPLICATE_AAQIL_TYPE_CODE
-                            + request.getCode());
-        }
-
-        MasterDataAaqilType entity =
-                masterDataMapper.toAaqilTypeEntity(request);
-
-        MasterDataAaqilType saved =
-                aaqilTypeRepository.save(entity);
-
-        return masterDataMapper.toAaqilTypeResponseDto(saved);
-    }
-
-    private AaqilTypeResponse updateAaqilType(AaqilTypeRequest request) {
-
-        MasterDataAaqilType entity =
-                aaqilTypeRepository
-                        .findByIdAndIsDeleted(
-                                request.getId(),
-                                false)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        MasterDataConstants.RECORD_NOT_FOUND
-                                                + request.getId()));
-
-        boolean exists =
-                aaqilTypeRepository.existsByCodeIgnoreCaseAndIsDeletedAndIdNot(
-                        request.getCode(),
-                        false,
-                        request.getId());
-
-        if (exists) {
-            throw new DuplicateException(
-                    MasterDataConstants.DUPLICATE_AAQIL_TYPE_CODE
-                            + request.getCode());
-        }
-
-        masterDataMapper.updateAaqilTypeEntity(entity, request);
-
-        MasterDataAaqilType updated =
-                aaqilTypeRepository.save(entity);
-
-        return masterDataMapper.toAaqilTypeResponseDto(updated);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public AaqilTypeResponse getAaqilTypeById(Long id) {
-
-        MasterDataAaqilType entity =
-                aaqilTypeRepository
-                        .findByIdAndIsDeleted(id, false)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        MasterDataConstants.RECORD_NOT_FOUND
-                                                + id));
-
-        return masterDataMapper.toAaqilTypeResponseDto(entity);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<AaqilTypeResponse> getAllAaqilTypes() {
-
-        return aaqilTypeRepository
-                .findAllByIsDeletedOrderByValueAsc(false)
-                .stream()
-                .map(masterDataMapper::toAaqilTypeResponseDto)
-                .collect(Collectors.toList());
-    }
 
     // =========================================================================
 // HR TRAINER TOT METHODS

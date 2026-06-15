@@ -41,6 +41,7 @@ public class PoliticalPartyAgent extends AuditableEntity {
 
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "polling_station_id", nullable = false)
     private MasterDataPollingStation pollingStation;

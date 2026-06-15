@@ -15,7 +15,7 @@ public class TemporaryContractMapper {
         TemporaryContract temporaryContract = TemporaryContract.builder()
                 .startDate(temporaryContractRequestDto.getStartDate())
                 .endDate(temporaryContractRequestDto.getEndDate())
-                .contractNo(temporaryContractRequestDto.getContractNo())
+                .contactNo(temporaryContractRequestDto.getContactNo())
                 .totalContractAmount(temporaryContractRequestDto.getTotalContractAmount())
                 .initialPaymentPercentage(temporaryContractRequestDto.getInitialPaymentPercentage())
                 .remainingPercentage(temporaryContractRequestDto.getRemainingPercentage())

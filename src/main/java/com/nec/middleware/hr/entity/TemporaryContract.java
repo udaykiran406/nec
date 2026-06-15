@@ -22,8 +22,6 @@ public class TemporaryContract extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "contract_no", nullable = false, unique = true, length = 30)
-    private String contractNo;
 
     @Column(name = "contract_Id", nullable = false, unique = true, length = 30)
     private String contractId;
@@ -33,6 +31,9 @@ public class TemporaryContract extends AuditableEntity {
 
     @Column(name = "employee_name", nullable = false, length = 150)
     private String employeeName;
+
+    @Column(name = "contact_no", nullable = false, unique = true, length = 30)
+    private String contactNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_type_id", nullable = false)

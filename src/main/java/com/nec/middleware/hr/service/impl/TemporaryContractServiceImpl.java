@@ -38,8 +38,6 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
         TemporaryContract temporaryContract =
                 temporaryContractMapper.temporaryContractEntity(temporaryContractRequestDto);
 
-        temporaryContract.setContractId(generateContractNumber());
-
         temporaryContract.setContractType(
                 contractTypeRepository.findById(temporaryContractRequestDto.getContractTypeId())
                         .orElseThrow(() ->
@@ -51,6 +49,8 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
                                 new ResourceNotFoundException("Status not found")));
 
         calculatePaymentAmounts(temporaryContract);
+
+        temporaryContract.setContractId(generateContractNumber());
 
         temporaryContractRepository.save(temporaryContract);
 

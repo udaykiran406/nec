@@ -41,13 +41,4 @@ public interface UniversityTraineeRepository extends
             Long id
     );
 
-    // Code generation helper
-    @Query("""
-            SELECT COALESCE(
-                MAX(CAST(SUBSTRING(t.universityTraineeId, 3) AS int)), 0
-            )
-            FROM UniversityTrainee t
-            WHERE t.universityTraineeId LIKE 'UT%'
-            """)
-    int findMaxCodeSequence();
 }

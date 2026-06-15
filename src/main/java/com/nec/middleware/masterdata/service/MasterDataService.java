@@ -12,7 +12,6 @@ import com.nec.middleware.masterdata.dto.response.WarehouseSubStoreResponse;
 import com.nec.middleware.masterdata.dto.response.PoliticalPartyResponse;
 import com.nec.middleware.masterdata.dto.response.BankAccountResponse;
 import com.nec.middleware.masterdata.dto.response.DeploymentRoleResponse;
-import com.nec.middleware.masterdata.dto.response.AaqilTypeResponse;
 import com.nec.middleware.masterdata.dto.response.HrTrainerTotResponse;
 import org.springframework.data.domain.Page;
 import java.util.List;
@@ -96,13 +95,6 @@ public interface MasterDataService {
 
     DeploymentRoleResponse getDeploymentRoleById(Long id);
 
-    AaqilTypeResponse saveAaqilType(AaqilTypeRequest request);
-
-    List<AaqilTypeResponse> getAllAaqilTypes();
-
-   
-
-    AaqilTypeResponse getAaqilTypeById(Long id);
 
     HrTrainerTotResponse saveHrTrainerTot(HrTrainerTotRequest request);
 

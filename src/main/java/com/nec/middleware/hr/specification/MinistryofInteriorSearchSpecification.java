@@ -1,48 +1,48 @@
 package com.nec.middleware.hr.specification;
 
-import com.nec.middleware.hr.dto.request.AaqilFilterRequestDto;
-import com.nec.middleware.hr.entity.Aaqil;
+import com.nec.middleware.hr.dto.request.MinistryofInteriorFilterRequestDto;
+import com.nec.middleware.hr.entity.MinistryofInterior;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AaqilSearchSpecification {
+public class MinistryofInteriorSearchSpecification {
 
-    private AaqilSearchSpecification() {
+    private MinistryofInteriorSearchSpecification() {
     }
 
-    public static Specification<Aaqil> buildSpecification(
-            AaqilFilterRequestDto filterRequest) {
+    public static Specification<MinistryofInterior> buildSpecification(
+            MinistryofInteriorFilterRequestDto filterRequest) {
 
         return (entityRoot, criteriaQuery, criteriaBuilder) -> {
 
             List<Predicate> filterPredicates = new ArrayList<>();
 
             // Aaqil ID
-            if (filterRequest.getAaqilId() != null
-                    && !filterRequest.getAaqilId().isBlank()) {
+            if (filterRequest.getMinistryofInteriorId() != null
+                    && !filterRequest.getMinistryofInteriorId().isBlank()) {
 
                 filterPredicates.add(
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(
-                                        entityRoot.get("aaqilId")),
-                                "%" + filterRequest.getAaqilId()
+                                        entityRoot.get("MinistryofInteriorId")),
+                                "%" + filterRequest.getMinistryofInteriorId()
                                         .toLowerCase() + "%"
                         )
                 );
             }
 
-            // Full Name
-            if (filterRequest.getFullName() != null
-                    && !filterRequest.getFullName().isBlank()) {
+            //  Name
+            if (filterRequest.getName() != null
+                    && !filterRequest.getName().isBlank()) {
 
                 filterPredicates.add(
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(
-                                        entityRoot.get("fullName")),
-                                "%" + filterRequest.getFullName()
+                                        entityRoot.get("Name")),
+                                "%" + filterRequest.getName()
                                         .toLowerCase() + "%"
                         )
                 );
@@ -74,15 +74,18 @@ public class AaqilSearchSpecification {
                 );
             }
 
-            // Aaqil Type
-            if (filterRequest.getAaqilTypeId() != null) {
+
+
+            // Ministry of Interior Title
+            if (filterRequest.getMoiTitleId() != null) {
                 filterPredicates.add(
                         criteriaBuilder.equal(
-                                entityRoot.get("aaqilType").get("id"),
-                                filterRequest.getAaqilTypeId()
+                                entityRoot.get("moiTitle").get("id"),
+                                filterRequest.getMoiTitleId()
                         )
                 );
             }
+
 
             // Gender
             if (filterRequest.getGenderId() != null) {
@@ -133,6 +136,17 @@ public class AaqilSearchSpecification {
                         )
                 );
             }
+
+            // Voter Registration Center
+            if (filterRequest.getVrcId() != null) {
+                filterPredicates.add(
+                        criteriaBuilder.equal(
+                                entityRoot.get("vrc").get("id"),
+                                filterRequest.getVrcId()
+                        )
+                );
+            }
+
 
             // Active Flag
             if (filterRequest.getIsActive() != null) {

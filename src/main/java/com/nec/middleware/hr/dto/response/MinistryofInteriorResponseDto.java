@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AaqilResponseDto {
+public class MinistryofInteriorResponseDto {
 
-    private String aaqilId;
+    private String ministryofInteriorId;
 
-    private String fullName;
+    private String Name;
     private Short age;
     private String phone;
     private String email;
-
+    private String photoUrl;
     // ------------------------------------------------------------------ Lookups → IdValueDto
-    private IdValueDto aaqilType;
+    private IdValueDto moiTitle;;
     private IdValueDto gender;
     private IdValueDto status;
 
@@ -28,7 +28,7 @@ public class AaqilResponseDto {
     private IdValueDto region;
     private IdValueDto district;
     private IdValueDto city;
-
+    private IdValueDto vrc;
     // ------------------------------------------------------------------ Audit
     private Boolean isActive;
     private String createdBy;

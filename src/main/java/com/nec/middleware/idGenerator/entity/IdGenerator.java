@@ -1,5 +1,6 @@
 package com.nec.middleware.idGenerator.entity;
 
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +15,9 @@ public class IdGenerator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "module_code", nullable = false, unique = true)
-    private String moduleCode;
+   @Enumerated(EnumType.STRING)
+   @Column(name="module_code", nullable=false)
+    private ModuleCode moduleCode;
 
     @Column(name = "last_number", nullable = false)
     private Long lastNumber;
