@@ -1,6 +1,6 @@
 package com.nec.middleware.hr.specification;
 
-import com.nec.middleware.hr.dto.request.PortalUserListRequestDto;
+import com.nec.middleware.hr.dto.request.PortalUserFilterRequestDto;
 import com.nec.middleware.hr.entity.PortalUser;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -8,13 +8,13 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PortalUserSearchSpecification {
+public class PortalUserSearchSpecification {
 
     private PortalUserSearchSpecification() {
     }
 
-    public static Specification<PortalUser> build(
-            PortalUserListRequestDto request) {
+    public static Specification<PortalUser> buildSpecification(
+            PortalUserFilterRequestDto request) {
 
         return (root, query, criteriaBuilder) -> {
 
@@ -55,14 +55,6 @@ public final class PortalUserSearchSpecification {
                         criteriaBuilder.equal(
                                 root.get("role").get("id"),
                                 request.getRoleId())
-                );
-            }
-
-            if (request.getUniversityId() != null) {
-                predicates.add(
-                        criteriaBuilder.equal(
-                                root.get("university").get("id"),
-                                request.getUniversityId())
                 );
             }
 

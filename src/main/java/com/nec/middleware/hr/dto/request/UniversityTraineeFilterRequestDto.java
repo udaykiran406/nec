@@ -9,8 +9,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UniversityTraineeListRequestDto {
+public class UniversityTraineeFilterRequestDto {
 
+    // Search fields
+    private String universityTraineeId;   // partial match on business key
+    private String fullName;              // partial, case-insensitive
+
+    // FK filters — traverse associations in the Specification
+    private Long genderId;
+    private Long paymentMethodId;
     private Long universityId;
     private Long regionId;
     private Long districtId;
@@ -18,11 +25,4 @@ public class UniversityTraineeListRequestDto {
     private Long statusId;
     private Boolean isActive;
 
-    // Pagination
-    @Min(value = 0, message = "Page index must be 0 or greater")
-    private int page = 0;
-
-    @Min(value = 1, message = "Page size must be at least 1")
-    @Max(value = 100, message = "Page size must not exceed 100")
-    private int size = 20;
 }

@@ -3,6 +3,7 @@ package com.nec.middleware.exception;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

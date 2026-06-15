@@ -33,7 +33,7 @@ public class WarehouseRequest {
     @Pattern(regexp = "^(Active|Inactive)$")
     private String status;
 
-    private Long createdBy;
+    private String createdBy;
 
-    private Long updatedBy;
+    private String updatedBy;
 }

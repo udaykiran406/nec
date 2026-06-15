@@ -10,9 +10,9 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class ApiResponse<T> {
 
-    private int     status;
-    private String  message;
-    private T       data;
+    private int status;
+    private String message;
+    private T data;
 
     public static <T> ApiResponse<T> success(String message, T data) {
         return ApiResponse.<T>builder()

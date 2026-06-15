@@ -2,7 +2,7 @@ package com.nec.middleware.hr.controller;
 
 import com.nec.middleware.hr.constant.PortalUserConstants;
 
-import com.nec.middleware.hr.dto.request.PortalUserListRequestDto;
+import com.nec.middleware.hr.dto.request.PortalUserFilterRequestDto;
 import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
         description = "Portal User Management APIs"
 )
 @RestController
-@RequestMapping("/api/portal")
+@RequestMapping("/api/hr/portalUser")
 @RequiredArgsConstructor
 public class PortalUserController {
 
@@ -61,7 +61,7 @@ public class PortalUserController {
     @Operation(summary = "Get Paginated & Filtered Portal User List")
     @PostMapping("/getAllPortalUsers")
     public ResponseEntity<ApiResponse<Page<PortalUserResponseDto>>> getAllPortalUsers(
-            @RequestBody(required = false) PortalUserListRequestDto filterDto,@RequestParam(defaultValue = "0") int page,
+            @RequestBody(required = false) PortalUserFilterRequestDto filterDto, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         return ResponseEntity.ok(
@@ -87,14 +87,15 @@ public class PortalUserController {
     // ------------------------------------------------------------------ PATCH: Soft Delete
 
     @Operation(summary = "Soft Delete Portal User")
-    @PatchMapping("/delete/{portalUserId}")
-    public ResponseEntity<ApiResponse<PortalUserResponseDto>> softDelete(
-            @PathVariable String portalUserId) {
+    @PatchMapping("/changeStatus/{portalUserId}")
+    public ResponseEntity<ApiResponse<PortalUserResponseDto>> changeStatus(
+            @PathVariable String portalUserId,
+            @RequestParam Boolean isActive) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        PortalUserConstants.USER_DELETED,
-                        portalUserService.softDelete(portalUserId)));
+                        PortalUserConstants.USER_STATUS_CHANGED,
+                        portalUserService.changeStatus(portalUserId,isActive)));
     }
 }
 

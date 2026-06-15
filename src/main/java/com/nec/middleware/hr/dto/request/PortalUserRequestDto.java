@@ -10,8 +10,7 @@ import lombok.*;
 @Builder
 public class PortalUserRequestDto {
 
-    // null → CREATE, non-null → UPDATE
-    private Long id;
+
 
     private String portalUserId;
 
@@ -41,9 +40,6 @@ public class PortalUserRequestDto {
     @Size(max = 100, message = "Faculty must not exceed 100 characters")
     private String faculty;
 
-    @NotNull(message = "University is required")
-    private Long universityId;
-
     @NotNull(message = "Region is required")
     private Long regionId;
 
@@ -53,9 +49,12 @@ public class PortalUserRequestDto {
     @NotNull(message = "City is required")
     private Long cityId;
 
+    @NotNull(message = "Portal user type is required")
     private Long portalUserTypeId;
 
-//    private Long referenceId;
+    @NotNull(message = "MasterDataId is required")
+    private Long masterdataId;
+
 
     // Audit — populated from security context in the service layer
     private String createdBy;

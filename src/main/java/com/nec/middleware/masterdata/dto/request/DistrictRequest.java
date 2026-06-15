@@ -62,17 +62,13 @@ public class DistrictRequest {
     @Pattern(regexp = "^(Active|Inactive)$", message = "Status must be 'Active' or 'Inactive'")
     private String status;
 
-    /**
-     * ID of the user creating the record (optional on update).
-     */
-    @Min(value = 1, message = "createdBy must be a positive number")
-    private Long createdBy;
 
-    /**
-     * ID of the user updating the record (optional on create).
-     */
-    @Min(value = 1, message = "updatedBy must be a positive number")
-    private Long updatedBy;
+
+    private String createdBy;
+
+
+
+    private String updatedBy;
 }
 
 

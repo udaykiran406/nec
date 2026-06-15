@@ -4,6 +4,7 @@ package com.nec.middleware.Lookups.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +13,6 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+@NoArgsConstructor
 public class DeploymentTypes extends BaseLookupEntity{
 }

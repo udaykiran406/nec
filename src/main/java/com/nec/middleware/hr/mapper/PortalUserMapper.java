@@ -1,6 +1,7 @@
 package com.nec.middleware.hr.mapper;
 
 import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
+import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 import com.nec.middleware.hr.entity.PortalUser;
 
@@ -12,18 +13,18 @@ public class PortalUserMapper {
     /**
      * Map RequestDto → new Entity (for CREATE)
      */
-    public PortalUser portalUserEntity(PortalUserRequestDto dto) {
+    public PortalUser portalUserEntity(PortalUserRequestDto portalUserRequestDto) {
         PortalUser portalUserEntity = PortalUser.builder()
-                .userName(dto.getUserName())
-                .phone(dto.getPhone())
-                .email(dto.getEmail())
-                .photoPath(dto.getPhotoPath())
-                .faculty(dto.getFaculty())
+                .userName(portalUserRequestDto.getUserName())
+                .phone(portalUserRequestDto.getPhone())
+                .email(portalUserRequestDto.getEmail())
+                .photoPath(portalUserRequestDto.getPhotoPath())
+                .faculty(portalUserRequestDto.getFaculty())
                 .build();
 
         portalUserEntity.setIsActive(Boolean.TRUE);
-        portalUserEntity.setCreatedBy(dto.getCreatedBy());
-        portalUserEntity.setUpdatedBy(dto.getCreatedBy());
+        portalUserEntity.setCreatedBy(portalUserRequestDto.getCreatedBy());
+        portalUserEntity.setUpdatedBy(portalUserRequestDto.getCreatedBy());
 
         return portalUserEntity;
     }
@@ -54,13 +55,22 @@ public class PortalUserMapper {
         }
     }
 
+
+    // ------------------------------------------------------------------
+    // READ  — Entity → ResponseDto
+    // ------------------------------------------------------------------
+
     /**
-     * Map Entity → ResponseDto
+     * Maps every FK association to an {@link IdValueDto} so the response
+     * carries both the id and the human-readable label:
+     * <pre>
+     *   "city":  { "id": 1, "value": "Hyderabad" },
+     *   "role":  { "id": 2, "value": "Admin"     }
+     * </pre>
      */
     public PortalUserResponseDto portalUserResponseDto(PortalUser entity) {
         return PortalUserResponseDto.builder()
                 // Identity
-                .id(entity.getId())
                 .portalUserId(entity.getPortalUserId())
                 .userName(entity.getUserName())
                 .phone(entity.getPhone())
@@ -68,36 +78,55 @@ public class PortalUserMapper {
                 .photoPath(entity.getPhotoPath())
                 .faculty(entity.getFaculty())
 
-                // Lookup FKs — name resolved via lazy-loaded association
-//                .genderId(entity.getGenderId())
-                .genderName(entity.getGender() != null
-                        ? entity.getGender().getValue() : null)
+                // Lookup FKs → IdValueDto
+                .gender(entity.getGender() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getGender().getId())
+                          .value(entity.getGender().getValue())
+                          .build()
+                        : null)
 
-                .roleName(entity.getRole() != null
-                        ? entity.getRole().getValue() : null)
+                .role(entity.getRole() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getRole().getId())
+                          .value(entity.getRole().getValue())
+                          .build()
+                        : null)
 
-                .portalUserTypeName(entity.getPortalUserType() != null
-                        ? entity.getPortalUserType().getValue() : null)
+                .portalUserType(entity.getPortalUserType() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getPortalUserType().getId())
+                          .value(entity.getPortalUserType().getValue())
+                          .build()
+                        : null)
 
-                // Master data FKs — name resolved via lazy-loaded association
-                .universityName(entity.getUniversity() != null
-                        ? entity.getUniversity().getUniversityName() : null)
+                .region(entity.getRegion() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getRegion().getId())
+                          .value(entity.getRegion().getRegionName())
+                          .build()
+                        : null)
 
-                .regionName(entity.getRegion() != null
-                        ? entity.getRegion().getRegionName() : null)
+                .district(entity.getDistrict() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getDistrict().getId())
+                          .value(entity.getDistrict().getDistrictName())
+                          .build()
+                        : null)
 
-                .districtName(entity.getDistrict() != null
-                        ? entity.getDistrict().getDistrictName() : null)
-
-                .cityName(entity.getCity() != null
-                        ? entity.getCity().getCityName() : null)
+                .city(entity.getCity() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getCity().getId())
+                          .value(entity.getCity().getCityName())
+                          .build()
+                        : null)
 
                 // Audit
                 .isActive(entity.getIsActive())
+                .createdBy(entity.getCreatedBy())
+                .createdAt(entity.getCreatedAt())
                 .updatedBy(entity.getUpdatedBy())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }
-
-
 }

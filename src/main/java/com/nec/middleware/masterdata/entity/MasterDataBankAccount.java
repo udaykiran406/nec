@@ -49,10 +49,10 @@ public class MasterDataBankAccount {
     private String status = "Active";
 
     @Column(name = "created_by")
-    private Long createdBy;
+    private String createdBy;
 
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private String updatedBy;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

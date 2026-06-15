@@ -1,8 +1,25 @@
 package com.nec.middleware.hr.dto.response;
 
+import com.nec.middleware.dto.IdValueDto;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
+/**
+ * Every lookup and master-data FK is returned as an {@link IdValueDto}
+ * so the front-end receives both the id and the human-readable label
+ * in a structured object:
+ *
+ * <pre>
+ * "gender":         { "id": 1, "value": "Male"       },
+ * "role":           { "id": 2, "value": "Admin"       },
+ * "portalUserType": { "id": 3, "value": "Staff"       },
+ * "university":     { "id": 4, "value": "UOK"         },
+ * "region":         { "id": 5, "value": "Mogadishu"   },
+ * "district":       { "id": 6, "value": "Hodan"       },
+ * "city":           { "id": 7, "value": "Hyderabad"   }
+ * </pre>
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,7 +28,6 @@ import java.time.LocalDateTime;
 public class PortalUserResponseDto {
 
     // ------------------------------------------------------------------ Identity
-    private Long id;
     private String portalUserId;
     private String userName;
     private String phone;
@@ -19,24 +35,40 @@ public class PortalUserResponseDto {
     private String photoPath;
     private String faculty;
 
-    // ------------------------------------------------------------------ Lookup FKs (ID + resolved name)
-    private String genderName;
+    // ------------------------------------------------------------------ Lookup FKs → IdValueDto
+    /**
+     * nec_lkp_genders
+     */
+    private IdValueDto gender;
 
-    private String roleName;
+    /**
+     * nec_lkp_roles
+     */
+    private IdValueDto role;
 
-    private String portalUserTypeName;
+    /**
+     * nec_lkp_portal_user_types
+     */
+    private IdValueDto portalUserType;
 
-    // ------------------------------------------------------------------ Master Data FKs (ID + resolved name)
-    private Long universityId;
-    private String universityName;
+    // ------------------------------------------------------------------ Master Data FKs → IdValueDto
+    private IdValueDto masterData;
 
-    private String regionName;
 
-    private String districtName;
+    /**
+     * nec_regions
+     */
+    private IdValueDto region;
 
-    private Long cityId;
-    private String cityName;
-;
+    /**
+     * nec_districts
+     */
+    private IdValueDto district;
+
+    /**
+     * nec_cities
+     */
+    private IdValueDto city;
 
     // ------------------------------------------------------------------ Audit
     private Boolean isActive;

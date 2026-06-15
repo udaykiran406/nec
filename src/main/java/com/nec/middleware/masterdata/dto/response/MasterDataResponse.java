@@ -38,11 +38,8 @@ public class MasterDataResponse {
     /** Status: 'active' or 'inactive'. */
     private String status;
 
-    /** ID of the user who created this record. */
-    private Long createdBy;
-
-    /** ID of the user who last updated this record. */
-    private Long updatedBy;
+    private String createdBy;
+    private String updatedBy;
 
     /** Timestamp when the record was created. */
     private LocalDateTime createdAt;

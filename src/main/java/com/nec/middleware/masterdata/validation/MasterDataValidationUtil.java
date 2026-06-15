@@ -21,9 +21,6 @@ public class MasterDataValidationUtil {
         if (request.getId() != null) {
             throw new IllegalArgumentException("ID must be null for CREATE operations");
         }
-        if (request.getCreatedBy() == null || request.getCreatedBy() <= 0) {
-            throw new IllegalArgumentException("createdBy must be provided and positive");
-        }
     }
 
     /**
@@ -37,9 +34,7 @@ public class MasterDataValidationUtil {
         if (request.getId() == null || request.getId() <= 0) {
             throw new IllegalArgumentException("ID must be provided and positive for UPDATE operations");
         }
-        if (request.getUpdatedBy() == null || request.getUpdatedBy() <= 0) {
-            throw new IllegalArgumentException("updatedBy must be provided and positive");
-        }
+
     }
 }
 

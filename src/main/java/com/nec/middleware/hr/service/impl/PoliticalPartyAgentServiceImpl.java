@@ -1,15 +1,20 @@
 package com.nec.middleware.hr.service.impl;
 
+import com.nec.middleware.Lookups.repository.LookupGenderRepository;
+import com.nec.middleware.Lookups.repository.ThirdPartyStatusRepository;
+import com.nec.middleware.exception.DuplicateResourceException;
 import com.nec.middleware.exception.ResourceNotFoundException;
-import com.nec.middleware.exception.ValidationException;
 import com.nec.middleware.hr.constant.PoliticalPartyAgentConstants;
-import com.nec.middleware.hr.dto.request.PoliticalPartyAgentListRequestDto;
+import com.nec.middleware.hr.constant.PortalUserConstants;
+import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentRequestDto;
 import com.nec.middleware.hr.dto.response.PoliticalPartyAgentResponseDto;
 import com.nec.middleware.hr.entity.PoliticalPartyAgent;
 import com.nec.middleware.hr.mapper.PoliticalPartyAgentMapper;
 import com.nec.middleware.hr.repository.PoliticalPartyAgentRepository;
 import com.nec.middleware.hr.service.PoliticalPartyAgentService;
+import com.nec.middleware.hr.specification.PoliticalPartyAgentSearchSpecification;
+import com.nec.middleware.masterdata.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,141 +29,261 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentService {
 
-    private static final String CODE_PREFIX = "PA";
-    private static final int    CODE_PAD    = 3;   // PA001, PA002 …
+ // PA001, PA002 …
 
-    private final PoliticalPartyAgentRepository repository;
-    private final PoliticalPartyAgentMapper      mapper;
+    private final PoliticalPartyAgentRepository politicalPartyAgentRepository;
+    private final PoliticalPartyAgentMapper politicalPartyAgentMapper;
+    private final MasterDataRepository regionRepository;
+    private final DistrictRepository districtRepository;
+    private final CityRepository cityRepository;
+    private final LookupGenderRepository genderRepository;
+    private final PollingStationRepository pollingStationRepository;
+    private final PoliticalPartyRepository politicalPartyRepository;
+
+    private final ThirdPartyStatusRepository statusRepository;
 
     // ------------------------------------------------------------------ SAVE / UPDATE
 
     @Override
     @Transactional
-    public PoliticalPartyAgentResponseDto saveOrUpdate(PoliticalPartyAgentRequestDto requestDto) {
+    public PoliticalPartyAgentResponseDto savePartyAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
 
-        validateAgent(requestDto);
-        PoliticalPartyAgent entity;
+        validateAgent(politicalPartyAgentRequestDto);
+        log.info("Creating political party agent. AgentName: {}",politicalPartyAgentRequestDto.getAgentName());
+        PoliticalPartyAgent politicalPartyAgentEntity = politicalPartyAgentMapper.toPoliticalPartyAgentEntity(politicalPartyAgentRequestDto);
+        politicalPartyAgentEntity.setPoliticalPartyAgentUserId(generateUserID(PoliticalPartyAgentConstants.CODE_PREFIX, PoliticalPartyAgentConstants.CODE_PAD));
 
-        if (requestDto.getId() == null) {
+        politicalPartyAgentEntity.setPollingStation(
+                pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId()).orElseThrow(
+                ()->new ResourceNotFoundException("Polling Station Not Found")));
 
-            log.info("Creating political party agent");
-            entity = mapper.toEntity(requestDto);
-            entity.setCode(generateCode());
+        politicalPartyAgentEntity.setPoliticalPartyName(
+                politicalPartyRepository.findById(politicalPartyAgentRequestDto.getPoliticalPartyNameId()).orElseThrow(
+                        () -> new ResourceNotFoundException("Political Party Name Not Found")));
 
-        } else {
+        politicalPartyAgentEntity.setGender(
+                genderRepository.findById(politicalPartyAgentRequestDto.getGenderId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Gender Not Found"))
+        );
 
-            log.info("Updating political party agent id: {}", requestDto.getId());
-            entity = findByIdAndNotDeleted(requestDto.getId());
-            mapper.updateEntity(entity, requestDto);
-            // code is never changed on update
-        }
-
-        PoliticalPartyAgent saved = repository.save(entity);
-        return mapper.toResponseDto(saved);
+        politicalPartyAgentEntity.setRegion(
+                regionRepository.findById(
+                                politicalPartyAgentRequestDto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Region Not Found"))
+        );
+        politicalPartyAgentEntity.setDistrict(
+                districtRepository.findById(
+                                politicalPartyAgentRequestDto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("District Not Found"))
+        );
+        politicalPartyAgentEntity.setCity(
+                cityRepository.findById(
+                                politicalPartyAgentRequestDto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("City Not Found"))
+        );
+        politicalPartyAgentEntity.setStatus(statusRepository.findById(politicalPartyAgentRequestDto.getStatusId()).orElseThrow(()-> new ResourceNotFoundException("Status Not Found")));
+        PoliticalPartyAgent politicalPartyAgent = politicalPartyAgentRepository.save(politicalPartyAgentEntity);
+        return politicalPartyAgentMapper.politicalPartyResponseDto(politicalPartyAgent);
     }
 
     // ------------------------------------------------------------------ READ
 
     @Override
     @Transactional(readOnly = true)
-    public PoliticalPartyAgentResponseDto getById(Long id) {
-        return mapper.toResponseDto(findByIdAndNotDeleted(id));
+    public PoliticalPartyAgentResponseDto getPolticalPartyAgentById(String agentUserId) {
+        return politicalPartyAgentMapper.politicalPartyResponseDto(findByAgentUserId(agentUserId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PoliticalPartyAgentResponseDto> getAll(PoliticalPartyAgentListRequestDto filterDto) {
+    public Page<PoliticalPartyAgentResponseDto> getAllPartyAgents(PoliticalPartyAgentFilterRequestDto filterDto, int page, int size) {
 
+        if (filterDto == null) {
+            filterDto = new PoliticalPartyAgentFilterRequestDto();
+        }
         Pageable pageable = PageRequest.of(
-                filterDto.getPage(),
-                filterDto.getSize(),
+                page,
+                size,
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
-
-        return repository.findAllWithFilters(
-                filterDto.getPoliticalPartyNameId(),
-                filterDto.getPollingStationId(),
-                filterDto.getRegionId(),
-                filterDto.getDistrictId(),
-                filterDto.getCityId(),
-                filterDto.getStatusId(),
-                filterDto.getIsActive(),
-                pageable
-        ).map(mapper::toResponseDto);
-    }
-
-    // ------------------------------------------------------------------ STATUS CHANGE
-
-    @Override
-    @Transactional
-    public PoliticalPartyAgentResponseDto changeStatus(Long id) {
-
-        PoliticalPartyAgent entity = findById(id);
-        boolean newStatus = !entity.getIsActive();
-        entity.setIsActive(newStatus);
-
-        log.info("Changing status for political party agent id: {} → isActive={}", id, newStatus);
-
-        return mapper.toResponseDto(repository.save(entity));
+        return politicalPartyAgentRepository.findAll(
+                        PoliticalPartyAgentSearchSpecification.buildSpecification(filterDto),
+                        pageable)
+                .map(politicalPartyAgentMapper::politicalPartyResponseDto);
     }
 
     // ------------------------------------------------------------------ SOFT DELETE
 
     @Override
     @Transactional
-    public void softDelete(Long id) {
+    public PoliticalPartyAgentResponseDto changeStatus(String partyAgentId, Boolean isActiveFlag) {
 
-        PoliticalPartyAgent entity = findById(id);
-        entity.setIsActive(false);
-
-        repository.save(entity);
-        log.info("Political party agent soft deleted with id: {}", id);
+        PoliticalPartyAgent partyAgent = findByAgentUserId(partyAgentId);
+        partyAgent.setIsActive(isActiveFlag);
+        log.info("Political party agent soft deleted with id: {}", partyAgent);
+        return politicalPartyAgentMapper.politicalPartyResponseDto(
+                politicalPartyAgentRepository.save(politicalPartyAgentRepository.save(partyAgent)));
     }
+    //-------------------------------------------------------------Update
+    @Override
+    @Transactional
+    public PoliticalPartyAgentResponseDto updatePoliticalPartyAgent(
+            String agentUserId,
+            PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
 
+        PoliticalPartyAgent politicalPartyAgent =
+                findByAgentUserId(agentUserId);
+
+        validateAgentForUpdate(
+                politicalPartyAgentRequestDto,
+                politicalPartyAgent.getId()
+        );
+
+        updatePoliticalPartyAgents(
+                politicalPartyAgent,
+                politicalPartyAgentRequestDto
+        );
+
+        politicalPartyAgentRepository.save(politicalPartyAgent);
+
+        return politicalPartyAgentMapper.politicalPartyResponseDto(
+                politicalPartyAgent
+        );
+    }
     // ------------------------------------------------------------------
     // Code generation
     // ------------------------------------------------------------------
 
-    private String generateCode() {
-        int next = repository.findMaxCodeSequence() + 1;
-        return CODE_PREFIX + String.format("%0" + CODE_PAD + "d", next);
+    private String generateUserID(String codePrefix, int codePad)  {
+            int next = politicalPartyAgentRepository.findMaxCodeSequence() + 1;
+            return codePrefix + String.format("%0" + codePad + "d", next);
     }
 
     // ------------------------------------------------------------------
     // Validation
     // ------------------------------------------------------------------
 
-    private void validateAgent(PoliticalPartyAgentRequestDto dto) {
+    private void validateAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequest) {
 
-        if (dto.getId() == null) {
-
-            if (repository.existsByEmailAndIsActiveTrue(dto.getEmail()) ||
-                    repository.existsByPhoneAndIsActiveTrue(dto.getPhone())) {
-                throw new ValidationException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
+            if (politicalPartyAgentRepository.existsByEmail(politicalPartyAgentRequest.getEmail()) ||
+                    politicalPartyAgentRepository.existsByPhone(politicalPartyAgentRequest.getPhone())) {
+                throw new DuplicateResourceException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
             }
+    }
 
-        } else {
+    private void validateAgentForUpdate(
+            PoliticalPartyAgentRequestDto request,
+            Long id) {
 
-            if (repository.existsByEmailAndIsActiveTrueAndIdNot(dto.getEmail(), dto.getId()) ||
-                    repository.existsByPhoneAndIsActiveTrueAndIdNot(dto.getPhone(), dto.getId())) {
-                throw new ValidationException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
-            }
+        if (politicalPartyAgentRepository.existsByEmailAndIdNot(
+                request.getEmail(), id)
+                ||
+                politicalPartyAgentRepository.existsByPhoneAndIdNot(
+                        request.getPhone(), id)) {
+
+            throw new DuplicateResourceException(
+                    PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS
+            );
         }
     }
 
-    // ------------------------------------------------------------------
-    // Private Helpers
-    // ------------------------------------------------------------------
 
-    private PoliticalPartyAgent findByIdAndNotDeleted(Long id) {
-        return repository.findByIdAndIsActiveTrue(id)
+    private PoliticalPartyAgent findByAgentUserId(String agentUserId) {
+        return politicalPartyAgentRepository.findByPoliticalPartyAgentUserId(agentUserId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(PoliticalPartyAgentConstants.AGENT_NOT_FOUND + id));
+                        new ResourceNotFoundException(
+                                PoliticalPartyAgentConstants.AGENT_NOT_FOUND + agentUserId));
     }
 
-    private PoliticalPartyAgent findById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(PoliticalPartyAgentConstants.AGENT_NOT_FOUND + id));
+    public void updatePoliticalPartyAgents(
+            PoliticalPartyAgent politicalPartyAgent,
+            PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
+
+        if (politicalPartyAgentRequestDto.getAgentName() != null) {
+            politicalPartyAgent.setAgentName(politicalPartyAgentRequestDto.getAgentName());
+        }
+
+        if (politicalPartyAgentRequestDto.getPhone() != null) {
+            politicalPartyAgent.setPhone(politicalPartyAgentRequestDto.getPhone());
+        }
+
+        if (politicalPartyAgentRequestDto.getEmail() != null) {
+            politicalPartyAgent.setEmail(politicalPartyAgentRequestDto.getEmail());
+        }
+
+        if (politicalPartyAgentRequestDto.getPhotoUrl() != null) {
+            politicalPartyAgent.setPhotoUrl(politicalPartyAgentRequestDto.getPhotoUrl());
+        }
+
+        if (politicalPartyAgentRequestDto.getUpdatedBy() != null) {
+            politicalPartyAgent.setUpdatedBy(politicalPartyAgentRequestDto.getUpdatedBy());
+        }
+
+        // Political Party
+        if (politicalPartyAgentRequestDto.getPoliticalPartyNameId() != null) {
+            politicalPartyAgent.setPoliticalPartyName(
+                    politicalPartyRepository.findById(politicalPartyAgentRequestDto.getPoliticalPartyNameId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Political Party not found"))
+            );
+        }
+
+        // Gender
+        if (politicalPartyAgentRequestDto.getGenderId() != null) {
+            politicalPartyAgent.setGender(
+                    genderRepository.findById(politicalPartyAgentRequestDto.getGenderId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Gender not found"))
+            );
+        }
+
+        // Polling Station
+        if (politicalPartyAgentRequestDto.getPollingStationId() != null) {
+            politicalPartyAgent.setPollingStation(
+                    pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Polling Station not found"))
+            );
+        }
+
+        // Region
+        if (politicalPartyAgentRequestDto.getRegionId() != null) {
+            politicalPartyAgent.setRegion(
+                    regionRepository.findById(politicalPartyAgentRequestDto.getRegionId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Region not found"))
+            );
+        }
+
+        // District
+        if (politicalPartyAgentRequestDto.getDistrictId() != null) {
+            politicalPartyAgent.setDistrict(
+                    districtRepository.findById(politicalPartyAgentRequestDto.getDistrictId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("District not found"))
+            );
+        }
+
+        // City
+        if (politicalPartyAgentRequestDto.getCityId() != null) {
+            politicalPartyAgent.setCity(
+                    cityRepository.findById(politicalPartyAgentRequestDto.getCityId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("City not found"))
+            );
+        }
+
+        // Status
+        if (politicalPartyAgentRequestDto.getStatusId() != null) {
+            politicalPartyAgent.setStatus(
+                    statusRepository.findById(politicalPartyAgentRequestDto.getStatusId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("Status not found"))
+            );
+        }
     }
 }

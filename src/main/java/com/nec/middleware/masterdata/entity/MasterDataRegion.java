@@ -48,13 +48,13 @@ public class MasterDataRegion {
      * FK → nec_rbac_users.id – the user who created this record.
      */
     @Column(name = "created_by")
-    private Long createdBy;
+    private String createdBy;
 
     /**
      * FK → nec_rbac_users.id – the user who last updated this record.
      */
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private String updatedBy;
 
     /**
      * Timestamp automatically set on INSERT.
