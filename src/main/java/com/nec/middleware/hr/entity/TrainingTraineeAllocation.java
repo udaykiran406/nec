@@ -9,10 +9,19 @@ import java.time.LocalDate;
 /**
  * Maps to: nec_training_trainee_allocations
  *
+ * allocationCode → business key, auto-generated e.g. TA0001, TA0002
+ *
  * FK associations:
- *  - trainingClassId → nec_training_classes.id
  *  - traineeId       → nec_hr_university_trainees.id
+ *  - trainingClassId → nec_training_classes.id
  *  - statusId        → nec_lkp_training_management_status.id
+ *
+ * Derived fields for response:
+ *  - University, Region, Faculty come from UniversityTrainee
+ *  - Training Type comes from TrainingClass
+ *
+ * Business rule:
+ *  - One trainee can join only one class.
  *
  * Audit fields inherited from {@link AuditableEntity}.
  */
@@ -30,15 +39,11 @@ public class TrainingTraineeAllocation extends AuditableEntity {
     private Long id;
 
     /**
-     * FK → nec_training_classes.id
-     * Stored column: training_class_id
+     * Business key — generated once at creation, never changed.
+     * Example: TA0001
      */
-    @Column(name = "training_class_id", nullable = false, insertable = false, updatable = false)
-    private Long trainingClassId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "training_class_id", nullable = false)
-    private TrainingClass trainingClass;
+    @Column(name = "allocation_code", nullable = false, unique = true, length = 20)
+    private String allocationCode;
 
     /**
      * FK → nec_hr_university_trainees.id
@@ -50,6 +55,17 @@ public class TrainingTraineeAllocation extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainee_id", nullable = false)
     private UniversityTrainee trainee;
+
+    /**
+     * FK → nec_training_classes.id
+     * Stored column: training_class_id
+     */
+    @Column(name = "training_class_id", nullable = false, insertable = false, updatable = false)
+    private Long trainingClassId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "training_class_id", nullable = false)
+    private TrainingClass trainingClass;
 
     /**
      * FK → nec_lkp_training_management_status.id
