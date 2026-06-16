@@ -35,34 +35,34 @@ public interface BankAccountRepository
     );
 
     @Query("""
-        SELECT b
-        FROM MasterDataBankAccount b
-        WHERE b.isDeleted = 0
-          AND (
-                :accountType IS NULL
-                OR TRIM(:accountType) = ''
-                OR b.accountType = :accountType
-              )
-          AND (
-                :accountHolderName IS NULL
-                OR TRIM(:accountHolderName) = ''
-                OR LOWER(b.accountHolderName)
-                   LIKE CONCAT('%', LOWER(:accountHolderName), '%')
-              )
-          AND (
-                :bankName IS NULL
-                OR TRIM(:bankName) = ''
-                OR LOWER(b.bankName)
-                   LIKE CONCAT('%', LOWER(:bankName), '%')
-              )
-          AND (
-                :branchName IS NULL
-                OR TRIM(:branchName) = ''
-                OR LOWER(b.branchName)
-                   LIKE CONCAT('%', LOWER(:branchName), '%')
-              )
-        ORDER BY b.accountHolderName
-        """)
+    SELECT b
+    FROM MasterDataBankAccount b
+    WHERE b.isDeleted = 0
+      AND (
+            :accountType IS NULL
+            OR :accountType = ''
+            OR b.accountType = :accountType
+          )
+      AND (
+            :accountHolderName IS NULL
+            OR :accountHolderName = ''
+            OR LOWER(b.accountHolderName)
+               LIKE LOWER(CONCAT('%', :accountHolderName, '%'))
+          )
+      AND (
+            :bankName IS NULL
+            OR :bankName = ''
+            OR LOWER(b.bankName)
+               LIKE LOWER(CONCAT('%', :bankName, '%'))
+          )
+      AND (
+            :branchName IS NULL
+            OR :branchName = ''
+            OR LOWER(b.branchName)
+               LIKE LOWER(CONCAT('%', :branchName, '%'))
+          )
+    ORDER BY b.accountHolderName
+    """)
     Page<MasterDataBankAccount> findBankAccounts(
             @Param("accountType") String accountType,
             @Param("accountHolderName") String accountHolderName,

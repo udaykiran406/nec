@@ -1,9 +1,12 @@
 package com.nec.middleware.masterdata.repository;
 
 import com.nec.middleware.masterdata.entity.MasterDataUniversity;
+import com.nec.middleware.masterdata.entity.MasterDataVoterRegistrationCenter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,5 +28,20 @@ public interface UniversityRepository extends JpaRepository<MasterDataUniversity
             Long id
     );
 
-    Page<MasterDataUniversity> findAllByIsDeletedOrderByUniversityNameAsc(Short isDeleted, Pageable pageable);
+
+    @Query("""
+        SELECT u
+        FROM MasterDataUniversity u
+        WHERE u.isDeleted = 0
+          AND (:regionId IS NULL OR u.regionId = :regionId)
+          AND (:districtId IS NULL OR u.districtId = :districtId)
+          AND (:cityId IS NULL OR u.cityId = :cityId)
+        ORDER BY u.universityName
+        """)
+    Page<MasterDataUniversity> findUniversities(
+            @Param("regionId") Long regionId,
+            @Param("districtId") Long districtId,
+            @Param("cityId") Long cityId,
+            Pageable pageable
+    );
 }

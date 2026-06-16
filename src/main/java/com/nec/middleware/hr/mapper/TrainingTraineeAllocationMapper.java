@@ -27,13 +27,13 @@ public class TrainingTraineeAllocationMapper {
                         .build())
 
                 .university(IdValueDto.builder()
-                        .id(entity.getTrainee().getUniversityId())
-                        .value(null)
+                        .id(entity.getTrainee().getUniversity().getId())
+                        .value(entity.getTrainee().getUniversity().getUniversityName())
                         .build())
 
                 .region(IdValueDto.builder()
-                        .id(entity.getTrainee().getRegionId())
-                        .value(null)
+                        .id(entity.getTrainee().getRegion().getId())
+                        .value(entity.getTrainee().getRegion().getRegionName())
                         .build())
 
                 .faculty(entity.getTrainee().getFaculty())

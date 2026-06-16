@@ -55,7 +55,10 @@ public interface MasterDataService {
 
     UniversityResponse saveUniversity(UniversityRequest request);
 
-    List<UniversityResponse> getAllUniversities();
+
+
+    Page<UniversityResponse> getAllUniversities(
+            UniversityListRequestDto filterDto);
 
 
     UniversityResponse getUniversityById(Long id);

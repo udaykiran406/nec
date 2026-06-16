@@ -14,11 +14,15 @@ import com.nec.middleware.hr.repository.TrainingTraineeAllocationRepository;
 import com.nec.middleware.hr.repository.UniversityTraineeRepository;
 import com.nec.middleware.hr.service.TrainingTraineeAllocationService;
 import com.nec.middleware.hr.specification.TrainingTraineeAllocationSearchSpecification;
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
+import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Year;
 
 @Slf4j
 @Service
@@ -32,6 +36,7 @@ public class TrainingTraineeAllocationServiceImpl
     private final UniversityTraineeRepository universityTraineeRepository;
     private final TrainingClassRepository trainingClassRepository;
     private final TrainingManagementStatusRepository statusRepository;
+    private final UniqueIdGeneratorService uniqueIdGeneratorService;
 
     @Override
     @Transactional
@@ -50,10 +55,7 @@ public class TrainingTraineeAllocationServiceImpl
         TrainingTraineeAllocation entity = new TrainingTraineeAllocation();
 
         entity.setAllocationCode(
-                generateAllocationCode(
-                        TrainingTraineeAllocationConstants.CODE_PREFIX,
-                        TrainingTraineeAllocationConstants.CODE_PAD
-                )
+                generateAllocationCode()
         );
 
         populateAllocation(entity, requestDto);
@@ -172,9 +174,13 @@ public class TrainingTraineeAllocationServiceImpl
         );
     }
 
-    private String generateAllocationCode(String codePrefix, int codePad) {
-        int next = allocationRepository.findMaxCodeSequence() + 1;
-        return codePrefix + String.format("%0" + codePad + "d", next);
+    private String generateAllocationCode() {
+       String prefix= TrainingTraineeAllocationConstants.CODE_PREFIX+"-"
+               + Year.now().getValue()+"-";
+       return uniqueIdGeneratorService.generateId(
+               ModuleCode.TRAINEE_ALLOCATION,
+               prefix
+       );
     }
 
     private TrainingTraineeAllocation findByAllocationCode(

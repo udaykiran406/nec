@@ -28,5 +28,5 @@ public class TrainingScheduleConstants {
 
     public static final String CODE_PREFIX = "TS";
 
-    public static final int CODE_PAD = 4;
+
 }

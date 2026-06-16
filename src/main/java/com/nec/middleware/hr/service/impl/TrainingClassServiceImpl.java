@@ -13,6 +13,8 @@ import com.nec.middleware.hr.mapper.TrainingClassMapper;
 import com.nec.middleware.hr.repository.TrainingClassRepository;
 import com.nec.middleware.hr.service.TrainingClassService;
 import com.nec.middleware.hr.specification.TrainingClassSearchSpecification;
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
+import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Year;
 
 @Slf4j
 @Service
@@ -42,6 +46,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     private final CityRepository cityRepository;
     private final UniversityRepository universityRepository;
     private final HrTrainerTotRepository hrTrainerTotRepository;
+    private final UniqueIdGeneratorService uniqueIdGeneratorService;
 
     @Override
     public TrainingClassResponse createTrainingClass(TrainingClassRequest request) {
@@ -196,8 +201,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     private TrainingClass toTrainingClassEntity(TrainingClassRequest request) {
 
         TrainingClass trainingClassEntity = trainingClassMapper.toTrainingClassEntity(request);
-        trainingClassEntity.setClassCode(generateClassCode(TrainingClassConstants.CODE_PREFIX, TrainingClassConstants.CODE_PAD));
-
+        trainingClassEntity.setClassCode(generateTrainingClassNumber());
         trainingClassEntity.setTrainingType(
                 trainingTypeRepository.findById(request.getTrainingTypeId())
                         .orElseThrow(() -> new ResourceNotFoundException("Training type not found"))
@@ -240,10 +244,15 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     }
 
 
-    private String generateClassCode(String codePrefix, int codePad) {
-        int next = trainingClassRepository.findMaxCodeSequence() + 1;
+    public String generateTrainingClassNumber() {
 
-        return codePrefix + String.format("%0" + codePad + "d", next);
+        String prefix = TrainingClassConstants.CODE_PREFIX + "-"
+                + Year.now().getValue() + "-";
+
+        return uniqueIdGeneratorService.generateId(
+                ModuleCode.TRAINING_CLASS,
+                prefix
+        );
     }
 
 }

@@ -5,8 +5,7 @@ public final class TrainingClassConstants {
     private TrainingClassConstants() {
     }
 
-    public static final String CODE_PREFIX = "TC";
-    public static final int CODE_PAD = 4;
+    public static final String CODE_PREFIX = "TCL";
 
     public static final String CLASS_CREATED =
             "Training class created successfully";

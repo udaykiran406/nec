@@ -15,6 +15,12 @@ public class UniversityResponse {
 
     private String universityName;
 
+    private Long regionId;
+
+    private Long districtId;
+
+    private Long cityId;
+
     private String location;
 
     private String status;

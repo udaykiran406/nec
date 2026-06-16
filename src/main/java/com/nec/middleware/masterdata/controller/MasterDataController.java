@@ -282,12 +282,16 @@ public class MasterDataController {
     }
 
     @GetMapping("/universities/list")
-    public ResponseEntity<ApiResponse<List<UniversityResponse>>> getAllUniversities() {
+    public ResponseEntity<ApiResponse<Page<UniversityResponse>>>
+    getAllUniversities(
+            UniversityListRequestDto filterDto) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         MasterDataConstants.RECORDS_FETCHED,
-                        service.getAllUniversities()));
+                        service.getAllUniversities(filterDto)
+                )
+        );
     }
 
 

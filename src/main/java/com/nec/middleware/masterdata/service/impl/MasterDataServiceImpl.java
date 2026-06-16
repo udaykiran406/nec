@@ -632,14 +632,21 @@ public class MasterDataServiceImpl implements MasterDataService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UniversityResponse> getAllUniversities() {
+    public Page<UniversityResponse> getAllUniversities(
+            UniversityListRequestDto filterDto) {
 
-        return universityRepository
-                .findAllByIsDeletedOrderByUniversityNameAsc(
-                        MasterDataConstants.IS_DELETED_FALSE)
-                .stream()
-                .map(masterDataMapper::toUniversityResponseDto)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(
+                filterDto.getPage(),
+                filterDto.getSize()
+        );
+
+        return universityRepository.findUniversities(
+                        filterDto.getRegionId(),
+                        filterDto.getDistrictId(),
+                        filterDto.getCityId(),
+                        pageable
+                )
+                .map(masterDataMapper::toUniversityResponseDto);
     }
 
     // =========================================================================

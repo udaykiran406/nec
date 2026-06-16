@@ -22,13 +22,5 @@ public interface TrainingClassRepository
             String classCode
     );
 
-    @Query("""
-        SELECT COALESCE(
-            MAX(CAST(SUBSTRING(t.classCode, 3) AS int)),
-            0
-        )
-        FROM TrainingClass t
-        WHERE t.classCode LIKE 'TC%'
-    """)
-    int findMaxCodeSequence();
+
 }
