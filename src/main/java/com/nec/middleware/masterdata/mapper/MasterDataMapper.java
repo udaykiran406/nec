@@ -33,9 +33,6 @@ import com.nec.middleware.masterdata.entity.MasterDataBankAccount;
 import com.nec.middleware.masterdata.dto.request.DeploymentRoleRequest;
 import com.nec.middleware.masterdata.dto.response.DeploymentRoleResponse;
 import com.nec.middleware.masterdata.entity.MasterDataDeploymentRole;
-import com.nec.middleware.masterdata.dto.request.AaqilTypeRequest;
-import com.nec.middleware.masterdata.dto.response.AaqilTypeResponse;
-import com.nec.middleware.masterdata.entity.MasterDataAaqilType;
 import com.nec.middleware.masterdata.dto.request.HrTrainerTotRequest;
 import com.nec.middleware.masterdata.dto.response.HrTrainerTotResponse;
 import com.nec.middleware.masterdata.entity.MasterDataHrTrainerTot;
@@ -599,44 +596,7 @@ public class MasterDataMapper {
         entity.setUpdatedBy(request.getUpdatedBy());
     }
 
-    public MasterDataAaqilType toAaqilTypeEntity(AaqilTypeRequest request) {
 
-        return MasterDataAaqilType.builder()
-                .code(trimSafe(request.getCode()))
-                .value(trimSafe(request.getValue()))
-                .description(trimSafe(request.getDescription()))
-                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
-                .createdBy(request.getCreatedBy())
-                .updatedBy(request.getUpdatedBy())
-                .build();
-    }
-
-    public AaqilTypeResponse toAaqilTypeResponseDto(MasterDataAaqilType entity) {
-
-        return AaqilTypeResponse.builder()
-                .id(entity.getId())
-                .code(entity.getCode())
-                .value(entity.getValue())
-                .description(entity.getDescription())
-                .isActive(entity.getIsActive())
-                .isDeleted(entity.getIsDeleted())
-                .createdBy(entity.getCreatedBy())
-                .updatedBy(entity.getUpdatedBy())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
-
-    public void updateAaqilTypeEntity(
-            MasterDataAaqilType entity,
-            AaqilTypeRequest request) {
-
-        entity.setCode(trimSafe(request.getCode()));
-        entity.setValue(trimSafe(request.getValue()));
-        entity.setDescription(trimSafe(request.getDescription()));
-        entity.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
-        entity.setUpdatedBy(request.getUpdatedBy());
-    }
 
     public MasterDataHrTrainerTot toHrTrainerTotEntity(
             HrTrainerTotRequest request) {

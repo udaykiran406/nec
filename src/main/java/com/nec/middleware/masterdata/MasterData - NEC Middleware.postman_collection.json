@@ -1,0 +1,2029 @@
+{
+  "info": {
+    "_postman_id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+    "name": "MasterData - NEC Middleware",
+    "description": "Postman collection for Master Data Management APIs in NEC Middleware. Covers Regions, Districts, Cities, Polling Stations, Voter Registration Centers, Universities, Warehouses, Warehouse Sub Stores, Political Parties, Bank Accounts, Deployment Roles, and HR Trainer TOT.\n\nAll save endpoints handle both CREATE (id=null) and UPDATE (id=non-null).\nStatus values are case-sensitive: 'active'/'inactive' for Regions; 'Active'/'Inactive' for all others.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Regions",
+      "item": [
+        {
+          "name": "Save Region (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Region created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"region_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Region ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"regionName\": \"Maroodi Jeex\",\n  \"status\": \"active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/regions/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "regions", "save"]
+            },
+            "description": "Creates a new region. Omit 'id' or set to null for creation.\n\nRequired: regionName (max 150), status ('active' or 'inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Region (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Region updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{region_id}},\n  \"regionName\": \"Maroodi Jeex (Updated)\",\n  \"status\": \"active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/regions/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "regions", "save"]
+            },
+            "description": "Updates an existing region. Provide 'id' to update.\n\nRequired: id, regionName, status\nOptional: updatedBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Regions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains regions list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/regions/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "regions", "list"]
+            },
+            "description": "Returns a full list of all regions (no pagination)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Region by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains region data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/regions/{{region_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "regions", "{{region_id}}"]
+            },
+            "description": "Fetches a single region by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Regions."
+    },
+    {
+      "name": "Districts",
+      "item": [
+        {
+          "name": "Save District (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "",
+                  "pm.test(\"District created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"district_id\", jsonData.data.id);",
+                  "        console.log(\"✓ District ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"regionId\": {{region_id}},\n  \"districtName\": \"Hargeisa District\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/districts/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "districts", "save"]
+            },
+            "description": "Creates a new district linked to a region.\n\nRequired: regionId, districtName (max 150), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save District (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"District updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{district_id}},\n  \"regionId\": {{region_id}},\n  \"districtName\": \"Hargeisa District (Updated)\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/districts/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "districts", "save"]
+            },
+            "description": "Updates an existing district."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Districts (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"totalElements\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/districts/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "districts", "list"],
+              "query": [
+                { "key": "regionId", "value": "", "description": "Filter by region ID (optional)", "disabled": true },
+                { "key": "districtName", "value": "", "description": "Filter by district name (optional)", "disabled": true },
+                { "key": "page", "value": "0", "description": "Page number (0-indexed, default 0)" },
+                { "key": "size", "value": "20", "description": "Page size (1-100, default 20)" }
+              ]
+            },
+            "description": "Returns a paginated list of districts.\n\nOptional query params:\n- regionId: Filter by region\n- districtName: Filter by name\n- page: 0-indexed (default 0)\n- size: 1–100 (default 20)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get District by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains district data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/districts/{{district_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "districts", "{{district_id}}"]
+            },
+            "description": "Fetches a single district by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Districts."
+    },
+    {
+      "name": "Cities",
+      "item": [
+        {
+          "name": "Save City (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"City created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"city_id\", jsonData.data.id);",
+                  "        console.log(\"✓ City ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityName\": \"Hargeisa\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/cities/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "cities", "save"]
+            },
+            "description": "Creates a new city linked to a region and district.\n\nRequired: regionId, districtId, cityName (max 150), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save City (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"City updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{city_id}},\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityName\": \"Hargeisa (Updated)\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/cities/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "cities", "save"]
+            },
+            "description": "Updates an existing city."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Cities (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/cities/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "cities", "list"],
+              "query": [
+                { "key": "regionId", "value": "", "description": "Filter by region ID (optional)", "disabled": true },
+                { "key": "districtId", "value": "", "description": "Filter by district ID (optional)", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            },
+            "description": "Returns a paginated list of cities.\n\nOptional filters: regionId, districtId\nPagination: page (default 0), size (default 20, max 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get City by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains city data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/cities/{{city_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "cities", "{{city_id}}"]
+            },
+            "description": "Fetches a single city by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Cities."
+    },
+    {
+      "name": "Polling Stations",
+      "item": [
+        {
+          "name": "Save Polling Station (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Polling station created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"polling_station_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Polling Station ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pollingStationName\": \"Central Polling Station\",\n  \"pollingStationCode\": \"PS-001\",\n  \"voterCapacity\": 500,\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/polling-stations/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "polling-stations", "save"]
+            },
+            "description": "Creates a new polling station.\n\nRequired: pollingStationName (max 255), pollingStationCode (max 100, must be unique), voterCapacity (≥0), regionId, districtId, cityId, status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Polling Station (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Polling station updated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{polling_station_id}},\n  \"pollingStationName\": \"Central Polling Station (Updated)\",\n  \"pollingStationCode\": \"PS-001\",\n  \"voterCapacity\": 600,\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/polling-stations/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "polling-stations", "save"]
+            },
+            "description": "Updates an existing polling station."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Polling Stations (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/polling-stations/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "polling-stations", "list"],
+              "query": [
+                { "key": "regionId", "value": "", "description": "Filter by region ID (optional)", "disabled": true },
+                { "key": "districtId", "value": "", "description": "Filter by district ID (optional)", "disabled": true },
+                { "key": "cityId", "value": "", "description": "Filter by city ID (optional)", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            },
+            "description": "Returns a paginated list of polling stations.\n\nOptional filters: regionId, districtId, cityId\nPagination: page (default 0), size (default 20, max 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Polling Station by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains polling station data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/polling-stations/{{polling_station_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "polling-stations", "{{polling_station_id}}"]
+            },
+            "description": "Fetches a single polling station by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Polling Stations."
+    },
+    {
+      "name": "Voter Registration Centers",
+      "item": [
+        {
+          "name": "Save Voter Registration Center (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"VRC created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"vrc_id\", jsonData.data.id);",
+                  "        console.log(\"✓ VRC ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vrcName\": \"Hargeisa Central VRC\",\n  \"vrcCode\": \"VRC-001\",\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/voter-registration-centers/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "voter-registration-centers", "save"]
+            },
+            "description": "Creates a new Voter Registration Center (VRC).\n\nRequired: vrcName (max 200), vrcCode (max 50, must be unique), regionId, districtId, cityId, status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Voter Registration Center (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"VRC updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{vrc_id}},\n  \"vrcName\": \"Hargeisa Central VRC (Updated)\",\n  \"vrcCode\": \"VRC-001\",\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/voter-registration-centers/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "voter-registration-centers", "save"]
+            },
+            "description": "Updates an existing Voter Registration Center."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Voter Registration Centers (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/voter-registration-centers/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "voter-registration-centers", "list"],
+              "query": [
+                { "key": "regionId", "value": "", "description": "Filter by region ID (optional)", "disabled": true },
+                { "key": "districtId", "value": "", "description": "Filter by district ID (optional)", "disabled": true },
+                { "key": "cityId", "value": "", "description": "Filter by city ID (optional)", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            },
+            "description": "Returns a paginated list of VRCs.\n\nOptional filters: regionId, districtId, cityId\nPagination: page (default 0), size (default 20, max 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voter Registration Center by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains VRC data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/voter-registration-centers/{{vrc_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "voter-registration-centers", "{{vrc_id}}"]
+            },
+            "description": "Fetches a single Voter Registration Center by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Voter Registration Centers (VRCs)."
+    },
+    {
+      "name": "Universities",
+      "item": [
+        {
+          "name": "Save University (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"University created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"university_id\", jsonData.data.id);",
+                  "        console.log(\"✓ University ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"universityName\": \"University of Hargeisa\",\n  \"location\": \"Hargeisa, Somaliland\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/universities/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "universities", "save"]
+            },
+            "description": "Creates a new university.\n\nRequired: universityName (max 200, must be unique), location (max 200), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save University (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"University updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{university_id}},\n  \"universityName\": \"University of Hargeisa (Updated)\",\n  \"location\": \"Hargeisa, Somaliland\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/universities/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "universities", "save"]
+            },
+            "description": "Updates an existing university."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Universities",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains universities list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/universities/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "universities", "list"]
+            },
+            "description": "Returns a full list of all universities (no pagination)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get University by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains university data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/universities/{{university_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "universities", "{{university_id}}"]
+            },
+            "description": "Fetches a single university by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Universities."
+    },
+    {
+      "name": "Warehouses",
+      "item": [
+        {
+          "name": "Save Warehouse (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Warehouse created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"warehouse_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Warehouse ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseName\": \"Hargeisa Main Warehouse\",\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"purpose\": \"Election material storage\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouses/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouses", "save"]
+            },
+            "description": "Creates a new warehouse.\n\nRequired: warehouseName (max 200, must be unique), regionId, districtId, cityId, purpose (max 200), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Warehouse (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Warehouse updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{warehouse_id}},\n  \"warehouseName\": \"Hargeisa Main Warehouse (Updated)\",\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"purpose\": \"Election material and equipment storage\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouses/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouses", "save"]
+            },
+            "description": "Updates an existing warehouse."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Warehouses (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouses/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouses", "list"],
+              "query": [
+                { "key": "regionId", "value": "", "description": "Filter by region ID (optional)", "disabled": true },
+                { "key": "districtId", "value": "", "description": "Filter by district ID (optional)", "disabled": true },
+                { "key": "cityId", "value": "", "description": "Filter by city ID (optional)", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            },
+            "description": "Returns a paginated list of warehouses.\n\nOptional filters: regionId, districtId, cityId\nPagination: page (default 0), size (default 20, max 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Warehouse by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains warehouse data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouses/{{warehouse_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouses", "{{warehouse_id}}"]
+            },
+            "description": "Fetches a single warehouse by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Warehouses."
+    },
+    {
+      "name": "Warehouse Sub Stores",
+      "item": [
+        {
+          "name": "Save Warehouse Sub Store (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Warehouse sub store created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"sub_store_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Sub Store ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseId\": {{warehouse_id}},\n  \"subStoreName\": \"Zone A Sub Store\",\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"purpose\": \"Ballot box storage\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouse-sub-stores/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouse-sub-stores", "save"]
+            },
+            "description": "Creates a new warehouse sub store.\n\nRequired: warehouseId, subStoreName (max 200, must be unique per warehouse), regionId, districtId, cityId, purpose (max 200), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Warehouse Sub Store (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Sub store updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{sub_store_id}},\n  \"warehouseId\": {{warehouse_id}},\n  \"subStoreName\": \"Zone A Sub Store (Updated)\",\n  \"regionId\": {{region_id}},\n  \"districtId\": {{district_id}},\n  \"cityId\": {{city_id}},\n  \"purpose\": \"Ballot box and material storage\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouse-sub-stores/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouse-sub-stores", "save"]
+            },
+            "description": "Updates an existing warehouse sub store."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Warehouse Sub Stores (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouse-sub-stores/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouse-sub-stores", "list"],
+              "query": [
+                { "key": "warehouseId", "value": "", "description": "Filter by warehouse ID (optional)", "disabled": true },
+                { "key": "regionId", "value": "", "description": "Filter by region ID (optional)", "disabled": true },
+                { "key": "districtId", "value": "", "description": "Filter by district ID (optional)", "disabled": true },
+                { "key": "cityId", "value": "", "description": "Filter by city ID (optional)", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            },
+            "description": "Returns a paginated list of warehouse sub stores.\n\nOptional filters: warehouseId, regionId, districtId, cityId\nPagination: page (default 0), size (default 20, max 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Warehouse Sub Store by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains sub store data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/warehouse-sub-stores/{{sub_store_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "warehouse-sub-stores", "{{sub_store_id}}"]
+            },
+            "description": "Fetches a single warehouse sub store by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Warehouse Sub Stores."
+    },
+    {
+      "name": "Political Parties",
+      "item": [
+        {
+          "name": "Save Political Party (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Political party created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"political_party_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Political Party ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partyName\": \"Somaliland National Party\",\n  \"location\": \"Hargeisa, Somaliland\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/political-parties/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "political-parties", "save"]
+            },
+            "description": "Creates a new political party.\n\nRequired: partyName (max 200, must be unique), location (max 200), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Political Party (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Political party updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{political_party_id}},\n  \"partyName\": \"Somaliland National Party (Updated)\",\n  \"location\": \"Hargeisa, Somaliland\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/political-parties/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "political-parties", "save"]
+            },
+            "description": "Updates an existing political party."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Political Parties",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains parties list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/political-parties/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "political-parties", "list"]
+            },
+            "description": "Returns a full list of all political parties (no pagination)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Political Party by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains party data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/political-parties/{{political_party_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "political-parties", "{{political_party_id}}"]
+            },
+            "description": "Fetches a single political party by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Political Parties."
+    },
+    {
+      "name": "Bank Accounts",
+      "item": [
+        {
+          "name": "Save Bank Account (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Bank account created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"bank_account_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Bank Account ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountHolderName\": \"NEC Somaliland\",\n  \"accountNumber\": \"SO1234567890\",\n  \"accountType\": \"Current\",\n  \"bankName\": \"Dahabshiil Bank\",\n  \"branchName\": \"Hargeisa Main Branch\",\n  \"ifscSwiftCode\": \"DHBLSOM1\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/bank-accounts/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "bank-accounts", "save"]
+            },
+            "description": "Creates a new bank account.\n\nRequired: accountHolderName (max 200), accountNumber (max 100, must be unique), accountType (max 100), bankName (max 200), branchName (max 200), ifscSwiftCode (max 50), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Bank Account (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Bank account updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{bank_account_id}},\n  \"accountHolderName\": \"NEC Somaliland (Updated)\",\n  \"accountNumber\": \"SO1234567890\",\n  \"accountType\": \"Current\",\n  \"bankName\": \"Dahabshiil Bank\",\n  \"branchName\": \"Hargeisa Main Branch\",\n  \"ifscSwiftCode\": \"DHBLSOM1\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/bank-accounts/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "bank-accounts", "save"]
+            },
+            "description": "Updates an existing bank account."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Bank Accounts (Paginated + Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response is paginated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/bank-accounts/list?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "bank-accounts", "list"],
+              "query": [
+                { "key": "accountType", "value": "", "description": "Filter by account type (optional)", "disabled": true },
+                { "key": "accountHolderName", "value": "", "description": "Filter by account holder name (optional)", "disabled": true },
+                { "key": "bankName", "value": "", "description": "Filter by bank name (optional)", "disabled": true },
+                { "key": "branchName", "value": "", "description": "Filter by branch name (optional)", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            },
+            "description": "Returns a paginated list of bank accounts.\n\nOptional filters: accountType, accountHolderName, bankName, branchName\nPagination: page (default 0), size (default 20, max 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bank Account by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains bank account data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/bank-accounts/{{bank_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "bank-accounts", "{{bank_account_id}}"]
+            },
+            "description": "Fetches a single bank account by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Bank Accounts."
+    },
+    {
+      "name": "Deployment Roles",
+      "item": [
+        {
+          "name": "Save Deployment Role (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"Deployment role created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"deployment_role_id\", jsonData.data.id);",
+                  "        console.log(\"✓ Deployment Role ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Polling Officer\",\n  \"status\": \"Active\",\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/deployment-roles/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "deployment-roles", "save"]
+            },
+            "description": "Creates a new deployment role.\n\nRequired: roleName (max 200, must be unique), status ('Active' or 'Inactive')\nOptional: createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Deployment Role (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Deployment role updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{deployment_role_id}},\n  \"roleName\": \"Senior Polling Officer\",\n  \"status\": \"Active\",\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/deployment-roles/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "deployment-roles", "save"]
+            },
+            "description": "Updates an existing deployment role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Deployment Roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains deployment roles list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/deployment-roles/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "deployment-roles", "list"]
+            },
+            "description": "Returns a full list of all deployment roles (no pagination)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Deployment Role by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains deployment role data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/deployment-roles/{{deployment_role_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "deployment-roles", "{{deployment_role_id}}"]
+            },
+            "description": "Fetches a single deployment role by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for Deployment Roles."
+    },
+    {
+      "name": "HR Trainer TOT",
+      "item": [
+        {
+          "name": "Save HR Trainer TOT (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.test(\"HR Trainer TOT created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record created successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.id) {",
+                  "        pm.environment.set(\"trainer_tot_id\", jsonData.data.id);",
+                  "        console.log(\"✓ HR Trainer TOT ID saved:\", jsonData.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"TOT-2026-001\",\n  \"fullName\": \"Ahmed Hassan Mohamed\",\n  \"phone\": \"252631234567\",\n  \"email\": \"ahmed.trainer@example.com\",\n  \"description\": \"Senior trainer for election staff\",\n  \"isActive\": true,\n  \"createdBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/hr-trainer-tots/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "hr-trainer-tots", "save"]
+            },
+            "description": "Creates a new HR Trainer TOT record.\n\nRequired: code (max 20, must be unique), fullName (max 150)\nOptional: phone (max 30), email (valid email, max 180), description (max 255), isActive (true/false), createdBy"
+          },
+          "response": []
+        },
+        {
+          "name": "Save HR Trainer TOT (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"HR Trainer TOT updated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record updated successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Accept", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{trainer_tot_id}},\n  \"code\": \"TOT-2026-001\",\n  \"fullName\": \"Ahmed Hassan Mohamed (Updated)\",\n  \"phone\": \"252631234568\",\n  \"email\": \"ahmed.trainer.updated@example.com\",\n  \"description\": \"Lead trainer for election operations\",\n  \"isActive\": true,\n  \"updatedBy\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/hr-trainer-tots/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "hr-trainer-tots", "save"]
+            },
+            "description": "Updates an existing HR Trainer TOT record."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All HR Trainer TOTs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains trainer TOT list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Records fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/hr-trainer-tots/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "hr-trainer-tots", "list"]
+            },
+            "description": "Returns a full list of all HR Trainer TOT records (no pagination)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get HR Trainer TOT by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "pm.test(\"Response contains trainer TOT data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.eql(\"Record fetched successfully\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/masterdata/hr-trainer-tots/{{trainer_tot_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "masterdata", "hr-trainer-tots", "{{trainer_tot_id}}"]
+            },
+            "description": "Fetches a single HR Trainer TOT record by its numeric ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD endpoints for HR Trainer TOT (Training of Trainers) records."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request setup"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/nec",
+      "description": "Base URL of the NEC Middleware API"
+    },
+    {
+      "key": "region_id",
+      "value": "1",
+      "description": "Region numeric ID - auto-set from Save Region response"
+    },
+    {
+      "key": "district_id",
+      "value": "1",
+      "description": "District numeric ID - auto-set from Save District response"
+    },
+    {
+      "key": "city_id",
+      "value": "1",
+      "description": "City numeric ID - auto-set from Save City response"
+    },
+    {
+      "key": "polling_station_id",
+      "value": "1",
+      "description": "Polling Station numeric ID - auto-set from Save Polling Station response"
+    },
+    {
+      "key": "vrc_id",
+      "value": "1",
+      "description": "Voter Registration Center numeric ID - auto-set from Save VRC response"
+    },
+    {
+      "key": "university_id",
+      "value": "1",
+      "description": "University numeric ID - auto-set from Save University response"
+    },
+    {
+      "key": "warehouse_id",
+      "value": "1",
+      "description": "Warehouse numeric ID - auto-set from Save Warehouse response"
+    },
+    {
+      "key": "sub_store_id",
+      "value": "1",
+      "description": "Warehouse Sub Store numeric ID - auto-set from Save Sub Store response"
+    },
+    {
+      "key": "political_party_id",
+      "value": "1",
+      "description": "Political Party numeric ID - auto-set from Save Political Party response"
+    },
+    {
+      "key": "bank_account_id",
+      "value": "1",
+      "description": "Bank Account numeric ID - auto-set from Save Bank Account response"
+    },
+    {
+      "key": "deployment_role_id",
+      "value": "1",
+      "description": "Deployment Role numeric ID - auto-set from Save Deployment Role response"
+    },
+    {
+      "key": "trainer_tot_id",
+      "value": "1",
+      "description": "HR Trainer TOT numeric ID - auto-set from Save HR Trainer TOT response"
+    }
+  ]
+}

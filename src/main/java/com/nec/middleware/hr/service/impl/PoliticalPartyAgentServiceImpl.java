@@ -5,7 +5,6 @@ import com.nec.middleware.Lookups.repository.ThirdPartyStatusRepository;
 import com.nec.middleware.exception.DuplicateResourceException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.constant.PoliticalPartyAgentConstants;
-import com.nec.middleware.hr.constant.PortalUserConstants;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentFilterRequestDto;
 import com.nec.middleware.hr.dto.request.PoliticalPartyAgentRequestDto;
 import com.nec.middleware.hr.dto.response.PoliticalPartyAgentResponseDto;
@@ -14,6 +13,8 @@ import com.nec.middleware.hr.mapper.PoliticalPartyAgentMapper;
 import com.nec.middleware.hr.repository.PoliticalPartyAgentRepository;
 import com.nec.middleware.hr.service.PoliticalPartyAgentService;
 import com.nec.middleware.hr.specification.PoliticalPartyAgentSearchSpecification;
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
+import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +25,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Year;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentService {
 
- // PA001, PA002 …
-
     private final PoliticalPartyAgentRepository politicalPartyAgentRepository;
     private final PoliticalPartyAgentMapper politicalPartyAgentMapper;
+    private final UniqueIdGeneratorService uniqueIdGeneratorService;
     private final MasterDataRepository regionRepository;
     private final DistrictRepository districtRepository;
     private final CityRepository cityRepository;
@@ -51,7 +53,6 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         validateAgent(politicalPartyAgentRequestDto);
         log.info("Creating political party agent. AgentName: {}",politicalPartyAgentRequestDto.getAgentName());
         PoliticalPartyAgent politicalPartyAgentEntity = politicalPartyAgentMapper.toPoliticalPartyAgentEntity(politicalPartyAgentRequestDto);
-        politicalPartyAgentEntity.setPoliticalPartyAgentUserId(generateUserID(PoliticalPartyAgentConstants.CODE_PREFIX, PoliticalPartyAgentConstants.CODE_PAD));
 
         politicalPartyAgentEntity.setPollingStation(
                 pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId()).orElseThrow(
@@ -85,7 +86,16 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("City Not Found"))
         );
-        politicalPartyAgentEntity.setStatus(statusRepository.findById(politicalPartyAgentRequestDto.getStatusId()).orElseThrow(()-> new ResourceNotFoundException("Status Not Found")));
+        politicalPartyAgentEntity.setStatus(
+                statusRepository.findById(politicalPartyAgentRequestDto.getStatusId())
+                        .orElseThrow(()->
+                                new ResourceNotFoundException("Status Not Found")));
+
+        // 4. Generate code — only after all lookups succeeded
+        politicalPartyAgentEntity.setPoliticalPartyAgentUserId(
+                generatePoliticalPartyAgentNumber()
+        );
+
         PoliticalPartyAgent politicalPartyAgent = politicalPartyAgentRepository.save(politicalPartyAgentEntity);
         return politicalPartyAgentMapper.politicalPartyResponseDto(politicalPartyAgent);
     }
@@ -155,14 +165,16 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         );
     }
     // ------------------------------------------------------------------
-    // Code generation
+    //Code Generation
     // ------------------------------------------------------------------
-
-    private String generateUserID(String codePrefix, int codePad)  {
-            int next = politicalPartyAgentRepository.findMaxCodeSequence() + 1;
-            return codePrefix + String.format("%0" + codePad + "d", next);
+    public String generatePoliticalPartyAgentNumber() {
+        String prefix= PoliticalPartyAgentConstants.CODE_PREFIX+"-"
+                + Year.now().getValue()+"-";
+        return uniqueIdGeneratorService.generateId(
+                ModuleCode.POLITICAL_PARTY_AGENT,
+                prefix
+        );
     }
-
     // ------------------------------------------------------------------
     // Validation
     // ------------------------------------------------------------------

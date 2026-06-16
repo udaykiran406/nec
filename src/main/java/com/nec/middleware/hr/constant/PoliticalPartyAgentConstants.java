@@ -14,5 +14,5 @@ public final class PoliticalPartyAgentConstants {
 
 
     public static final String CODE_PREFIX = "PA";
-    public static final int    CODE_PAD    = 3;
+
 }

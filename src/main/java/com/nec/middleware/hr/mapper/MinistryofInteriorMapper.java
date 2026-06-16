@@ -1,13 +1,13 @@
 package com.nec.middleware.hr.mapper;
 
 import com.nec.middleware.dto.IdValueDto;
-import com.nec.middleware.hr.dto.request.AaqilRequestDto;
-import com.nec.middleware.hr.dto.response.AaqilResponseDto;
-import com.nec.middleware.hr.entity.Aaqil;
+import com.nec.middleware.hr.dto.request.MinistryofInteriorRequestDto;
+import com.nec.middleware.hr.dto.response.MinistryofInteriorResponseDto;
+import com.nec.middleware.hr.entity.MinistryofInterior;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AaqilMapper {
+public class MinistryofInteriorMapper {
 
     /**
      * Map RequestDto → new Entity (CREATE).
@@ -15,12 +15,13 @@ public class AaqilMapper {
      * FK associations (aaqilType, gender, status, region, district, city)
      * are resolved and set by the service layer immediately after this call.
      */
-    public Aaqil toEntity(AaqilRequestDto dto) {
-        Aaqil entity = Aaqil.builder()
-                .fullName(dto.getFullName())
+    public MinistryofInterior toEntity(MinistryofInteriorRequestDto dto) {
+        MinistryofInterior entity = MinistryofInterior.builder()
+                .Name(dto.getName())
                 .age(dto.getAge())
                 .phone(dto.getPhone())
                 .email(dto.getEmail())
+                .photoUrl(dto.getPhotoUrl())
                 .build();
 
         entity.setIsActive(Boolean.TRUE);
@@ -35,11 +36,12 @@ public class AaqilMapper {
      * Scalar fields only; FK associations handled by service.
      * {@code aaqilId} is immutable and deliberately excluded.
      */
-    public void updateEntity(Aaqil entity, AaqilRequestDto dto) {
-        if (dto.getFullName() != null) entity.setFullName(dto.getFullName());
+    public void updateEntity(MinistryofInterior entity, MinistryofInteriorRequestDto dto) {
+        if (dto.getName() != null) entity.setName(dto.getName());
         if (dto.getAge()      != null) entity.setAge(dto.getAge());
         if (dto.getPhone()    != null) entity.setPhone(dto.getPhone());
         if (dto.getEmail()    != null) entity.setEmail(dto.getEmail());
+        if (dto.getPhotoUrl()  != null) entity.setPhotoUrl(dto.getPhotoUrl());
         if (dto.getUpdatedBy()!= null) entity.setUpdatedBy(dto.getUpdatedBy());
     }
 
@@ -47,19 +49,20 @@ public class AaqilMapper {
      * Map Entity → ResponseDto.
      * Reads lazy-loaded @ManyToOne associations and converts each to IdValueDto.
      */
-    public AaqilResponseDto toResponseDto(Aaqil entity) {
-        return AaqilResponseDto.builder()
-                .aaqilId(entity.getAaqilId())
-                .fullName(entity.getFullName())
+    public MinistryofInteriorResponseDto toResponseDto(MinistryofInterior entity) {
+        return MinistryofInteriorResponseDto.builder()
+                .ministryofInteriorId(entity.getMinistryofInteriorId())
+                .Name(entity.getName())
                 .age(entity.getAge())
                 .phone(entity.getPhone())
                 .email(entity.getEmail())
+                .photoUrl(entity.getPhotoUrl())
 
                 // ---- Lookups → IdValueDto
-                .aaqilType(entity.getAaqilType() != null
+                .moiTitle(entity.getMoiTitle() != null
                         ? IdValueDto.builder()
-                          .id(entity.getAaqilType().getId())
-                          .value(entity.getAaqilType().getValue())
+                          .id(entity.getMoiTitle().getId())
+                          .value(entity.getMoiTitle().getValue())
                           .build()
                         : null)
 
@@ -96,6 +99,12 @@ public class AaqilMapper {
                         ? IdValueDto.builder()
                           .id(entity.getCity().getId())
                           .value(entity.getCity().getCityName())
+                          .build()
+                        : null)
+                .vrc(entity.getVrc() != null
+                        ? IdValueDto.builder()
+                          .id(entity.getVrc().getId())
+                          .value(entity.getVrc().getVrcName())
                           .build()
                         : null)
 

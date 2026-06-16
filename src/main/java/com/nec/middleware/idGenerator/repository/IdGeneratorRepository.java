@@ -1,5 +1,6 @@
 package com.nec.middleware.idGenerator.repository;
 
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import com.nec.middleware.idGenerator.entity.IdGenerator;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,5 @@ public interface IdGeneratorRepository
         extends JpaRepository<IdGenerator, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<IdGenerator> findByModuleCode(String moduleCode);
+    Optional<IdGenerator> findByModuleCode(ModuleCode moduleCode);
 }

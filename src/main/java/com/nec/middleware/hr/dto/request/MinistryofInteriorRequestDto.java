@@ -8,16 +8,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AaqilRequestDto {
+public class MinistryofInteriorRequestDto {
 
-    private String aaqilId;
+    private String ministryofInteriorId;
 
-    @NotNull(message = "Aaqil type is required")
-    private Long aaqilTypeId;
+    @NotNull(message = "Title type is required")
+    private Long moiTitleId;
 
     @NotBlank(message = "Full name is required")
     @Size(max = 120, message = "Full name must not exceed 120 characters")
-    private String fullName;
+    private String Name;
 
     @NotNull(message = "Gender is required")
     private Long genderId;
@@ -30,6 +30,9 @@ public class AaqilRequestDto {
     @Size(min = 9, max = 30, message = "Phone must be between 9 and 30 characters")
     @Pattern(regexp = "^[0-9+\\-\\s()]+$", message = "Phone must contain only digits and allowed symbols")
     private String phone;
+
+    @Size(max = 500, message = "Photo URL must not exceed 500 characters")
+    private String photoUrl;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
@@ -44,6 +47,9 @@ public class AaqilRequestDto {
 
     @NotNull(message = "City is required")
     private Long cityId;
+
+    @NotNull(message = "Voter Registration Center is required")
+    private Long vrcId;
 
     @NotNull(message = "Status is required")
     private Long statusId;

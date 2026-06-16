@@ -1,10 +1,11 @@
 package com.nec.middleware.hr.service.impl;
 
+import com.nec.middleware.Lookups.entity.MinistryOfInteriorTitles;
 import com.nec.middleware.Lookups.repository.LookupGenderRepository;
+import com.nec.middleware.Lookups.repository.LookupMOITitlesRepository;
 import com.nec.middleware.Lookups.repository.LookupPortalUserTypeRepository;
 import com.nec.middleware.Lookups.repository.LookupRoleRepository;
 import com.nec.middleware.exception.DuplicateResourceException;
-import com.nec.middleware.exception.ResourceAlreadyExistsException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.Enum.MasterData;
 import com.nec.middleware.hr.constant.PortalUserConstants;
@@ -16,10 +17,9 @@ import com.nec.middleware.hr.entity.PortalUser;
 import com.nec.middleware.hr.mapper.PortalUserMapper;
 import com.nec.middleware.hr.repository.PortalUserRepository;
 import com.nec.middleware.hr.service.PortalUserService;
-
-
 import com.nec.middleware.hr.specification.PortalUserSearchSpecification;
-import com.nec.middleware.masterdata.entity.MasterDataAaqilType;
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
+import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.entity.MasterDataPoliticalParty;
 import com.nec.middleware.masterdata.entity.MasterDataUniversity;
 import com.nec.middleware.masterdata.repository.*;
@@ -32,12 +32,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Year;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PortalUserServiceImpl implements PortalUserService {
 
     private final PortalUserRepository portalUserrepository;
+    private final UniqueIdGeneratorService uniqueIdGeneratorService;
     private final PortalUserMapper portalUserMapper;
     private final MasterDataRepository regionRepository;
     private final DistrictRepository districtRepository;
@@ -46,8 +49,8 @@ public class PortalUserServiceImpl implements PortalUserService {
     private final LookupGenderRepository genderRepository;
     private final LookupPortalUserTypeRepository portalUserTypeRepository;
     private final LookupRoleRepository roleRepository;
-    private final AaqilTypeRepository aaqilRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
+    private final LookupMOITitlesRepository moiTitlesRepository;
 
 
     // ------------------------------------------------------------------ SAVE
@@ -59,7 +62,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         log.info("Creating portal user {}", portalUserRequest.getUserName());
         validateDuplicateUser(portalUserRequest);
         PortalUser portalUserEntity = portalUserMapper.portalUserEntity(portalUserRequest);
-        portalUserEntity.setPortalUserId(generateUserId(PortalUserConstants.CODE_PREFIX, PortalUserConstants.CODE_PAD));
+
         // ---------------- LOOKUPS ----------------
         portalUserEntity.setGender(
                 genderRepository.findById(portalUserRequest.getGenderId())
@@ -109,14 +112,19 @@ public class PortalUserServiceImpl implements PortalUserService {
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("City not found"))
         );
+        // 4. Generate code — only after all lookups succeeded
+        portalUserEntity.setPortalUserId(generatePortalUserNumber());
+
         PortalUser savedEntity = portalUserrepository.save(portalUserEntity);
 
         PortalUserResponseDto response =
                 portalUserMapper.portalUserResponseDto(savedEntity);
 
-        // Enrich masterData as IdValueDto: { id: masterdataId, value: "University Name / Party Name / Aaqil Value" }
+        // Enrich masterData as IdValueDto: { id: masterdataId, value: "University Name / Party Name / MOI Value" }
         response.setMasterData(
                 buildMasterDataIdValueDto(savedEntity.getMasterData(), savedEntity.getMasterdataId()));
+
+
 
         return response;
     }
@@ -296,23 +304,17 @@ public class PortalUserServiceImpl implements PortalUserService {
         return portalUserMapper.portalUserResponseDto(
                 portalUserrepository.save(portalUser));
     }
+//--------------------------------------------------------------------code generation
+    public String generatePortalUserNumber() {
 
-
-// ------------------------------------------------------------------
-    // Code generation
-    // ------------------------------------------------------------------
-
-    /**
-     * Reads the current max numeric suffix stored in the DB and returns the
-     * next code, e.g. if the highest is PU007 this returns PU008.
-     * The call is made inside a @Transactional method, so it is safe under
-     * concurrent load (the subsequent save will fail on the unique constraint
-     * in the extreme race-condition case, which can be retried at the API level).
-     */
-    private String generateUserId(String codePrefix, int codePad) {
-        int next = portalUserrepository.findMaxCodeSequence() + 1;
-        return codePrefix + String.format("%0" + codePad + "d", next);
+        String prefix= PortalUserConstants.CODE_PREFIX+"-"
+                + Year.now().getValue()+"-";
+        return uniqueIdGeneratorService.generateId(
+                ModuleCode.PORTAL_USER,
+                prefix
+        );
     }
+
     // ------------------------------------------------------------------
     // Validation
     // ------------------------------------------------------------------
@@ -357,7 +359,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         return switch (portalUserTypeId.intValue()) {
             case 1 -> MasterData.UNIVERSITY;
             case 2 -> MasterData.POLITICAL_PARTY;
-            case 3 -> MasterData.AAQIL;
+            case 3 -> MasterData.MINISTRY_OF_INTERIOR;
             default -> throw new ResourceNotFoundException("Invalid portal user type");
         };
     }
@@ -366,7 +368,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         return switch (type) {
             case UNIVERSITY -> universityRepository.existsById(id);
             case POLITICAL_PARTY -> politicalPartyRepository.existsById(id);
-            case AAQIL -> aaqilRepository.existsById(id);
+            case MINISTRY_OF_INTERIOR -> moiTitlesRepository.existsById(id);
         };
     }
 
@@ -393,9 +395,9 @@ public class PortalUserServiceImpl implements PortalUserService {
                     .map(MasterDataPoliticalParty::getPartyName)
                     .orElseThrow(() -> new ResourceNotFoundException("Political party not found"));
 
-            case AAQIL -> aaqilRepository.findById(masterdataId)
-                    .map(MasterDataAaqilType::getValue)
-                    .orElseThrow(() -> new ResourceNotFoundException("Aaqil not found"));
+            case MINISTRY_OF_INTERIOR -> moiTitlesRepository.findById(masterdataId)
+                    .map(MinistryOfInteriorTitles::getValue)
+                    .orElseThrow(() -> new ResourceNotFoundException("Ministry of Interior not found"));
         };
 
         return IdValueDto.builder()

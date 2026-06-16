@@ -13,5 +13,5 @@ public class PortalUserConstants {
     public static final String USER_ALREADY_EXISTS    = "A portal user already exists with this email or Phone number";
 
     public static final String CODE_PREFIX = "PU";
-    public static final int CODE_PAD    = 3;
+
 }

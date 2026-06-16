@@ -15,7 +15,6 @@ import com.nec.middleware.masterdata.dto.response.WarehouseSubStoreResponse;
 import com.nec.middleware.masterdata.dto.response.PoliticalPartyResponse;
 import com.nec.middleware.masterdata.dto.response.BankAccountResponse;
 import com.nec.middleware.masterdata.dto.response.DeploymentRoleResponse;
-import com.nec.middleware.masterdata.dto.response.AaqilTypeResponse;
 import com.nec.middleware.masterdata.dto.response.HrTrainerTotResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -528,50 +527,7 @@ public class MasterDataController {
                         MasterDataConstants.RECORD_FETCHED,
                         service.getDeploymentRoleById(id)));
     }
-
-    // =========================================================================
-    // AAQIL TYPE APIs
-    // =========================================================================
-
-    @PostMapping("/aaqil-types/save")
-    public ResponseEntity<ApiResponse<AaqilTypeResponse>> saveAaqilType(
-            @Valid @RequestBody AaqilTypeRequest request) {
-
-        AaqilTypeResponse response = service.saveAaqilType(request);
-
-        if (request.getId() == null) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.success(
-                            MasterDataConstants.RECORD_CREATED,
-                            response));
-        }
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        MasterDataConstants.RECORD_UPDATED,
-                        response));
-    }
-
-    @GetMapping("/aaqil-types/list")
-    public ResponseEntity<ApiResponse<List<AaqilTypeResponse>>> getAllAaqilTypes() {
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        MasterDataConstants.RECORDS_FETCHED,
-                        service.getAllAaqilTypes()));
-    }
-
-
-
-    @GetMapping("/aaqil-types/{id}")
-    public ResponseEntity<ApiResponse<AaqilTypeResponse>> getAaqilTypeById(
-            @PathVariable Long id) {
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        MasterDataConstants.RECORD_FETCHED,
-                        service.getAaqilTypeById(id)));
-    }
+    
 
     // =========================================================================
     // HR TRAINER TOT APIs

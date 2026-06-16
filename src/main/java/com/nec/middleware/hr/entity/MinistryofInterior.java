@@ -1,33 +1,34 @@
 package com.nec.middleware.hr.entity;
 
 import com.nec.middleware.Lookups.entity.Genders;
+import com.nec.middleware.Lookups.entity.MinistryOfInteriorTitles;
 import com.nec.middleware.Lookups.entity.ThirdPartyStatus;
-import com.nec.middleware.masterdata.entity.MasterDataAaqilType;
 import com.nec.middleware.masterdata.entity.MasterDataCity;
 import com.nec.middleware.masterdata.entity.MasterDataDistrict;
 import com.nec.middleware.masterdata.entity.MasterDataRegion;
+import com.nec.middleware.masterdata.entity.MasterDataVoterRegistrationCenter;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "nec_hr_aaqils")
+@Table(name = "nec_hr_ministry_of_interiors")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Aaqil extends AuditableEntity {
+public class MinistryofInterior extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /** Business key — generated once at creation, never changed. e.g. AA001 */
-    @Column(name = "aaqil_id", nullable = false, unique = true, length = 20)
-    private String aaqilId;
+    @Column(name = "MinistryofInterior_id", nullable = false, unique = true, length = 20)
+    private String ministryofInteriorId;
 
     @Column(name = "full_name", nullable = false, length = 120)
-    private String fullName;
+    private String Name;
 
     @Column(name = "age")
     private Short age;
@@ -38,11 +39,13 @@ public class Aaqil extends AuditableEntity {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(name = "photo_url", length = 500)
+    private String photoUrl;
     // ------------------------------------------------------------------ LOOKUPS FKs
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "aaqil_type_id", nullable = false)
-    private MasterDataAaqilType aaqilType;
+    @JoinColumn(name = "moi_title_id", nullable = false)
+    private MinistryOfInteriorTitles moiTitle;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gender_id", nullable = false)
@@ -65,4 +68,8 @@ public class Aaqil extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private MasterDataCity city;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vrc_id", nullable = false)
+    private MasterDataVoterRegistrationCenter vrc;
 }

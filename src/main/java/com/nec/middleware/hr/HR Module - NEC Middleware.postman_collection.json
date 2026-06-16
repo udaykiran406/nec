@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "84b869b9-959d-4675-a4c3-f2a5f4c454a4",
-    "name": "HR Module - NEC Middleware",
-    "description": "Comprehensive Postman collection for HR Module APIs in NEC Middleware. Includes University Trainee Management, Political Party Agent Management, Aaqil Management, and Portal User Management with full CRUD operations, filtering, pagination, and status management.",
+    "_postman_id": "851cce7a-295a-437d-ad41-df5f8cec38f0",
+    "name": "HR Module - NEC Middleware Copy",
+    "description": "Comprehensive Postman collection for HR Module APIs in NEC Middleware. Includes Portal User Management, University Trainee Management, Political Party Agent Management, Ministry of Interior Management, and Temporary Contract Management with full CRUD operations, filtering, pagination, and status management.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "50342627",
-    "_collection_link": "https://go.postman.co/collection/50342627-84b869b9-959d-4675-a4c3-f2a5f4c454a4?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/50342627-851cce7a-295a-437d-ad41-df5f8cec38f0?source=collection_link"
   },
   "item": [
     {
@@ -25,19 +25,13 @@
                   "pm.test(\"Response has success status\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate response status field",
                   "    pm.expect(jsonData.status).to.equal(201);",
-                  "",
-                  "    // validate message",
                   "    pm.expect(jsonData.message).to.eql(\"Portal user created successfully\");",
-                  "",
-                  "    // validate data object exists",
                   "    pm.expect(jsonData.data).to.be.an('object');",
                   "});",
                   "",
                   "if (pm.response.code === 201) {",
                   "    var jsonData = pm.response.json();",
-                  "",
                   "    if (jsonData.data && jsonData.data.portalUserId) {",
                   "        pm.environment.set(\"portal_user_id\", jsonData.data.portalUserId);",
                   "        console.log(\"✓ Portal User ID saved:\", jsonData.data.portalUserId);",
@@ -66,7 +60,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userName\": \"Lokesh\",\n  \"genderId\": 1,\n  \"roleId\": 9,\n  \"phone\": \"7896541230\",\n  \"email\": \"lokesh@gmail.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 2,\n  \"masterdataId\": 2,\n  \"createdBy\": \"admin\"\n}"
+              "raw": "{\n  \"userName\": \"Vasu\",\n  \"genderId\": 1,\n  \"roleId\": 9,\n  \"phone\": \"7412589630\",\n  \"email\": \"vasu@gmail.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 2,\n  \"masterdataId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/hr/portalUser/saveUser",
@@ -80,7 +79,7 @@
                 "saveUser"
               ]
             },
-            "description": "Creates a portal user. masterdataId is dynamic based on portalUserTypeId:\n\nportalUserTypeId=1 (University)     → masterdataId = university id\nportalUserTypeId=2 (Political Party) → masterdataId = political party id\nportalUserTypeId=3 (Aaqil)           → masterdataId = aaqil type id\n\n---- Example 2: Political Party ----\n{\n  \"userName\": \"hassan_party_agent\",\n  \"genderId\": 1,\n  \"roleId\": 2,\n  \"phone\": \"252631234568\",\n  \"email\": \"hassan.party@example.com\",\n  \"photoPath\": \"https://example.com/photo2.jpg\",\n  \"faculty\": null,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 2,\n  \"masterdataId\": 3,\n  \"createdBy\": \"admin\"\n}\n\n---- Example 3: Aaqil ----\n{\n  \"userName\": \"fadumo_aaqil\",\n  \"genderId\": 2,\n  \"roleId\": 3,\n  \"phone\": \"252631234569\",\n  \"email\": \"fadumo.aaqil@example.com\",\n  \"photoPath\": \"https://example.com/photo3.jpg\",\n  \"faculty\": null,\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"portalUserTypeId\": 3,\n  \"masterdataId\": 1,\n  \"createdBy\": \"admin\"\n}"
+            "description": "Creates a portal user. masterdataId is dynamic based on portalUserTypeId:\n\nportalUserTypeId=1 (University)     → masterdataId = university id\nportalUserTypeId=2 (Political Party) → masterdataId = political party id\nportalUserTypeId=3 (Ministry)        → masterdataId = ministry related id\n\nRequired fields: userName, genderId, roleId, phone, email, regionId, districtId, cityId, portalUserTypeId, masterdataId\nOptional: photoPath, faculty, createdBy"
           },
           "response": []
         },
@@ -98,16 +97,9 @@
                   "pm.test(\"Response contains user data\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // check response status field",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // check message",
                   "    pm.expect(jsonData.message).to.eql(\"Portal user fetched successfully\");",
-                  "",
-                  "    // check data exists",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "",
-                  "    // check portalUserId exists",
                   "    pm.expect(jsonData.data).to.have.property(\"portalUserId\");",
                   "});"
                 ],
@@ -138,7 +130,7 @@
                 "{{portal_user_id}}"
               ]
             },
-            "description": "Fetch a single portal user by their portalUserId (e.g. PU001).\n\nResponse shape — masterData is always { id, value } regardless of type:\n\n{\n  \"statusCode\": 200,\n  \"message\": \"Portal user fetched successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"portalUserId\": \"PU001\",\n    \"userName\": \"ahmed_uni_user\",\n    \"phone\": \"252631234567\",\n    \"email\": \"ahmed.uni@example.com\",\n    \"photoPath\": \"https://example.com/photo.jpg\",\n    \"faculty\": \"Engineering\",\n    \"gender\": {\n      \"id\": 1,\n      \"value\": \"Male\"\n    },\n    \"role\": {\n      \"id\": 1,\n      \"value\": \"Viewer\"\n    },\n    \"portalUserType\": {\n      \"id\": 1,\n      \"value\": \"University\"\n    },\n    \"masterData\": {\n      \"id\": 1,\n      \"value\": \"Hargeisa University\"\n    },\n    \"region\": {\n      \"id\": 1,\n      \"value\": \"Maroodi Jeex\"\n    },\n    \"district\": {\n      \"id\": 1,\n      \"value\": \"Hargeisa District\"\n    },\n    \"city\": {\n      \"id\": 1,\n      \"value\": \"Hargeisa\"\n    },\n    \"isActive\": true,\n    \"isDeleted\": false,\n    \"createdBy\": \"admin\",\n    \"createdAt\": \"2026-06-12T10:00:00\",\n    \"updatedBy\": \"admin\",\n    \"updatedAt\": \"2026-06-12T10:00:00\"\n  }\n}"
+            "description": "Fetch a single portal user by their portalUserId (e.g. PU001)."
           },
           "response": []
         },
@@ -156,16 +148,9 @@
                   "pm.test(\"Response is paginated\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate message",
                   "    pm.expect(jsonData.message).to.eql(\"Portal users fetched successfully\");",
-                  "",
-                  "    // validate paginated content",
                   "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
-                  "",
-                  "    // validate pagination fields",
                   "    pm.expect(jsonData.data).to.have.property(\"totalElements\");",
                   "    pm.expect(jsonData.data).to.have.property(\"totalPages\");",
                   "    pm.expect(jsonData.data).to.have.property(\"number\");",
@@ -194,7 +179,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/hr/portalUser/getAllPortalUsers?page=0&size=10",
@@ -220,7 +210,7 @@
                 }
               ]
             },
-            "description": "Fetches a paginated list of portal users with optional filters. Send empty JSON object {} in body."
+            "description": "Fetches a paginated list of portal users with optional filters.\n\nAvailable filter fields (all optional):\n- portalUserId: Business ID (e.g. PU001)\n- userName: Partial or full name\n- phone, email: Contact filters\n- genderId, roleId: Lookup IDs\n- regionId, districtId, cityId: Location IDs\n- portalUserTypeId, masterdataId: Type/master data IDs\n- isActive: true / false\n\nSend empty {} to get all records."
           },
           "response": []
         },
@@ -238,19 +228,10 @@
                   "pm.test(\"Portal user updated successfully\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate success message",
                   "    pm.expect(jsonData.message).to.include(\"updated\");",
-                  "",
-                  "    // validate response data exists",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "",
-                  "    // validate identifier exists",
                   "    pm.expect(jsonData.data).to.have.property(\"portalUserId\");",
-                  "",
-                  "    // validate updated timestamp exists",
                   "    pm.expect(jsonData.data).to.have.property(\"updatedAt\");",
                   "});"
                 ],
@@ -276,7 +257,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userName\": \"VasuDeva\",\n  \"genderId\": 1,\n  \"roleId\": 9,\n  \"phone\": \"9638527412\",\n  \"email\": \"vasu@gmail.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 3,\n  \"masterdataId\": 2,\n  \"createdBy\": \"admin\"\n}"
+              "raw": "{\n  \"userName\": \"VasuDeva\",\n  \"genderId\": 1,\n  \"roleId\": 9,\n  \"phone\": \"9638527412\",\n  \"email\": \"vasu@gmail.com\",\n  \"photoPath\": \"https://example.com/photo.jpg\",\n  \"faculty\": \"Engineering\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"portalUserTypeId\": 3,\n  \"masterdataId\": 2,\n  \"updatedBy\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/hr/portalUser/update/{{portal_user_id}}",
@@ -291,7 +277,7 @@
                 "{{portal_user_id}}"
               ]
             },
-            "description": "Updates a portal user. masterdataId is dynamic based on portalUserTypeId:\n\nportalUserTypeId=1 (University)      → masterdataId = university id\nportalUserTypeId=2 (Political Party)  → masterdataId = political party id\nportalUserTypeId=3 (Aaqil)            → masterdataId = aaqil type id\n\nAll fields are optional — only send what needs to change."
+            "description": "Updates a portal user by portalUserId.\n\nAll fields are optional — send only what needs to change."
           },
           "response": []
         },
@@ -309,13 +295,8 @@
                   "pm.test(\"Status changed successfully\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate message contains status",
                   "    pm.expect(jsonData.message).to.include(\"status\");",
-                  "",
-                  "    // validate data exists (if your API returns data)",
                   "    pm.expect(jsonData.data).to.exist;",
                   "});"
                 ],
@@ -349,11 +330,12 @@
               "query": [
                 {
                   "key": "isActive",
-                  "value": "false"
+                  "value": "false",
+                  "description": "Set to true to activate, false to deactivate"
                 }
               ]
             },
-            "description": "Changes the active status of a portal user. Pass IsActive=true or IsActive=false as query parameter. Note: Parameter is case-sensitive (IsActive, not isActive)."
+            "description": "Changes the active status of a portal user.\n\nQuery parameter:\n- isActive=true  → activates the user\n- isActive=false → deactivates the user"
           },
           "response": []
         }
@@ -377,29 +359,16 @@
                   "pm.test(\"Response has success status\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(201);",
-                  "",
-                  "    // validate data object exists",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "",
-                  "    // validate generated trainee ID exists",
                   "    pm.expect(jsonData.data).to.have.property(\"universityTraineeId\");",
                   "});",
                   "",
                   "if (pm.response.code === 201) {",
                   "    var jsonData = pm.response.json();",
-                  "",
                   "    if (jsonData.data && jsonData.data.universityTraineeId) {",
-                  "        pm.environment.set(",
-                  "            \"universityTraineeId\",",
-                  "            jsonData.data.universityTraineeId",
-                  "        );",
-                  "",
-                  "        console.log(",
-                  "            \"✓ University Trainee ID saved:\",",
-                  "            jsonData.data.universityTraineeId",
-                  "        );",
+                  "        pm.environment.set(\"universityTraineeId\", jsonData.data.universityTraineeId);",
+                  "        console.log(\"✓ University Trainee ID saved:\", jsonData.data.universityTraineeId);",
                   "    }",
                   "}"
                 ],
@@ -425,7 +394,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"John\",\n  \"genderId\": 1,\n  \"age\": 25,\n  \"phone\": \"7894561230\",\n  \"email\": \"john@example.com\",\n  \"paymentMethodId\": 1,\n  \"universityId\": 2,\n  \"semester\": \"Fall 2024\",\n  \"faculty\": \"Engineering\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"statusId\": 1\n}"
+              "raw": "{\n  \"fullName\": \"Kevin\",\n  \"genderId\": 1,\n  \"age\": 25,\n  \"phone\": \"8512347892\",\n  \"email\": \"kevin@example.com\",\n  \"paymentMethodId\": 1,\n  \"universityId\": 2,\n  \"semester\": \"Fall 2024\",\n  \"faculty\": \"Vasu\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"statusId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{base_url}}/api/hr/universityTrainee/saveTrainee",
@@ -439,77 +413,7 @@
                 "saveTrainee"
               ]
             },
-            "description": "Creates a new university trainee record. The response includes the newly created trainee ID which is automatically saved to 'universityTraineeId'."
-          },
-          "response": []
-        },
-        {
-          "name": "Update University Trainee",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.expect(pm.response.code).to.equal(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has success status\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "",
-                  "    // validate API status",
-                  "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate message contains updated",
-                  "    pm.expect(jsonData.message).to.include(\"updated\");",
-                  "",
-                  "    // validate response data exists",
-                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "",
-                  "    // validate ID exists",
-                  "    pm.expect(jsonData.data).to.have.property(\"universityTraineeId\");",
-                  "",
-                  "    // validate updated timestamp exists",
-                  "    pm.expect(jsonData.data).to.have.property(\"updatedAt\");",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Jane Doe Updated\",\n  \"genderId\": 2,\n  \"age\": 26,\n  \"phone\": \"201001234568\",\n  \"email\": \"jane.doe@example.com\",\n  \"paymentMethodId\": 2,\n  \"universityId\": 2,\n  \"semester\": \"Spring 2025\",\n  \"faculty\": \"Medicine\",\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"photoUrl\": \"https://example.com/photo-updated.jpg\",\n  \"statusId\": 1\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/hr/universityTrainee/{{universityTraineeId}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "hr",
-                "universityTrainee",
-                "{{universityTraineeId}}"
-              ]
-            },
-            "description": "Updates an existing university trainee by universityTraineeId."
+            "description": "Creates a new university trainee record.\n\nRequired fields: fullName, genderId, phone, email, paymentMethodId, universityId, regionId, districtId, cityId, statusId\nOptional: age, semester, faculty, photoUrl, createdBy\n\nThe generated universityTraineeId (e.g. UT001) is automatically saved to the environment variable."
           },
           "response": []
         },
@@ -527,13 +431,8 @@
                   "pm.test(\"Response contains trainee data\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate data object exists",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "",
-                  "    // validate trainee ID exists",
                   "    pm.expect(jsonData.data).to.have.property(\"universityTraineeId\");",
                   "});"
                 ],
@@ -543,9 +442,6 @@
               }
             }
           ],
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
             "method": "GET",
             "header": [
@@ -555,15 +451,6 @@
                 "type": "text"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "{{base_url}}/api/hr/universityTrainee/{{universityTraineeId}}",
               "host": [
@@ -576,12 +463,12 @@
                 "{{universityTraineeId}}"
               ]
             },
-            "description": "Fetches a single university trainee by universityTraineeId."
+            "description": "Fetches a single university trainee by universityTraineeId (e.g. UT001)."
           },
           "response": []
         },
         {
-          "name": "Get All Trainees (Paginated)",
+          "name": "Get All Trainees (Paginated + Filtered)",
           "event": [
             {
               "listen": "test",
@@ -594,16 +481,9 @@
                   "pm.test(\"Response is paginated\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate data object exists",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "",
-                  "    // validate paginated content",
                   "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
-                  "",
-                  "    // validate pagination fields",
                   "    pm.expect(jsonData.data).to.have.property(\"totalElements\");",
                   "    pm.expect(jsonData.data).to.have.property(\"totalPages\");",
                   "    pm.expect(jsonData.data).to.have.property(\"number\");",
@@ -619,6 +499,11 @@
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
               {
                 "key": "Accept",
                 "value": "application/json",
@@ -658,7 +543,73 @@
                 }
               ]
             },
-            "description": "Fetches a paginated list of university trainees with optional filters."
+            "description": "Fetches a paginated list of university trainees with optional filters. Send empty {} body to get all records."
+          },
+          "response": []
+        },
+        {
+          "name": "Update University Trainee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "",
+                  "    pm.expect(jsonData.status).to.equal(200);",
+                  "    pm.expect(jsonData.message).to.include(\"updated\");",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"universityTraineeId\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"updatedAt\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"genderId\": 2,\n  \"age\": 26,\n  \"phone\": \"7894561231\",\n  \"email\": \"john.updated@example.com\",\n  \"paymentMethodId\": 2,\n  \"universityId\": 2,\n  \"semester\": \"Spring 2025\",\n  \"faculty\": \"Medicine\",\n  \"regionId\": 2,\n  \"districtId\": 2,\n  \"cityId\": 2,\n  \"photoUrl\": \"https://example.com/photo-updated.jpg\",\n  \"statusId\": 1,\n  \"updatedBy\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/universityTrainee/{{universityTraineeId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "universityTrainee",
+                "{{universityTraineeId}}"
+              ]
+            },
+            "description": "Updates an existing university trainee by universityTraineeId. All fields are optional — send only what needs to change."
           },
           "response": []
         },
@@ -676,13 +627,8 @@
                   "pm.test(\"Status changed successfully\", function () {",
                   "    var jsonData = pm.response.json();",
                   "",
-                  "    // validate API status",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "",
-                  "    // validate message contains status",
                   "    pm.expect(jsonData.message).to.include(\"status\");",
-                  "",
-                  "    // validate response data exists (if returned)",
                   "    pm.expect(jsonData.data).to.exist;",
                   "});"
                 ],
@@ -717,11 +663,11 @@
                 {
                   "key": "isActive",
                   "value": "false",
-                  "description": "Set to true/false to activate/deactivate"
+                  "description": "Set to true to activate, false to deactivate"
                 }
               ]
             },
-            "description": "Toggles or sets isActive status for a trainee. Pass isActive=true or isActive=false as query parameter."
+            "description": "Toggles isActive status for a trainee.\n\nQuery parameter:\n- isActive=true  → activates the trainee\n- isActive=false → deactivates the trainee"
           },
           "response": []
         }
@@ -781,7 +727,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"politicalPartyNameId\": 1,\n  \"agentName\": \"Hassan Ahmed\",\n  \"genderId\": 1,\n  \"phone\": \"252631234567\",\n  \"email\": \"hassan.ahmed@example.com\",\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"pollingStationId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1,\n  \"createdBy\": \"admin\"\n}",
+              "raw": "{\n  \"politicalPartyNameId\": 1,\n  \"agentName\": \"Hassan\",\n  \"genderId\": 1,\n  \"phone\": \"25285746214\",\n  \"email\": \"hassan@example.com\",\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"pollingStationId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1\n \n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -800,7 +746,7 @@
                 "savePartyAgent"
               ]
             },
-            "description": "Creates a new political party agent. The generated politicalPartyAgentUserId (e.g. PA001) is automatically saved to the 'agent_id' environment variable.\n\nRequired fields:\n- politicalPartyNameId: ID of the political party\n- agentName: Full name of the agent (max 120 chars)\n- genderId: Lookup gender ID\n- phone: Agent phone number (9–30 chars, digits and +/- allowed)\n- email: Valid email address (max 100 chars)\n- pollingStationId: Assigned polling station ID\n- regionId, districtId, cityId: Location IDs\n- statusId: Status lookup ID\n\nOptional:\n- photoUrl: URL to agent photo (max 500 chars)\n- createdBy: Audit field"
+            "description": "Creates a new political party agent. The generated politicalPartyAgentUserId (e.g. PA001) is automatically saved to the 'agent_id' environment variable.\n\nRequired fields:\n- politicalPartyNameId: ID of the political party\n- agentName: Full name of the agent (max 120 chars)\n- genderId: Lookup gender ID\n- phone: Agent phone number (9–30 chars)\n- email: Valid email address (max 100 chars)\n- pollingStationId: Assigned polling station ID\n- regionId, districtId, cityId: Location IDs\n- statusId: Status lookup ID\n\nOptional: photoUrl, createdBy"
           },
           "response": []
         },
@@ -852,7 +798,7 @@
                 "{{agent_id}}"
               ]
             },
-            "description": "Fetches a single political party agent by their business ID (e.g. PA001).\n\nResponse shape:\n{\n  \"status\": 200,\n  \"message\": \"Political party agent fetched successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"politicalPartyAgentUserId\": \"PA001\",\n    \"politicalPartyName\": { \"id\": 1, \"value\": \"Party Name\" },\n    \"agentName\": \"Hassan Ahmed\",\n    \"gender\": { \"id\": 1, \"value\": \"Male\" },\n    \"phone\": \"252631234567\",\n    \"email\": \"hassan.ahmed@example.com\",\n    \"photoUrl\": \"https://example.com/photo.jpg\",\n    \"pollingStation\": { \"id\": 1, \"value\": \"Station Name\" },\n    \"region\": { \"id\": 1, \"value\": \"Maroodi Jeex\" },\n    \"district\": { \"id\": 1, \"value\": \"Hargeisa District\" },\n    \"city\": { \"id\": 1, \"value\": \"Hargeisa\" },\n    \"status\": { \"id\": 1, \"value\": \"Active\" },\n    \"isActive\": true,\n    \"createdBy\": \"admin\",\n    \"createdAt\": \"2026-06-13T10:00:00\",\n    \"updatedBy\": null,\n    \"updatedAt\": null\n  }\n}"
+            "description": "Fetches a single political party agent by their business ID (e.g. PA001)."
           },
           "response": []
         },
@@ -886,7 +832,7 @@
             }
           ],
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
@@ -899,15 +845,25 @@
                 "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{base_url}}/api/hr/politicalPartyAgents?page=0&size=10",
+              "raw": "{{base_url}}/api/hr/politicalPartyAgents/getAllPoliticalPartyAgents?page=0&size=10",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "hr",
-                "politicalPartyAgents"
+                "politicalPartyAgents",
+                "getAllPoliticalPartyAgents"
               ],
               "query": [
                 {
@@ -922,7 +878,7 @@
                 }
               ]
             },
-            "description": "Returns a paginated list of political party agents. An optional JSON body can be sent to filter results.\n\nAvailable filter fields (all optional, send null to ignore):\n- politicalPartyAgentUserId: Business ID (e.g. \"PA001\")\n- politicalPartyNameId: Political party lookup ID\n- pollingStationId: Polling station ID\n- regionId, districtId, cityId: Location filter IDs\n- statusId: Status ID\n- isActive: true / false\n- agentName: Partial or full agent name\n- genderId: Gender ID\n- phone: Agent phone number\n- email: Agent email\n\nQuery params:\n- page: 0-indexed page number (default 0)\n- size: Page size (default 10)"
+            "description": "Returns a paginated list of political party agents. Send empty {} or optional filter body.\n\nAvailable filter fields (all optional):\n- politicalPartyAgentUserId: Business ID (e.g. PA001)\n- politicalPartyNameId: Political party lookup ID\n- pollingStationId: Polling station ID\n- regionId, districtId, cityId: Location filter IDs\n- statusId: Status ID\n- isActive: true / false\n- agentName: Partial or full agent name\n- genderId: Gender ID\n- phone, email: Contact filters"
           },
           "response": []
         },
@@ -989,7 +945,7 @@
                 "{{agent_id}}"
               ]
             },
-            "description": "Updates an existing political party agent by their business ID (e.g. PA001).\n\nAll fields are optional — send only the fields that need to be changed.\n\nUpdatable fields:\n- politicalPartyNameId\n- agentName\n- genderId\n- phone\n- email\n- photoUrl\n- pollingStationId\n- regionId, districtId, cityId\n- statusId\n- updatedBy"
+            "description": "Updates an existing political party agent by their business ID (e.g. PA001).\n\nAll fields are optional — send only the fields that need to be changed."
           },
           "response": []
         },
@@ -1029,7 +985,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/hr/politicalPartyAgents/changeStatus/{{agent_id}}?isActiveFlag=false",
+              "raw": "{{base_url}}/api/hr/politicalPartyAgents/changeStatus/{{agent_id}}?isActive=false",
               "host": [
                 "{{base_url}}"
               ],
@@ -1042,13 +998,13 @@
               ],
               "query": [
                 {
-                  "key": "isActiveFlag",
+                  "key": "isActive",
                   "value": "false",
                   "description": "Set to true to activate, false to deactivate"
                 }
               ]
             },
-            "description": "Activates or deactivates a political party agent.\n\nQuery parameter:\n- isActiveFlag=true  → activates the agent\n- isActiveFlag=false → deactivates the agent\n\nNote: Parameter name is 'isActiveFlag' (case-sensitive)."
+            "description": "Activates or deactivates a political party agent.\n\nQuery parameter:\n- isActive=true  → activates the agent\n- isActive=false → deactivates the agent"
           },
           "response": []
         }
@@ -1056,10 +1012,10 @@
       "description": "All endpoints for managing Political Party Agents in the HR module."
     },
     {
-      "name": "Aaqil Management",
+      "name": "Ministry of Interior Management",
       "item": [
         {
-          "name": "Create Aaqil",
+          "name": "Create Ministry of Interior",
           "event": [
             {
               "listen": "test",
@@ -1071,17 +1027,18 @@
                   "",
                   "pm.test(\"Response has success status\", function () {",
                   "    var jsonData = pm.response.json();",
+                  "",
                   "    pm.expect(jsonData.status).to.equal(201);",
-                  "    pm.expect(jsonData.message).to.eql(\"Aaqil created successfully\");",
+                  "    pm.expect(jsonData.message).to.eql(\"Moi created successfully\");",
                   "    pm.expect(jsonData.data).to.be.an('object');",
-                  "    pm.expect(jsonData.data).to.have.property(\"aaqilId\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"ministryofInteriorId\");",
                   "});",
                   "",
                   "if (pm.response.code === 201) {",
                   "    var jsonData = pm.response.json();",
-                  "    if (jsonData.data && jsonData.data.aaqilId) {",
-                  "        pm.environment.set(\"aaqil_id\", jsonData.data.aaqilId);",
-                  "        console.log(\"✓ Aaqil ID saved:\", jsonData.data.aaqilId);",
+                  "    if (jsonData.data && jsonData.data.ministryofInteriorId) {",
+                  "        pm.environment.set(\"moi_id\", jsonData.data.ministryofInteriorId);",
+                  "        console.log(\"✓ Ministry of Interior ID saved:\", jsonData.data.ministryofInteriorId);",
                   "    }",
                   "}"
                 ],
@@ -1107,7 +1064,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"aaqilTypeId\": 1,\n  \"fullName\": \"Mohamed Ali\",\n  \"genderId\": 1,\n  \"age\": 45,\n  \"phone\": \"252634567890\",\n  \"email\": \"mohamed@example.com\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1,\n  \"createdBy\": \"admin\"\n}",
+              "raw": "{\n  \"moiTitleId\": 1,\n  \"Name\": \"Ahmed Mohamed\",\n  \"genderId\": 1,\n  \"age\": 35,\n  \"phone\": \"252631234567\",\n  \"email\": \"ahmed.moi@example.com\",\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"vrcId\": 1,\n  \"statusId\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1115,23 +1072,23 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/hr/aaqils/save",
+              "raw": "{{base_url}}/api/hr/ministry-of-interior/save",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "hr",
-                "aaqils",
+                "ministry-of-interior",
                 "save"
               ]
             },
-            "description": "Creates a new Aaqil (Traditional Leader) record. The generated aaqilId (e.g. AA001) is automatically saved to the 'aaqil_id' environment variable.\n\nRequired fields:\n- aaqilTypeId: Aaqil type lookup ID\n- fullName: Full name (max 120 chars)\n- genderId: Gender lookup ID\n- age: Age (17–100)\n- phone: Phone number (9–30 chars)\n- email: Valid email (max 100 chars)\n- regionId, districtId, cityId: Location IDs\n- statusId: Status lookup ID\n\nOptional:\n- createdBy: Audit field"
+            "description": "Creates a new Ministry of Interior record. The generated ministryofInteriorId (e.g. MOI001) is automatically saved to the 'moi_id' environment variable.\n\nRequired fields:\n- moiTitleId: Title lookup ID\n- Name: Full name (max 120 chars)\n- genderId: Gender lookup ID\n- age: Age (17–100)\n- phone: Phone number (9–30 chars)\n- email: Valid email (max 100 chars)\n- regionId, districtId, cityId: Location IDs\n- vrcId: Voter Registration Center ID\n- statusId: Status lookup ID\n\nOptional: photoUrl, createdBy"
           },
           "response": []
         },
         {
-          "name": "Get Aaqil by ID",
+          "name": "Get Ministry of Interior by ID",
           "event": [
             {
               "listen": "test",
@@ -1141,12 +1098,14 @@
                   "    pm.expect(pm.response.code).to.equal(200);",
                   "});",
                   "",
-                  "pm.test(\"Response contains aaqil data\", function () {",
+                  "pm.test(\"Response contains MoI data\", function () {",
                   "    var jsonData = pm.response.json();",
+                  "",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "    pm.expect(jsonData.message).to.eql(\"Aaqil fetched successfully\");",
+                  "    pm.expect(jsonData.message).to.eql(\"Moi fetched successfully\");",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "    pm.expect(jsonData.data).to.have.property(\"aaqilId\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"ministryofInteriorId\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"Name\");",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -1165,23 +1124,23 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/hr/aaqils/{{aaqil_id}}",
+              "raw": "{{base_url}}/api/hr/ministry-of-interior/{{moi_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "hr",
-                "aaqils",
-                "{{aaqil_id}}"
+                "ministry-of-interior",
+                "{{moi_id}}"
               ]
             },
-            "description": "Fetches a single Aaqil by their business ID (e.g. AA001)."
+            "description": "Fetches a single Ministry of Interior record by their business ID (e.g. MOI001)."
           },
           "response": []
         },
         {
-          "name": "Get All Aaqils (Paginated + Filtered)",
+          "name": "Get All Ministry of Interior (Paginated + Filtered)",
           "event": [
             {
               "listen": "test",
@@ -1193,8 +1152,9 @@
                   "",
                   "pm.test(\"Response is paginated\", function () {",
                   "    var jsonData = pm.response.json();",
+                  "",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "    pm.expect(jsonData.message).to.eql(\"Aaqils fetched successfully\");",
+                  "    pm.expect(jsonData.message).to.eql(\"Moi fetched successfully\");",
                   "    pm.expect(jsonData.data.content).to.be.an(\"array\");",
                   "    pm.expect(jsonData.data).to.have.property(\"totalElements\");",
                   "    pm.expect(jsonData.data).to.have.property(\"totalPages\");",
@@ -1212,20 +1172,34 @@
             "method": "POST",
             "header": [
               {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
                 "key": "Accept",
                 "value": "application/json",
                 "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{base_url}}/api/hr/aaqils/getAll?page=0&size=10",
+              "raw": "{{base_url}}/api/hr/ministry-of-interior/getAll?page=0&size=10",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "hr",
-                "aaqils",
+                "ministry-of-interior",
                 "getAll"
               ],
               "query": [
@@ -1241,12 +1215,12 @@
                 }
               ]
             },
-            "description": "Returns a paginated list of Aaqils. Optional filter parameters can be appended as query params.\n\nAvailable filter query params (all optional):\n- aaqilId: Business ID (e.g. AA001)\n- aaqilTypeId: Aaqil type ID\n- fullName: Name search\n- genderId: Gender ID\n- regionId, districtId, cityId: Location IDs\n- statusId: Status ID\n- isActive: true / false\n- phone, email: Contact filters\n\nPagination:\n- page: 0-indexed page number (default 0)\n- size: Page size (default 10)"
+            "description": "Returns a paginated list of Ministry of Interior records. Send empty {} or optional filter body.\n\nAvailable filter fields (all optional):\n- ministryofInteriorId: Business ID (e.g. MOI001)\n- moiTitleId: Title lookup ID\n- Name: Partial or full name search\n- genderId: Gender ID\n- regionId, districtId, cityId: Location IDs\n- vrcId: Voter Registration Center ID\n- statusId: Status ID\n- isActive: true / false\n- phone, email: Contact filters"
           },
           "response": []
         },
         {
-          "name": "Update Aaqil",
+          "name": "Update Ministry of Interior",
           "event": [
             {
               "listen": "test",
@@ -1256,12 +1230,13 @@
                   "    pm.expect(pm.response.code).to.equal(200);",
                   "});",
                   "",
-                  "pm.test(\"Aaqil updated successfully\", function () {",
+                  "pm.test(\"Ministry of Interior updated successfully\", function () {",
                   "    var jsonData = pm.response.json();",
+                  "",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "    pm.expect(jsonData.message).to.eql(\"Aaqil updated successfully\");",
+                  "    pm.expect(jsonData.message).to.eql(\"Moi updated successfully\");",
                   "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "    pm.expect(jsonData.data).to.have.property(\"aaqilId\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"ministryofInteriorId\");",
                   "    pm.expect(jsonData.data).to.have.property(\"updatedAt\");",
                   "});"
                 ],
@@ -1287,7 +1262,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"aaqilTypeId\": 1,\n  \"fullName\": \"Mohamed Ali Updated\",\n  \"genderId\": 1,\n  \"age\": 46,\n  \"phone\": \"252634567891\",\n  \"email\": \"mohamed.updated@example.com\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"statusId\": 1,\n  \"updatedBy\": \"admin\"\n}",
+              "raw": "{\n  \"moiTitleId\": 1,\n  \"Name\": \"Ahmed Mohamed Updated\",\n  \"genderId\": 1,\n  \"age\": 36,\n  \"phone\": \"252631234568\",\n  \"email\": \"ahmed.moi.updated@example.com\",\n  \"photoUrl\": \"https://example.com/photo-updated.jpg\",\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"vrcId\": 1,\n  \"statusId\": 1,\n  \"updatedBy\": \"admin\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1295,23 +1270,23 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/hr/aaqils/{{aaqil_id}}",
+              "raw": "{{base_url}}/api/hr/ministry-of-interior/{{moi_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "hr",
-                "aaqils",
-                "{{aaqil_id}}"
+                "ministry-of-interior",
+                "{{moi_id}}"
               ]
             },
-            "description": "Updates an existing Aaqil by their business ID (e.g. AA001).\n\nAll fields are optional — send only what needs to change."
+            "description": "Updates an existing Ministry of Interior record by their business ID (e.g. MOI001).\n\nAll fields are optional — send only the fields that need to be changed."
           },
           "response": []
         },
         {
-          "name": "Change Aaqil Status",
+          "name": "Change Ministry of Interior Status",
           "event": [
             {
               "listen": "test",
@@ -1323,8 +1298,9 @@
                   "",
                   "pm.test(\"Status changed successfully\", function () {",
                   "    var jsonData = pm.response.json();",
+                  "",
                   "    pm.expect(jsonData.status).to.equal(200);",
-                  "    pm.expect(jsonData.message).to.eql(\"Aaqil status updated successfully\");",
+                  "    pm.expect(jsonData.message).to.eql(\"Moi status updated successfully\");",
                   "    pm.expect(jsonData.data).to.exist;",
                   "    pm.expect(jsonData.data).to.have.property(\"isActive\");",
                   "});"
@@ -1345,16 +1321,16 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/hr/aaqils/status/{{aaqil_id}}?isActive=false",
+              "raw": "{{base_url}}/api/hr/ministry-of-interior/status/{{moi_id}}?isActive=false",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "hr",
-                "aaqils",
+                "ministry-of-interior",
                 "status",
-                "{{aaqil_id}}"
+                "{{moi_id}}"
               ],
               "query": [
                 {
@@ -1364,12 +1340,90 @@
                 }
               ]
             },
-            "description": "Activates or deactivates an Aaqil.\n\nQuery parameter:\n- isActive=true  → activates the aaqil\n- isActive=false → deactivates the aaqil\n\nNote: Parameter name is 'isActive' (case-sensitive)."
+            "description": "Activates or deactivates a Ministry of Interior record.\n\nQuery parameter:\n- isActive=true  → activates the record\n- isActive=false → deactivates the record"
           },
           "response": []
         }
       ],
-      "description": "All endpoints for managing Aaqil (Traditional Leaders) in the HR module."
+      "description": "All endpoints for managing Ministry of Interior (MoI) records in the HR module."
+    },
+    {
+      "name": "Temporary Contract Management",
+      "item": [
+        {
+          "name": "Create Temporary Contract",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "",
+                  "    pm.expect(jsonData.status).to.equal(200);",
+                  "    pm.expect(jsonData.message).to.eql(\"Temporary Contract Created Successfully\");",
+                  "    pm.expect(jsonData.data).to.be.an('object');",
+                  "    pm.expect(jsonData.data).to.have.property(\"contractId\");",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.contractId) {",
+                  "        pm.environment.set(\"contract_id\", jsonData.data.contractId);",
+                  "        console.log(\"✓ Contract ID saved:\", jsonData.data.contractId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employerName\": \"NEC Organization\",\n  \"employeeName\": \"Ahmed Hassan\",\n  \"contractTypeId\": 1,\n  \"startDate\": \"2026-01-01\",\n  \"endDate\": \"2026-12-31\",\n  \"totalContractAmount\": 50000.00,\n  \"initialPaymentPercentage\": 30.00,\n  \"remainingPercentage\": 70.00,\n  \"jobDescription\": \"Election monitoring and data entry services\",\n  \"termsAndConditions\": \"Standard NEC terms and conditions apply\",\n  \"statusId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hr/universityTrainee",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hr",
+                "universityTrainee"
+              ]
+            },
+            "description": "Creates a new temporary contract. The generated contractId (format: TC-YYYY-XXXXXX) is automatically saved to the 'contract_id' environment variable.\n\nRequired fields:\n- employerName: Employer name (max 200 chars)\n- employeeName: Employee name (max 150 chars)\n- contractTypeId: Contract type lookup ID\n- startDate: Contract start date (YYYY-MM-DD)\n- endDate: Contract end date (YYYY-MM-DD)\n- totalContractAmount: Total value of the contract (> 0)\n- initialPaymentPercentage: % of initial payment (e.g. 30.00)\n- remainingPercentage: % of remaining payment (e.g. 70.00)\n- statusId: Status lookup ID\n\nOptional: contractNo (null = CREATE), jobDescription, termsAndConditions, createdBy\n\nNote: initialPaymentAmount and remainingPaymentAmount are auto-calculated from the percentages."
+          },
+          "response": []
+        }
+      ],
+      "description": "All endpoints for managing Temporary Contracts in the HR module."
     }
   ],
   "event": [
@@ -1391,6 +1445,11 @@
       "description": "Base URL of the NEC Middleware API"
     },
     {
+      "key": "portal_user_id",
+      "value": "PU001",
+      "description": "Portal User Business ID (e.g., PU001) - auto-set from create response"
+    },
+    {
       "key": "universityTraineeId",
       "value": "UT001",
       "description": "University Trainee Business ID (e.g., UT001) - auto-set from create response"
@@ -1401,14 +1460,14 @@
       "description": "Political Party Agent Business ID (e.g., PA001) - auto-set from create response"
     },
     {
-      "key": "aaqil_id",
-      "value": "AA001",
-      "description": "Aaqil Business ID (e.g., AA001) - auto-set from create response"
+      "key": "moi_id",
+      "value": "MOI001",
+      "description": "Ministry of Interior Business ID (e.g., MOI001) - auto-set from create response"
     },
     {
-      "key": "portal_user_id",
-      "value": "PU001",
-      "description": "Portal User Business ID (e.g., PU001) - auto-set from create response"
+      "key": "contract_id",
+      "value": "TC-2026-000001",
+      "description": "Temporary Contract ID (e.g., TC-2026-000001) - auto-set from create response"
     }
   ]
 }

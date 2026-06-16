@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/processdef">
+
+    <process id="approvalWorkflow"
+             name="Approval Workflow"
+             isExecutable="true">
+
+        <startEvent id="startEvent"/>
+
+        <sequenceFlow id="flow1"
+                      sourceRef="startEvent"
+                      targetRef="approvalTask"/>
+
+        <userTask id="approvalTask"
+                  name="${currentApproval}"
+                  flowable:candidateGroups="${approvalRole}" />
+
+        <sequenceFlow id="flow2"
+                      sourceRef="approvalTask"
+                      targetRef="checkNextLevel"/>
+
+        <serviceTask id="checkNextLevel"
+                     name="Check Next Approval Level"
+                     flowable:delegateExpression="${approvalLevelDelegate}" />
+
+        <sequenceFlow id="flow3"
+                      sourceRef="checkNextLevel"
+                      targetRef="hasNextLevelGateway"/>
+
+        <exclusiveGateway id="hasNextLevelGateway"/>
+
+        <sequenceFlow id="flow4"
+                      sourceRef="hasNextLevelGateway"
+                      targetRef="approvalTask">
+
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hasNextLevel == true}]]>
+            </conditionExpression>
+
+        </sequenceFlow>
+
+        <sequenceFlow id="flow5"
+                      sourceRef="hasNextLevelGateway"
+                      targetRef="approvedEnd">
+
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hasNextLevel == false}]]>
+            </conditionExpression>
+
+        </sequenceFlow>
+
+        <endEvent id="approvedEnd"/>
+
+    </process>
+
+</definitions>
