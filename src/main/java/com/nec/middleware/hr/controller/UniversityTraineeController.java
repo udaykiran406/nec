@@ -13,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Tag(
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
         description = "University Trainee Management APIs"
 )
 @RestController
-@RequestMapping("/api/hr/universityTrainee")
+@RequestMapping("/api/v1/hr/universityTrainee")
 @RequiredArgsConstructor
 public class UniversityTraineeController {
 
@@ -30,13 +32,16 @@ public class UniversityTraineeController {
 
     // ------------------------------------------------------------------ CREATE
 
-    @Operation(summary = "Create University Trainee")
-    @PostMapping("/saveTrainee")
+    @Operation(summary = "Create University Trainee",
+            description = "multipart/form-data: flat fields + photo file")
+    @PostMapping(   value = "/saveTrainee",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> createUniversityTrainee(
-            @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
+            @Valid @ModelAttribute UniversityTraineeRequestDto requestDto,
+            @RequestParam("photo")MultipartFile photo) {
 
         UniversityTraineeResponseDto universityTraineeResponse =
-                universityTraineeService.createTrainee(requestDto);
+                universityTraineeService.createTrainee(requestDto, photo);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
@@ -47,16 +52,20 @@ public class UniversityTraineeController {
 
     // ------------------------------------------------------------------ UPDATE
 
-    @Operation(summary = "Update University Trainee")
-    @PatchMapping("/{universityTraineeId}")
+    @Operation(summary = "Update University Trainee",
+            description = "multipart/form-data: flat fields + optional photo")
+    @PatchMapping(value = "/{universityTraineeId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> updateUniversityTrainee(
             @PathVariable String universityTraineeId,
-            @Valid @RequestBody UniversityTraineeRequestDto requestDto) {
+            @Valid @ModelAttribute UniversityTraineeRequestDto requestDto,
+            @RequestParam(value="photo", required = false) MultipartFile photo) {
 
         UniversityTraineeResponseDto response =
                 universityTraineeService.updateTrainee(
                         universityTraineeId,
-                        requestDto
+                        requestDto,
+                        photo
                 );
 
         return ResponseEntity.ok(

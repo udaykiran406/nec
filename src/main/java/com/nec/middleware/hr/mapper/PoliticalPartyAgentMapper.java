@@ -19,7 +19,7 @@ public class PoliticalPartyAgentMapper {
                 .agentName(politicalPartyAgentRequestDto.getAgentName())
                 .phone(politicalPartyAgentRequestDto.getPhone())
                 .email(politicalPartyAgentRequestDto.getEmail())
-                .photoUrl(politicalPartyAgentRequestDto.getPhotoUrl())
+                .photoPath(politicalPartyAgentRequestDto.getPhotoPath())
                 .build();
 
         politicalPartyAgentEntity.setIsActive(Boolean.TRUE);
@@ -38,7 +38,7 @@ public class PoliticalPartyAgentMapper {
         entity.setAgentName(dto.getAgentName());
         entity.setPhone(dto.getPhone());
         entity.setEmail(dto.getEmail());
-        entity.setPhotoUrl(dto.getPhotoUrl());
+        entity.setPhotoPath(dto.getPhotoPath());
 //        entity.setPollingStation(dto.getPollingStationId());
 //        entity.setRegion(dto.getRegionId());
 //        entity.setDistrict(dto.getDistrictId());
@@ -56,7 +56,7 @@ public class PoliticalPartyAgentMapper {
                 .agentName(politicalPartyAgent.getAgentName())
                 .phone(politicalPartyAgent.getPhone())
                 .email(politicalPartyAgent.getEmail())
-                .photoUrl(politicalPartyAgent.getPhotoUrl())
+                .photoPath(politicalPartyAgent.getPhotoPath())
                 .politicalPartyName(politicalPartyAgent.getPoliticalPartyName()!=null ? IdValueDto.builder().id(
                         politicalPartyAgent.getPoliticalPartyName().getId())
                         .value(politicalPartyAgent.getPoliticalPartyName().getPartyName()).build():null)

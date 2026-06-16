@@ -56,8 +56,8 @@ public class UniversityTrainee extends AuditableEntity {
     @Column(name = "faculty", nullable = false, length = 100)
     private String faculty;
 
-    @Column(name = "photo_url", length = 500)
-    private String photoUrl;
+    @Column(name = "photo_path", length = 500)
+    private String photoPath;
 
     @Column(name = "status_id", nullable = false)
     private Long statusId;
