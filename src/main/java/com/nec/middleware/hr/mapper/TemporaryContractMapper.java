@@ -37,6 +37,9 @@ public class TemporaryContractMapper {
 
                 // Identity
                 .contractId(entity.getContractId())
+                .employerName(entity.getEmployerName())
+                .employeeName(entity.getEmployeeName())
+                .contactNo(entity.getContactNo())
 
                 // Contract Type
                 .contractType(entity.getContractType() != null
@@ -47,8 +50,8 @@ public class TemporaryContractMapper {
                         : null)
 
                 // Contract Details
-                .startDate(entity.getStartDate())
-                .endDate(entity.getEndDate())
+//                .startDate(entity.getStartDate())
+//                .endDate(entity.getEndDate())
 
                 .totalContractAmount(entity.getTotalContractAmount())
 
@@ -82,8 +85,8 @@ public class TemporaryContractMapper {
 //                .processInstanceId(
 //                        entity.getProcessInstanceId())
 
-                .currentApproval(
-                        entity.getCurrentApproval())
+//                .currentApproval(
+//                        entity.getCurrentApproval())
 //
 //                .approvalRemarks(
 //                        entity.getApprovalRemarks())

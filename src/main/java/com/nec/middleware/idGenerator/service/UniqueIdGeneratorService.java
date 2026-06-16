@@ -32,6 +32,6 @@ public class UniqueIdGeneratorService {
 
         idGeneratorRepository.save(generator);
 
-        return prefix +String.format("%03d", nextNumber);
+        return prefix +String.format("%07d", nextNumber);
     }
 }

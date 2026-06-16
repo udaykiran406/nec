@@ -97,8 +97,8 @@ public class TemporaryContract extends AuditableEntity {
     @JoinColumn(name = "status_id")
     private TemporaryContractStatus status;
 
-    @Column(name = "approval_remarks", length = 1000)
-    private String approvalRemarks;
+    @Column(name = "rejected_remarks", length = 1000)
+    private String rejectedRemarks;
 
     //Payment Tracking
 //    @Column(name = "initial_payment_released")

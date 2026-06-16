@@ -4,6 +4,7 @@ import com.nec.middleware.hr.dto.request.TemporaryContractRequestDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
 import com.nec.middleware.hr.service.TemporaryContractService;
+import com.nec.middleware.workflow.dto.response.WorkflowSubmissionResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class TemporaryContractController {
 
     TemporaryContractService temporaryContractService;
     @PostMapping
-    public ResponseEntity<ApiResponse<TemporaryContractResponseDto>>
+    public ResponseEntity<ApiResponse<WorkflowSubmissionResponseDto>>
     createTemporaryContract(
             @RequestBody @Valid TemporaryContractRequestDto requestDto) {
 
