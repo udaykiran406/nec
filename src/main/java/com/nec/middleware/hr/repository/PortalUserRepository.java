@@ -30,14 +30,4 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> , 
 
     boolean existsByPhoneAndIdNot(String phone, Long id);
 
-// ------------------------------------------------------------------ Code generation helper
-
-    /**
-     * Returns the highest numeric suffix currently stored in any PU-prefixed code,
-     * or 0 if no records exist yet.
-     * Example stored codes: PU001, PU002 → returns 2.
-     */
-    @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(u.portalUserId, 3) AS int)), 0) FROM PortalUser u WHERE u.portalUserId LIKE 'PU%'")
-    int findMaxCodeSequence();
-
 }

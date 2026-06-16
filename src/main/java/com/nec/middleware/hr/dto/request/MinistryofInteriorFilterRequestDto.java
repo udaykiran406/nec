@@ -7,16 +7,17 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AaqilFilterRequestDto {
+public class MinistryofInteriorFilterRequestDto {
 
-    private String aaqilId;
-    private Long aaqilTypeId;
+    private String ministryofInteriorId;
+    private Long moiTitleId;
     private Long regionId;
     private Long districtId;
     private Long cityId;
+    private Long vrcId;
     private Long statusId;
     private Boolean isActive;
-    private String fullName;
+    private String Name;
     private Long genderId;
     private String phone;
     private String email;

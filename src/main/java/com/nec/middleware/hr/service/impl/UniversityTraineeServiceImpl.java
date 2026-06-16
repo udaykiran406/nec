@@ -14,6 +14,8 @@ import com.nec.middleware.hr.mapper.UniversityTraineeMapper;
 import com.nec.middleware.hr.repository.UniversityTraineeRepository;
 import com.nec.middleware.hr.service.UniversityTraineeService;
 import com.nec.middleware.hr.specification.UniversityTraineeSearchSpecification;
+import com.nec.middleware.idGenerator.Enum.ModuleCode;
+import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.repository.CityRepository;
 import com.nec.middleware.masterdata.repository.DistrictRepository;
 import com.nec.middleware.masterdata.repository.MasterDataRepository;
@@ -27,6 +29,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Year;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,7 +38,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
     private final UniversityTraineeRepository universityTraineerepository;
     private final UniversityTraineeMapper universityTraineeMapper;
-
+    private final UniqueIdGeneratorService uniqueIdGeneratorService;
     // ---- Lookup repositories (mirrors PortalUserServiceImpl) ----
     private final LookupGenderRepository genderRepository;
     private final LookupPaymentMethodsRepository paymentMethodRepository;
@@ -56,7 +60,6 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         validateTrainee(requestDto);
 
         UniversityTrainee universityTraineeEntity = universityTraineeMapper.toEntity(requestDto);
-        universityTraineeEntity.setUniversityTraineeId(generateTraineeId(UniversityTraineeConstants.CODE_PREFIX, UniversityTraineeConstants.CODE_PAD));
 
         // LOOKUPS
         universityTraineeEntity.setGender(
@@ -94,6 +97,11 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
                 cityRepository.findById(requestDto.getCityId())
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("City not found"))
+        );
+
+        // 4. Generate code — only after all lookups succeeded
+        universityTraineeEntity.setUniversityTraineeId(
+                generateUniversityTraineeNumber()
         );
 
         UniversityTrainee savedEntity = universityTraineerepository.save(universityTraineeEntity);
@@ -227,11 +235,16 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
         return universityTraineeMapper.toResponseDto(universityTraineerepository.save(entity));
     }
 
-    // ------------------------------------------------------------------ CODE GENERATION
+ //--------------------------------------------------------------------Code generation
 
-    private String generateTraineeId(String codePrefix, int codePad) {
-        int next = universityTraineerepository.findMaxCodeSequence() + 1;
-        return codePrefix + String.format("%0" + codePad + "d", next);
+    public String generateUniversityTraineeNumber() {
+
+        String prefix = UniversityTraineeConstants.CODE_PREFIX+"-"
+                + Year.now().getValue()+"-";
+        return uniqueIdGeneratorService.generateId(
+                ModuleCode.UNIVERSITY_TRAINEE,
+                prefix
+        );
     }
 
     // ------------------------------------------------------------------ VALIDATION

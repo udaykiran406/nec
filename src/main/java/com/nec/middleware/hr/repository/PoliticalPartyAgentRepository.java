@@ -29,7 +29,4 @@ public interface PoliticalPartyAgentRepository extends JpaRepository<PoliticalPa
 
     Optional<PoliticalPartyAgent> findByPoliticalPartyAgentUserId(String agentUserId);
 
-    // Code generation helper
-    @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(a.politicalPartyAgentUserId, 3) AS int)), 0) FROM PoliticalPartyAgent a WHERE a.politicalPartyAgentUserId LIKE 'PA%'")
-    int findMaxCodeSequence();
 }

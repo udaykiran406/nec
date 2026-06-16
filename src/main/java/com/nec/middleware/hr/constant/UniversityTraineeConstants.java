@@ -14,7 +14,7 @@ public final class UniversityTraineeConstants {
 
 
     public static final String CODE_PREFIX = "UT";
-    public static final int    CODE_PAD    = 3;
+
 
 
 }

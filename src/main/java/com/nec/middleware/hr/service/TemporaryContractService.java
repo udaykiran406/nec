@@ -1,9 +1,9 @@
 package com.nec.middleware.hr.service;
 
 import com.nec.middleware.hr.dto.request.TemporaryContractRequestDto;
-import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
+import com.nec.middleware.workflow.dto.response.WorkflowSubmissionResponseDto;
 
 public interface TemporaryContractService {
 
-    TemporaryContractResponseDto createTemporaryContract(TemporaryContractRequestDto requestDto);
+    WorkflowSubmissionResponseDto createTemporaryContract(TemporaryContractRequestDto requestDto);
 }
