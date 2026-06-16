@@ -20,7 +20,7 @@ public class MinistryofInteriorSearchSpecification {
 
             List<Predicate> filterPredicates = new ArrayList<>();
 
-            // Aaqil ID
+
             if (filterRequest.getMinistryofInteriorId() != null
                     && !filterRequest.getMinistryofInteriorId().isBlank()) {
 

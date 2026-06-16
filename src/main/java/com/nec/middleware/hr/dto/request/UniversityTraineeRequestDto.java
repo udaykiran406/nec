@@ -57,8 +57,9 @@ public class UniversityTraineeRequestDto {
     @NotNull(message = "City is required")
     private Long cityId;
 
-    @Size(max = 500, message = "Photo URL must not exceed 500 characters")
-    private String photoUrl;
+    // Populated by the service layer after storing the uploaded multipart file.
+    // Not settable by the client directly (no @Size/manual-entry validation needed).
+    private String photoPath;
 
     @NotNull(message = "Status is required")
     private Long statusId;

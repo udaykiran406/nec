@@ -33,7 +33,7 @@ public class UniversityTraineeResponseDto {
     private String email;
     private String semester;
     private String faculty;
-    private String photoUrl;
+    private String photoPath;
     private Long   statusId;
 
     // ------------------------------------------------------------------ Lookup FKs → IdValueDto

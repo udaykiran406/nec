@@ -14,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Tag(
@@ -23,19 +25,21 @@ import org.springframework.web.bind.annotation.*;
         description = "Political Party Agent Management APIs"
 )
 @RestController
-@RequestMapping("/api/hr/politicalPartyAgents")
+@RequestMapping("/api/v1/hr/politicalPartyAgents")
 @RequiredArgsConstructor
 public class PoliticalPartyAgentController {
 
     private final PoliticalPartyAgentService politicalPartyAgentService;
 
     // ------------------------------------------------------------------ POST: Save / Update
-    @Operation(summary = "Save Political Party Agent")
-    @PostMapping("/savePartyAgent")
+    @Operation(summary = "Save Political Party Agent",
+            description = "multipart/form-data: 'requestDto' part is the JSON payload, 'photo' part is the image file (jpg/jpeg/png/webp, max 5MB).")
+    @PostMapping(value="/savePartyAgent", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<PoliticalPartyAgentResponseDto>> createPartyAgent(
-            @Valid @RequestBody PoliticalPartyAgentRequestDto PartyAgentRequestDto) {
+            @Valid @ModelAttribute PoliticalPartyAgentRequestDto PartyAgentRequestDto,
+            @RequestParam ("photo") MultipartFile photo ) {
 
-        PoliticalPartyAgentResponseDto politicalPartyAgentResponseDto = politicalPartyAgentService.savePartyAgent(PartyAgentRequestDto);
+        PoliticalPartyAgentResponseDto politicalPartyAgentResponseDto = politicalPartyAgentService.savePartyAgent(PartyAgentRequestDto,photo);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(PoliticalPartyAgentConstants.AGENT_CREATED, politicalPartyAgentResponseDto));
 
@@ -88,15 +92,18 @@ public class PoliticalPartyAgentController {
                         PoliticalPartyAgentConstants.AGENT_STATUS_CHANGED,
                         politicalPartyAgentService.changeStatus(partyAgentUserId,isActive)));
     }
-
-    @Operation(summary = "Update Political Party Agent")
-    @PatchMapping("update/{partyAgentUserId}")
+  //-----------------------------------------------------------------------Update
+    @Operation(summary = "Update Political Party Agent",
+            description = "multipart/form-data: flat fields + optional photo")
+    @PatchMapping(value="update/{partyAgentUserId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PoliticalPartyAgentResponseDto>> updatePoliticalPartyAgent(
             @PathVariable String partyAgentUserId,
-            @RequestBody PoliticalPartyAgentRequestDto requestDto) {
+            @ModelAttribute PoliticalPartyAgentRequestDto requestDto,
+            @RequestParam (value = "photo", required = false) MultipartFile photo) {
 
         PoliticalPartyAgentResponseDto partyAgent =
-                politicalPartyAgentService.updatePoliticalPartyAgent(partyAgentUserId, requestDto);
+                politicalPartyAgentService.updatePoliticalPartyAgent(partyAgentUserId, requestDto, photo);
 
         return ResponseEntity.ok(
                 ApiResponse.success(

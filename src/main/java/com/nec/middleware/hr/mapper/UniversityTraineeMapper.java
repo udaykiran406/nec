@@ -34,7 +34,7 @@ public class UniversityTraineeMapper {
                 .email(universityTraineeRequestDto.getEmail())
                 .semester(universityTraineeRequestDto.getSemester())
                 .faculty(universityTraineeRequestDto.getFaculty())
-                .photoUrl(universityTraineeRequestDto.getPhotoUrl())
+                .photoPath(universityTraineeRequestDto.getPhotoPath())
                 .statusId(universityTraineeRequestDto.getStatusId())
                 .build();
 
@@ -61,7 +61,7 @@ public class UniversityTraineeMapper {
         if (universityTraineeRequesDto.getEmail()     != null) UniversityTraineEntity.setEmail(universityTraineeRequesDto.getEmail());
         if (universityTraineeRequesDto.getSemester()  != null) UniversityTraineEntity.setSemester(universityTraineeRequesDto.getSemester());
         if (universityTraineeRequesDto.getFaculty()   != null) UniversityTraineEntity.setFaculty(universityTraineeRequesDto.getFaculty());
-        if (universityTraineeRequesDto.getPhotoUrl()  != null) UniversityTraineEntity.setPhotoUrl(universityTraineeRequesDto.getPhotoUrl());
+        if (universityTraineeRequesDto.getPhotoPath()  != null) UniversityTraineEntity.setPhotoPath(universityTraineeRequesDto.getPhotoPath());
         if (universityTraineeRequesDto.getStatusId()  != null) UniversityTraineEntity.setStatusId(universityTraineeRequesDto.getStatusId());
         if (universityTraineeRequesDto.getUpdatedBy() != null) UniversityTraineEntity.setUpdatedBy(universityTraineeRequesDto.getUpdatedBy());
     }
@@ -90,7 +90,7 @@ public class UniversityTraineeMapper {
                 .email(universityTraineEentity.getEmail())
                 .semester(universityTraineEentity.getSemester())
                 .faculty(universityTraineEentity.getFaculty())
-                .photoUrl(universityTraineEentity.getPhotoUrl())
+                .photoPath(universityTraineEentity.getPhotoPath())
                 .statusId(universityTraineEentity.getStatusId())
 
                 // Lookup FKs → IdValueDto (lazy-loaded via @ManyToOne)

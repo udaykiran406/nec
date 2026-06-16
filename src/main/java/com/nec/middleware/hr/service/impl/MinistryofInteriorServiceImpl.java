@@ -14,6 +14,7 @@ import com.nec.middleware.hr.mapper.MinistryofInteriorMapper;
 import com.nec.middleware.hr.repository.MinistryofInteriorRepository;
 import com.nec.middleware.hr.service.MinistryofInteriorService;
 import com.nec.middleware.hr.specification.MinistryofInteriorSearchSpecification;
+import com.nec.middleware.hr.util.FileStorageUtil;
 import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.repository.*;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Year;
 
@@ -41,13 +43,17 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
     private final MasterDataRepository regionRepository;
     private final DistrictRepository districtRepository;
     private final CityRepository cityRepository;
+    private final VoterRegistrationCenterRepository vrcRepository;
     private final UniqueIdGeneratorService uniqueIdGeneratorService;
 
+    private final FileStorageUtil fileStorageUtil;
+
+    private static final String PHOTO_SUB_FOLDER = "ministry_of_interior";
     // ------------------------------------------------------------------ SAVE / UPDATE
 
     @Override
     @Transactional
-    public MinistryofInteriorResponseDto saveMinistryofInterior(MinistryofInteriorRequestDto ministryofInteriorRequestDto) {
+    public MinistryofInteriorResponseDto saveMinistryofInterior(MinistryofInteriorRequestDto ministryofInteriorRequestDto , MultipartFile photo) {
 
         validateMinistryOfInterior(ministryofInteriorRequestDto);
 
@@ -92,8 +98,22 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
                                 new ResourceNotFoundException("City Not Found"))
         );
 
+        moiEntity.setVrc(
+                vrcRepository.findById(ministryofInteriorRequestDto.getVrcId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("VRC Not Found"))
+        );
+
         // 4. Generate code — only after all lookups succeeded
         moiEntity.setMinistryofInteriorId(generateMinistryofInteriorNumber());
+
+        // store photo AFTER portalUserId is generated
+        String storedPhotoPath = fileStorageUtil.storePhoto(
+                photo,
+                PHOTO_SUB_FOLDER,
+                moiEntity.getMinistryofInteriorId()
+        );
+        moiEntity.setPhotoPath(storedPhotoPath);
 
         MinistryofInterior aaqil = ministryofInteriorRepository.save(moiEntity);
 
@@ -155,7 +175,7 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
     @Transactional
     public MinistryofInteriorResponseDto updateMinistryofInterior(
             String aaqilId,
-            MinistryofInteriorRequestDto ministryofInteriorRequestDto) {
+            MinistryofInteriorRequestDto ministryofInteriorRequestDto,MultipartFile photo) {
 
         MinistryofInterior moi = findByMinistryofInteriorId(aaqilId);
 
@@ -163,6 +183,19 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
                 ministryofInteriorRequestDto,
                 moi.getId()
         );
+        // Only touch the photo if a new file was actually sent — otherwise
+        // keep whatever is already on the entity.
+        if (photo != null && !photo.isEmpty()) {
+            fileStorageUtil.deleteIfExists(moi.getPhotoPath());
+
+            String newPhotoPath = fileStorageUtil.storePhoto(
+                    photo,
+                    PHOTO_SUB_FOLDER,
+                    moi.getMinistryofInteriorId()
+            );
+
+            ministryofInteriorRequestDto.setPhotoPath(newPhotoPath);
+        }
 
         updateMinistryofInteriorEntity(
                 moi,
@@ -289,6 +322,14 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
                     cityRepository.findById(moiRequestDto.getCityId())
                             .orElseThrow(() ->
                                     new ResourceNotFoundException("City not found"))
+            );
+        }
+
+        if (moiRequestDto.getVrcId() != null) {
+            moi.setVrc(
+                    vrcRepository.findById(moiRequestDto.getVrcId())
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException("VRC not found"))
             );
         }
     }

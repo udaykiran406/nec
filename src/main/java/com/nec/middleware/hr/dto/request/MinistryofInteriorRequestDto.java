@@ -31,8 +31,9 @@ public class MinistryofInteriorRequestDto {
     @Pattern(regexp = "^[0-9+\\-\\s()]+$", message = "Phone must contain only digits and allowed symbols")
     private String phone;
 
-    @Size(max = 500, message = "Photo URL must not exceed 500 characters")
-    private String photoUrl;
+    // Populated by the service layer after storing the uploaded multipart file.
+    // Not settable by the client directly (no @Size/manual-entry validation needed).
+    private String photoPath;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")

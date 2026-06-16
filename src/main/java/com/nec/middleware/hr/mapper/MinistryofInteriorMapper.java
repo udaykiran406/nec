@@ -21,7 +21,7 @@ public class MinistryofInteriorMapper {
                 .age(dto.getAge())
                 .phone(dto.getPhone())
                 .email(dto.getEmail())
-                .photoUrl(dto.getPhotoUrl())
+                .photoPath(dto.getPhotoPath())
                 .build();
 
         entity.setIsActive(Boolean.TRUE);
@@ -41,7 +41,7 @@ public class MinistryofInteriorMapper {
         if (dto.getAge()      != null) entity.setAge(dto.getAge());
         if (dto.getPhone()    != null) entity.setPhone(dto.getPhone());
         if (dto.getEmail()    != null) entity.setEmail(dto.getEmail());
-        if (dto.getPhotoUrl()  != null) entity.setPhotoUrl(dto.getPhotoUrl());
+        if (dto.getPhotoPath()  != null) entity.setPhotoPath(dto.getPhotoPath());
         if (dto.getUpdatedBy()!= null) entity.setUpdatedBy(dto.getUpdatedBy());
     }
 
@@ -56,7 +56,7 @@ public class MinistryofInteriorMapper {
                 .age(entity.getAge())
                 .phone(entity.getPhone())
                 .email(entity.getEmail())
-                .photoUrl(entity.getPhotoUrl())
+                .photoPath(entity.getPhotoPath())
 
                 // ---- Lookups → IdValueDto
                 .moiTitle(entity.getMoiTitle() != null

@@ -39,8 +39,8 @@ public class MinistryofInterior extends AuditableEntity {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "photo_url", length = 500)
-    private String photoUrl;
+    @Column(name = "photo_path", length = 500)
+    private String photoPath;
     // ------------------------------------------------------------------ LOOKUPS FKs
 
     @ManyToOne(fetch = FetchType.LAZY)
