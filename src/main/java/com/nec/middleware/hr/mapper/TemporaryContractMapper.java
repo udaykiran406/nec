@@ -4,8 +4,10 @@ import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.hr.dto.request.TemporaryContractRequestDto;
 import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
 import com.nec.middleware.hr.entity.TemporaryContract;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class TemporaryContractMapper {
 
@@ -13,6 +15,8 @@ public class TemporaryContractMapper {
             TemporaryContractRequestDto temporaryContractRequestDto) {
 
         TemporaryContract temporaryContract = TemporaryContract.builder()
+                .employeeName(temporaryContractRequestDto.getEmployeeName())
+                .employerName(temporaryContractRequestDto.getEmployerName())
                 .startDate(temporaryContractRequestDto.getStartDate())
                 .endDate(temporaryContractRequestDto.getEndDate())
                 .contactNo(temporaryContractRequestDto.getContactNo())
@@ -26,7 +30,8 @@ public class TemporaryContractMapper {
         temporaryContract.setIsActive(Boolean.TRUE);
         temporaryContract.setCreatedBy(temporaryContractRequestDto.getCreatedBy());
         temporaryContract.setUpdatedBy(temporaryContractRequestDto.getCreatedBy());
-
+        log.info("Temporary contract created by {}",temporaryContractRequestDto.getCreatedBy());
+        log.info("Binded temporary contract request to Entity {} ",temporaryContract);
         return temporaryContract;
     }
 
@@ -50,8 +55,8 @@ public class TemporaryContractMapper {
                         : null)
 
                 // Contract Details
-//                .startDate(entity.getStartDate())
-//                .endDate(entity.getEndDate())
+                .startDate(entity.getStartDate())
+                .endDate(entity.getEndDate())
 
                 .totalContractAmount(entity.getTotalContractAmount())
 
@@ -74,12 +79,7 @@ public class TemporaryContractMapper {
                         entity.getTermsAndConditions())
 
                 // Status
-                .status(entity.getStatus() != null
-                        ? IdValueDto.builder()
-                        .id(entity.getStatus().getId())
-                        .value(entity.getStatus().getValue())
-                        .build()
-                        : null)
+                .status(entity.getStatus())
 
                 // Workflow
 //                .processInstanceId(

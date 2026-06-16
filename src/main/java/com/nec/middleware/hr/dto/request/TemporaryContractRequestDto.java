@@ -54,7 +54,7 @@ public class TemporaryContractRequestDto {
     @Size(max = 5000)
     private String termsAndConditions;
     @NotNull(message = "Status is required")
-    private Long statusId;
+    private String status;
     private String createdBy;
     private String updatedBy;
 }

@@ -39,7 +39,7 @@ public class TemporaryContractResponseDto {
 
     private String termsAndConditions;
 
-    private IdValueDto status;
+    private String status;
 
     private Boolean isActive;
 

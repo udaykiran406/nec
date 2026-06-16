@@ -24,7 +24,7 @@ public class UniqueIdGeneratorService {
                         .findByModuleCode(moduleCode)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Module configuration not found"));
+                                        "Module is not configured in ID generator --> "+moduleCode));
         Long nextNumber =
                 generator.getLastNumber() + 1;
 

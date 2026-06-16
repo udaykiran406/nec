@@ -3,22 +3,35 @@ package com.nec.middleware.workflow.entity;
 import com.nec.middleware.hr.entity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "workflow_audit")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WorkflowAudit extends AuditableEntity {
+@EntityListeners(AuditingEntityListener.class)
+@Table(
+        name = "workflow_audit",
+        indexes = {
+                @Index(
+                        name = "idx_module_entity",
+                        columnList = "module_name, entity_id"
+                )
+        }
+)
+public class WorkflowAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
     @Column(name = "module_name", nullable = false)
     private String moduleName;
 
@@ -42,7 +55,8 @@ public class WorkflowAudit extends AuditableEntity {
 
     @Column(name = "action_by")
     private String actionBy;
-
+    @Column(name = "requested_by")
+    private String requestedBy;
     @Column(name = "action_date")
     private LocalDateTime actionDate;
 }

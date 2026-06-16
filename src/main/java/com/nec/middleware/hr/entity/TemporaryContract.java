@@ -90,12 +90,12 @@ public class TemporaryContract extends AuditableEntity {
 //    Manual Completion
 //    Deployment Completion
 //    Finance Confirmation
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "completion_trigger_id")
-    private ContractCompletionTrigger completionTrigger;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_id")
-    private TemporaryContractStatus status;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "completion_trigger_id")
+//    private ContractCompletionTrigger completionTrigger;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "status_id")
+    private String status;
 
     @Column(name = "rejected_remarks", length = 1000)
     private String rejectedRemarks;
@@ -116,4 +116,5 @@ public class TemporaryContract extends AuditableEntity {
 //    private LocalDate closedDate;
     @Column(name = "is_active")
     private Boolean isActive;
+
 }
