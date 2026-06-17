@@ -25,12 +25,12 @@ public class TemporaryContractWorkflowService implements WorkflowEntityService {
 
     private final WorkflowService workflowService;
     @Override
-    public void moveToNextLevel(String moduleName,String entityId,String nextApprovalRole) {
+    public void moveToNextLevel(String entityId,String nextApprovalRole) {
         TemporaryContract contract =
                 temporaryContractRepository.findByContractId(entityId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Contract not found"));
+                                        "Contract not found for updating status for ID -->{}"+entityId));
 
         contract.setCurrentApproval(nextApprovalRole);
         temporaryContractRepository.save(contract);
@@ -43,7 +43,7 @@ public class TemporaryContractWorkflowService implements WorkflowEntityService {
                 temporaryContractRepository.findByContractId(entityId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Contract not found"));
+                                        "Contract not found for updating status to approved "+entityId));
         contract.setCurrentApproval(null);
         contract.setStatus(Constants.WORKFLOW_APPROVED_STATUS);
         temporaryContractRepository.save(contract);

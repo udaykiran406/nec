@@ -4,11 +4,10 @@ import com.nec.middleware.constants.Constants;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
 import com.nec.middleware.hr.entity.TemporaryContract;
-import com.nec.middleware.hr.mapper.TemporaryContractMapper;
+import com.nec.middleware.hr.mapper.TemporaryContractMapStruct;
 import com.nec.middleware.hr.repository.TemporaryContractRepository;
 import com.nec.middleware.workflow.factory.WorkflowModuleHandler;
 import com.nec.middleware.workflow.service.WorkflowAuditService;
-import com.nec.middleware.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class TemporaryContractWorkflowHandler implements WorkflowModuleHandler {
 
     private final TemporaryContractRepository temporaryContractRepository;
+    private final TemporaryContractMapStruct temporaryContractMapStruct;
 
-    private final TemporaryContractMapper temporaryContractMapper;
 
     private final WorkflowAuditService workflowAuditService;
 
@@ -38,7 +37,7 @@ public class TemporaryContractWorkflowHandler implements WorkflowModuleHandler {
                                         "Contract not found while fetching with entityID "));
 
         TemporaryContractResponseDto temporaryContractResponseDto =
-                temporaryContractMapper
+                temporaryContractMapStruct
                         .temporaryContractResponseDto(contract);
 
         temporaryContractResponseDto.setApprovalHistory(

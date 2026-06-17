@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.dto.response;
 
+import com.nec.middleware.workflow.dto.response.WorkflowInboxDto;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 

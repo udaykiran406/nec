@@ -13,8 +13,7 @@ import java.util.Optional;
 
 @Component("approvalLevelDelegate")
 @RequiredArgsConstructor
-public class ApprovalLevelDelegate
-        implements JavaDelegate {
+public class ApprovalLevelDelegate implements JavaDelegate {
 
     private final ApprovalWorkflowLevelRepository approvalWorkflowLevelRepository;
 
@@ -60,7 +59,7 @@ public class ApprovalLevelDelegate
                     "hasNextLevel",
                     true);
 
-            workflowService.moveToNextLevel(moduleName,entityId,level.get().getApprovalRole());
+            workflowService.moveToNextLevel(entityId,level.get().getApprovalRole());
 
         } else {
 

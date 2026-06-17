@@ -3,14 +3,13 @@ package com.nec.middleware.hr.service.impl;
 import com.nec.middleware.Lookups.repository.ContractTypeRepository;
 import com.nec.middleware.Lookups.repository.TemporaryContractStatusRepository;
 import com.nec.middleware.constants.Constants;
-import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.dto.request.TemporaryContractRequestDto;
+import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
 import com.nec.middleware.hr.entity.TemporaryContract;
-import com.nec.middleware.hr.mapper.TemporaryContractMapper;
+import com.nec.middleware.hr.mapper.TemporaryContractMapStruct;
 import com.nec.middleware.hr.repository.TemporaryContractRepository;
 import com.nec.middleware.hr.service.TemporaryContractService;
-import com.nec.middleware.workflow.dto.response.WorkflowInboxDto;
 import com.nec.middleware.workflow.mapper.WorkflowInboxMapper;
 import com.nec.middleware.workflow.service.WorkflowService;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
@@ -31,7 +30,8 @@ import static com.nec.middleware.idGenerator.Enum.ModuleCode.TEMPORARY_CONTRACT;
 @RequiredArgsConstructor
 public class TemporaryContractServiceImpl implements TemporaryContractService {
 
-    private final TemporaryContractMapper temporaryContractMapper;
+    private final TemporaryContractMapStruct temporaryContractMapStruct;
+
     private final TemporaryContractRepository temporaryContractRepository;
 
     private final UniqueIdGeneratorService uniqueIdGeneratorService;
@@ -48,47 +48,83 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
     private static final String DRAFT="DRAFT";
     @Override
     @Transactional
-    public WorkflowInboxDto createTemporaryContract(TemporaryContractRequestDto temporaryContractRequestDto) {
+    public TemporaryContractResponseDto createOrUpdateContract(TemporaryContractRequestDto temporaryContractRequestDto) {
 
-        log.info("Creating temporary contract --->");
-        TemporaryContract temporaryContract =
-                temporaryContractMapper.temporaryContractEntity(temporaryContractRequestDto);
+        TemporaryContract temporaryContract;
+        // UPDATE FLOW
+        if (temporaryContractRequestDto.getContractId() != null
+                && !temporaryContractRequestDto.getContractId().isBlank()) {
+
+            log.info("Updating existing contract: {}",
+                    temporaryContractRequestDto.getContractId());
+
+            temporaryContract = temporaryContractRepository
+                    .findByContractId(temporaryContractRequestDto.getContractId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Contract not found with id: "
+                                    + temporaryContractRequestDto.getContractId()));
+
+            // Update fields from request
+            temporaryContractMapStruct.updateEntityFromDto(
+                    temporaryContractRequestDto, temporaryContract);
+
+        } else {
+
+            // CREATE FLOW
+            log.info("Creating new contract");
+
+            temporaryContract =
+                    temporaryContractMapStruct.temporaryContractEntity(
+                            temporaryContractRequestDto);
+            temporaryContract.setCreatedBy(temporaryContractRequestDto.getCreatedBy());
+            temporaryContract.setUpdatedBy(temporaryContractRequestDto.getUpdatedBy());
+            String contractId = generateContractNumber();
+            temporaryContract.setContractId(contractId);
+            temporaryContract.setIsActive(true);
+            log.info("ContractId generated successfully {}", contractId);
+        }
 
         temporaryContract.setContractType(
-                contractTypeRepository.findById(temporaryContractRequestDto.getContractTypeId())
+                contractTypeRepository.findById(
+                                temporaryContractRequestDto.getContractTypeId())
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Contract Type not found")));
-//        temporaryContract.setStatus(
-//                temporaryContractStatusRepository.findById(temporaryContractRequestDto.getStatusId())
-//                        .orElseThrow(() ->
-//                                new ResourceNotFoundException("Status not found")));
-        temporaryContract.setStatus(temporaryContractRequestDto.getStatus());
+                                new ResourceNotFoundException(
+                                        "Contract Type not found")));
+
+        temporaryContract.setStatus(
+                temporaryContractRequestDto.getStatus());
+
         calculatePaymentAmounts(temporaryContract);
-        String contractId = generateContractNumber();
-        temporaryContract.setContractId(contractId);
-        log.info("contractId generated successfully {}",contractId);
-        TemporaryContract savedContract = temporaryContractRepository.save(temporaryContract);
-        log.info("created by after saving {} ",savedContract.getCreatedBy());
-        if (savedContract.getStatus().equalsIgnoreCase(DRAFT)) {
+
+        TemporaryContract savedContract =
+                temporaryContractRepository.save(temporaryContract);
+
+        log.info("Created/Updated successfully. CreatedBy: {}",
+                savedContract.getCreatedBy());
+
+        // DRAFT -> only save
+        if (DRAFT.equalsIgnoreCase(savedContract.getStatus())) {
             return saveAsDraft(savedContract);
         }
+
+        // SUBMITTED -> start workflow
         savedContract.setStatus(Constants.WORKFLOW_PENDING_STATUS);
         return submitForApproval(savedContract);
-
     }
 
-    private WorkflowInboxDto saveAsDraft(TemporaryContract contract) {
+    private TemporaryContractResponseDto saveAsDraft(TemporaryContract savedContract) {
 
-        return workflowSubmissionResponseDtoMapper
-                .workflowSubmissionResponseDto(
-                        contract.getContractId(),
-                        Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
-                        null,
-                        null,
-                        contract.getStatus());
+//        return workflowSubmissionResponseDtoMapper
+//                .workflowSubmissionResponseDto(
+//                        contract.getContractId(),
+//                        Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
+//                        null,
+//                        null,
+//                        contract.getStatus());
+        return temporaryContractMapStruct.temporaryContractResponseDto(savedContract);
     }
 
-    private WorkflowInboxDto submitForApproval(TemporaryContract contract) {
+    private TemporaryContractResponseDto submitForApproval(TemporaryContract contract) {
 
         ApprovalWorkflowLevel firstLevel =
                 approvalWorkflowLevelRepository
@@ -120,21 +156,21 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
                 Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
                 processInstanceId,contract.getCreatedBy());
 
-        WorkflowInboxDto response =
-                workflowSubmissionResponseDtoMapper
-                        .workflowSubmissionResponseDto(
-                                contract.getContractId(),
-                                Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
-                                contract.getCurrentApproval(),
-                                contract.getProcessInstanceId(),
-                                contract.getStatus());
+//        WorkflowInboxDto response =
+//                workflowSubmissionResponseDtoMapper
+//                        .workflowSubmissionResponseDto(
+//                                contract.getContractId(),
+//                                Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
+//                                contract.getCurrentApproval(),
+//                                contract.getProcessInstanceId(),
+//                                contract.getStatus());
 
 //        response.setApprovalHistory(
 //                workflowService.buildApprovalHistory(
 //                        WORKFLOW_MODULE_NAME,
 //                        contract.getContractId()));
 
-        return response;
+        return temporaryContractMapStruct.temporaryContractResponseDto(contract);
     }
 
     private void calculatePaymentAmounts(TemporaryContract contract) {

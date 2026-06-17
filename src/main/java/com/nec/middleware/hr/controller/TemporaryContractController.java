@@ -4,7 +4,6 @@ import com.nec.middleware.hr.dto.request.TemporaryContractRequestDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
 import com.nec.middleware.hr.service.TemporaryContractService;
-import com.nec.middleware.workflow.dto.response.WorkflowInboxDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemporaryContractController {
 
     private final TemporaryContractService temporaryContractService;
-    @PostMapping("/createContract")
-    public ResponseEntity<ApiResponse<WorkflowInboxDto>>createTemporaryContract( @RequestBody @Valid TemporaryContractRequestDto requestDto) {
+    @PostMapping("/createOrUpdateTemporaryContract")
+    public ResponseEntity<ApiResponse<TemporaryContractResponseDto>> createorUpdateTemporaryContract( @RequestBody @Valid TemporaryContractRequestDto requestDto) {
 
-        return ResponseEntity.ok(
+         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Temporary Contract Created Successfully",
                         temporaryContractService
-                                .createTemporaryContract(requestDto))
+                                .createOrUpdateContract(requestDto))
         );
     }
 }

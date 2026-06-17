@@ -101,8 +101,7 @@ public class WorkflowService {
         WorkflowModuleHandler handler =workflowModuleFactory.getHandler(moduleName);
 
         if (handler == null) {
-            throw new ResourceNotFoundException(
-                    "Workflow handler not found");
+            throw new ResourceNotFoundException("Workflow handler not found");
         }
 
         return handler.getDetails(entityId);
