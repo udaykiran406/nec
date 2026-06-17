@@ -33,7 +33,7 @@ public class LookupController {
 
         return ResponseEntity.ok(
                 ApiResponseDto.<List<LookupTableResponseDto>>builder()
-                        .success(true)
+                        .status(HttpStatus.OK.value())
                         .message("Lookup table names retrieved successfully")
                         .data(lookupService.getAllActiveLookupTables())
                         .build()
@@ -51,7 +51,7 @@ public class LookupController {
 
         return ResponseEntity.ok(
                 ApiResponseDto.<List<LookupValueResponseDto>>builder()
-                        .success(true)
+                        .status(HttpStatus.OK.value())
                         .message("Lookup values retrieved successfully")
                         .data(lookupService.getLookupValuesByTableName(tableName))
                         .build()
@@ -69,11 +69,11 @@ public class LookupController {
 
         LookupValueResponseDto response =
                 lookupService.addOrEditLookupValue(requestDto);
-
+HttpStatus status = requestDto.getId() == null ? HttpStatus.CREATED : HttpStatus.OK;
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         ApiResponseDto.<LookupValueResponseDto>builder()
-                                .success(true)
+                                .status(status.value())
                                 .message(
                                         requestDto.getId() == null
                                                 ? "Lookup value created successfully"

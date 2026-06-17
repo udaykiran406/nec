@@ -59,8 +59,8 @@ public class UniversityTrainee extends AuditableEntity {
     @Column(name = "photo_path", length = 500)
     private String photoPath;
 
-    @Column(name = "status_id", nullable = false)
-    private Long statusId;
+    @Column(name = "status", nullable = false)
+    private String status;
     // ------------------------------------------------------------------ LOOKUPS FKs
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gender_id", nullable = false)

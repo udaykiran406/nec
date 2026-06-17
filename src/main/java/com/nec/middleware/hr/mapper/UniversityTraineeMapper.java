@@ -35,7 +35,7 @@ public class UniversityTraineeMapper {
                 .semester(universityTraineeRequestDto.getSemester())
                 .faculty(universityTraineeRequestDto.getFaculty())
                 .photoPath(universityTraineeRequestDto.getPhotoPath())
-                .statusId(universityTraineeRequestDto.getStatusId())
+//                .status(universityTraineeRequestDto.getStatus())
                 .build();
 
         universityTraineeEntity.setIsActive(Boolean.TRUE);
@@ -62,7 +62,7 @@ public class UniversityTraineeMapper {
         if (universityTraineeRequesDto.getSemester()  != null) UniversityTraineEntity.setSemester(universityTraineeRequesDto.getSemester());
         if (universityTraineeRequesDto.getFaculty()   != null) UniversityTraineEntity.setFaculty(universityTraineeRequesDto.getFaculty());
         if (universityTraineeRequesDto.getPhotoPath()  != null) UniversityTraineEntity.setPhotoPath(universityTraineeRequesDto.getPhotoPath());
-        if (universityTraineeRequesDto.getStatusId()  != null) UniversityTraineEntity.setStatusId(universityTraineeRequesDto.getStatusId());
+//        if (universityTraineeRequesDto.getStatusId()  != null) UniversityTraineEntity.setStatusId(universityTraineeRequesDto.getStatusId());
         if (universityTraineeRequesDto.getUpdatedBy() != null) UniversityTraineEntity.setUpdatedBy(universityTraineeRequesDto.getUpdatedBy());
     }
 
@@ -91,7 +91,7 @@ public class UniversityTraineeMapper {
                 .semester(universityTraineEentity.getSemester())
                 .faculty(universityTraineEentity.getFaculty())
                 .photoPath(universityTraineEentity.getPhotoPath())
-                .statusId(universityTraineEentity.getStatusId())
+                .status(universityTraineEentity.getStatus())
 
                 // Lookup FKs → IdValueDto (lazy-loaded via @ManyToOne)
                 .gender(universityTraineEentity.getGender() != null

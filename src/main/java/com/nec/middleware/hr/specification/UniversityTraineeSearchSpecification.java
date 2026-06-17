@@ -88,10 +88,10 @@ public class UniversityTraineeSearchSpecification {
                 );
             }
 
-            // statusId — stored as plain Long on the entity
-            if (request.getStatusId() != null) {
+            // statusId — stored as plain String on the entity
+            if (request.getStatus() != null) {
                 predicates.add(
-                        criteriaBuilder.equal(entityRoot.get("statusId"), request.getStatusId())
+                        criteriaBuilder.equal(entityRoot.get("statusId"), request.getStatus())
                 );
             }
 

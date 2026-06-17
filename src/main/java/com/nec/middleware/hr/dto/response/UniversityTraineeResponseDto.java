@@ -34,7 +34,7 @@ public class UniversityTraineeResponseDto {
     private String semester;
     private String faculty;
     private String photoPath;
-    private Long   statusId;
+    private String  status;
 
     // ------------------------------------------------------------------ Lookup FKs → IdValueDto
     private IdValueDto gender;
