@@ -26,13 +26,13 @@ public abstract class BaseLookupEntity {
     private String description;
 
     @Column(name = "is_active")
-    private Short isActive;
+    private Short isActive=1;
 
     @Column(name = "display_order")
-    private Integer displayOrder;
+    private Integer displayOrder=1;
 
     @Column(name = "is_deleted")
-    private Short isDeleted;
+    private Short isDeleted=0;
 
     @Column(name = "created_by", length = 50)
     private String createdBy;
@@ -40,9 +40,9 @@ public abstract class BaseLookupEntity {
     @Column(name = "updated_by", length = 50)
     private String updatedBy;
 
-    @Column(name = "created_dt")
-    private LocalDateTime createdDt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "updated_dt")
-    private LocalDateTime updatedDt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

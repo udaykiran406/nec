@@ -18,7 +18,7 @@ public class PoliticalPartyAgentResponseDto {
     private IdValueDto gender;
     private String phone;
     private String email;
-    private String photoUrl;
+    private String photoPath;
     private IdValueDto pollingStation;
     private IdValueDto region;
     private IdValueDto district;

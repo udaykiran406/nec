@@ -4,10 +4,11 @@ import com.nec.middleware.hr.dto.request.MinistryofInteriorFilterRequestDto;
 import com.nec.middleware.hr.dto.request.MinistryofInteriorRequestDto;
 import com.nec.middleware.hr.dto.response.MinistryofInteriorResponseDto;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface MinistryofInteriorService {
 
-    MinistryofInteriorResponseDto saveMinistryofInterior(MinistryofInteriorRequestDto ministryofInteriorRequestDto);
+    MinistryofInteriorResponseDto saveMinistryofInterior(MinistryofInteriorRequestDto ministryofInteriorRequestDto, MultipartFile photo);
 
     MinistryofInteriorResponseDto getMinistryofInteriorById(String ministryofInteriorId);
 
@@ -18,6 +19,7 @@ public interface MinistryofInteriorService {
 
     MinistryofInteriorResponseDto updateMinistryofInterior(
             String ministryofInteriorId,
-            MinistryofInteriorRequestDto ministryofInteriorRequestDto
+            MinistryofInteriorRequestDto ministryofInteriorRequestDto,
+            MultipartFile photo
     );
 }

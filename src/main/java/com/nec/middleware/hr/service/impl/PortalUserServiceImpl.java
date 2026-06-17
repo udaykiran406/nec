@@ -18,6 +18,7 @@ import com.nec.middleware.hr.mapper.PortalUserMapper;
 import com.nec.middleware.hr.repository.PortalUserRepository;
 import com.nec.middleware.hr.service.PortalUserService;
 import com.nec.middleware.hr.specification.PortalUserSearchSpecification;
+import com.nec.middleware.hr.util.FileStorageUtil;
 import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.entity.MasterDataPoliticalParty;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Year;
 
@@ -51,16 +53,20 @@ public class PortalUserServiceImpl implements PortalUserService {
     private final LookupRoleRepository roleRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
     private final LookupMOITitlesRepository moiTitlesRepository;
+    private final FileStorageUtil fileStorageUtil;
 
+    private static final String PHOTO_SUB_FOLDER = "portal-users";
 
     // ------------------------------------------------------------------ SAVE
 
     @Override
-    public PortalUserResponseDto createPortalUser(PortalUserRequestDto portalUserRequest) {
+    public PortalUserResponseDto createPortalUser(PortalUserRequestDto portalUserRequest , MultipartFile photo) {
 
 
         log.info("Creating portal user {}", portalUserRequest.getUserName());
         validateDuplicateUser(portalUserRequest);
+
+
         PortalUser portalUserEntity = portalUserMapper.portalUserEntity(portalUserRequest);
 
         // ---------------- LOOKUPS ----------------
@@ -114,6 +120,13 @@ public class PortalUserServiceImpl implements PortalUserService {
         );
         // 4. Generate code — only after all lookups succeeded
         portalUserEntity.setPortalUserId(generatePortalUserNumber());
+         // store photo AFTER portalUserId is generated
+        String storedPhotoPath = fileStorageUtil.storePhoto(
+                photo,
+                PHOTO_SUB_FOLDER,
+                portalUserEntity.getPortalUserId()
+        );
+        portalUserEntity.setPhotoPath(storedPhotoPath);
 
         PortalUser savedEntity = portalUserrepository.save(portalUserEntity);
 
@@ -186,13 +199,27 @@ public class PortalUserServiceImpl implements PortalUserService {
     @Transactional
     public PortalUserResponseDto updatePortalUser(
             String portalUserId,
-            PortalUserRequestDto portalUserRequestDto) {
+            PortalUserRequestDto portalUserRequestDto, MultipartFile photo) {
 
         PortalUser portalUser = findByPortalUserId(portalUserId);
         validateDuplicateUserForUpdate(
                 portalUserRequestDto,
                 portalUser.getId()
         );
+        // Only touch the photo if a new file was actually sent — otherwise
+        // keep whatever is already on the entity.
+        if (photo != null && !photo.isEmpty()) {
+            fileStorageUtil.deleteIfExists(portalUser.getPhotoPath());
+
+            String newPhotoPath = fileStorageUtil.storePhoto(
+                    photo,
+                    PHOTO_SUB_FOLDER,
+                    portalUser.getPortalUserId()
+            );
+
+            portalUserRequestDto.setPhotoPath(newPhotoPath);
+        }
+
         if (portalUserRequestDto.getGenderId() != null) {
             portalUser.setGender(
                     genderRepository.findById(

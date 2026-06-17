@@ -13,6 +13,7 @@ import com.nec.middleware.hr.mapper.PoliticalPartyAgentMapper;
 import com.nec.middleware.hr.repository.PoliticalPartyAgentRepository;
 import com.nec.middleware.hr.service.PoliticalPartyAgentService;
 import com.nec.middleware.hr.specification.PoliticalPartyAgentSearchSpecification;
+import com.nec.middleware.hr.util.FileStorageUtil;
 import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.repository.*;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Year;
 
@@ -41,14 +43,16 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     private final LookupGenderRepository genderRepository;
     private final PollingStationRepository pollingStationRepository;
     private final PoliticalPartyRepository politicalPartyRepository;
-
     private final ThirdPartyStatusRepository statusRepository;
 
+    private final FileStorageUtil fileStorageUtil;
+
+    private static final String PHOTO_SUB_FOLDER = "political-party-agents";
     // ------------------------------------------------------------------ SAVE / UPDATE
 
     @Override
     @Transactional
-    public PoliticalPartyAgentResponseDto savePartyAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
+    public PoliticalPartyAgentResponseDto savePartyAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto, MultipartFile photo) {
 
         validateAgent(politicalPartyAgentRequestDto);
         log.info("Creating political party agent. AgentName: {}",politicalPartyAgentRequestDto.getAgentName());
@@ -95,6 +99,14 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         politicalPartyAgentEntity.setPoliticalPartyAgentUserId(
                 generatePoliticalPartyAgentNumber()
         );
+
+        // store photo AFTER portalUserId is generated
+        String storedPhotoPath = fileStorageUtil.storePhoto(
+                photo,
+                PHOTO_SUB_FOLDER,
+                politicalPartyAgentEntity.getPoliticalPartyAgentUserId()
+        );
+        politicalPartyAgentEntity.setPhotoPath(storedPhotoPath);
 
         PoliticalPartyAgent politicalPartyAgent = politicalPartyAgentRepository.save(politicalPartyAgentEntity);
         return politicalPartyAgentMapper.politicalPartyResponseDto(politicalPartyAgent);
@@ -143,7 +155,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     @Transactional
     public PoliticalPartyAgentResponseDto updatePoliticalPartyAgent(
             String agentUserId,
-            PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
+            PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto,MultipartFile photo) {
 
         PoliticalPartyAgent politicalPartyAgent =
                 findByAgentUserId(agentUserId);
@@ -152,6 +164,20 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
                 politicalPartyAgentRequestDto,
                 politicalPartyAgent.getId()
         );
+
+        // Only touch the photo if a new file was actually sent — otherwise
+        // keep whatever is already on the entity.
+        if (photo != null && !photo.isEmpty()) {
+            fileStorageUtil.deleteIfExists(politicalPartyAgent.getPhotoPath());
+
+            String newPhotoPath = fileStorageUtil.storePhoto(
+                    photo,
+                    PHOTO_SUB_FOLDER,
+                    politicalPartyAgent.getPoliticalPartyAgentUserId()
+            );
+
+            politicalPartyAgentRequestDto.setPhotoPath(newPhotoPath);
+        }
 
         updatePoliticalPartyAgents(
                 politicalPartyAgent,
@@ -227,8 +253,8 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
             politicalPartyAgent.setEmail(politicalPartyAgentRequestDto.getEmail());
         }
 
-        if (politicalPartyAgentRequestDto.getPhotoUrl() != null) {
-            politicalPartyAgent.setPhotoUrl(politicalPartyAgentRequestDto.getPhotoUrl());
+        if (politicalPartyAgentRequestDto.getPhotoPath() != null) {
+            politicalPartyAgent.setPhotoPath(politicalPartyAgentRequestDto.getPhotoPath());
         }
 
         if (politicalPartyAgentRequestDto.getUpdatedBy() != null) {

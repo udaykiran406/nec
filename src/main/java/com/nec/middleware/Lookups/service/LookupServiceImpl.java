@@ -32,6 +32,7 @@ public class LookupServiceImpl implements LookupService {
                 .map(entity -> LookupTableResponseDto.builder()
                         .id(entity.getId())
                         .tableName(entity.getTableName())
+                        .displayName(entity.getDisplayName())
                         .isActive(entity.getIsActive())
                         .build())
                 .toList();
@@ -180,7 +181,7 @@ public class LookupServiceImpl implements LookupService {
         }
     }
 
-    private String generateLookupCode() {
+    private String  generateLookupCode() {
 
         Long nextNumber = lookupDataRepository.getNextGlobalCodeNumber();
 

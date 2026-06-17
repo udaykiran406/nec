@@ -5,10 +5,11 @@ import com.nec.middleware.hr.dto.request.UniversityTraineeFilterRequestDto;
 import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
 import com.nec.middleware.hr.dto.response.UniversityTraineeResponseDto;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 
 public interface UniversityTraineeService {
-    UniversityTraineeResponseDto createTrainee(UniversityTraineeRequestDto requestDto);
+    UniversityTraineeResponseDto createTrainee(UniversityTraineeRequestDto requestDto,MultipartFile photo);
 
     UniversityTraineeResponseDto getTraineeByUniversityTraineeId(String universityTraineeId);
 
@@ -16,5 +17,5 @@ public interface UniversityTraineeService {
 
     UniversityTraineeResponseDto changeStatus(String universityTraineeId,Boolean isActive);
 
-    UniversityTraineeResponseDto updateTrainee(String universityTraineeId, UniversityTraineeRequestDto request);
+    UniversityTraineeResponseDto updateTrainee(String universityTraineeId, UniversityTraineeRequestDto request, MultipartFile photo);
 }

@@ -34,7 +34,8 @@ public class PortalUserRequestDto {
     @Size(max = 150, message = "Email must not exceed 150 characters")
     private String email;
 
-    @Size(max = 500, message = "Photo path must not exceed 500 characters")
+    // Populated by the service layer after storing the uploaded multipart file.
+    // Not settable by the client directly (no @Size/manual-entry validation needed).
     private String photoPath;
 
     @Size(max = 100, message = "Faculty must not exceed 100 characters")

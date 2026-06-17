@@ -1,9 +1,11 @@
 {
   "info": {
-    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "_postman_id": "7f057d37-2483-46a6-850d-b740be140f96",
     "name": "Lookups - NEC Middleware",
     "description": "Postman collection for Lookup Management APIs in NEC Middleware. Supports retrieving all active lookup tables, fetching values by table name, and adding/editing lookup values dynamically.\n\nLookup table names follow the pattern: nec_lkp_<name>\nExamples: nec_lkp_gender, nec_lkp_roles, nec_lkp_payment_methods, nec_lkp_status, nec_lkp_contract_types",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50342627",
+    "_collection_link": "https://go.postman.co/collection/50342627-7f057d37-2483-46a6-850d-b740be140f96?source=collection_link"
   },
   "item": [
     {
@@ -51,12 +53,106 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/v1/lookups",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "lookups"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lookups"
+              ]
             },
             "description": "Returns a list of all active lookup table names registered in the system.\n\nResponse shape:\n{\n  \"success\": true,\n  \"message\": \"Lookup table names retrieved successfully\",\n  \"data\": [\n    { \"id\": 1, \"tableName\": \"nec_lkp_gender\", \"isActive\": 1 },\n    { \"id\": 2, \"tableName\": \"nec_lkp_roles\", \"isActive\": 1 }\n  ]\n}\n\nUse the returned tableName values to call the 'Get Lookup Values by Table Name' endpoint."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Get All Active Lookup Tables",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 09:51:09 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup table names retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 16,\n            \"tableName\": \"nec_lkp_budget_heads\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 17,\n            \"tableName\": \"nec_lkp_budget_sub_heads\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 10,\n            \"tableName\": \"nec_lkp_certification_types\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 8,\n            \"tableName\": \"nec_lkp_contract_payment_types\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 7,\n            \"tableName\": \"nec_lkp_contract_types\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 14,\n            \"tableName\": \"nec_lkp_departments\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 29,\n            \"tableName\": \"nec_lkp_deployment_reporting_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 13,\n            \"tableName\": \"nec_lkp_deployment_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 12,\n            \"tableName\": \"nec_lkp_deployment_types\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 26,\n            \"tableName\": \"nec_lkp_director_appraisal_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 1,\n            \"tableName\": \"nec_lkp_genders\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 15,\n            \"tableName\": \"nec_lkp_job_positions\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 22,\n            \"tableName\": \"nec_lkp_leave_plan_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 23,\n            \"tableName\": \"nec_lkp_leave_request_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 21,\n            \"tableName\": \"nec_lkp_leave_type_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 3,\n            \"tableName\": \"nec_lkp_ministry_of_interior_titles\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 2,\n            \"tableName\": \"nec_lkp_modules\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 5,\n            \"tableName\": \"nec_lkp_payment_methods\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 19,\n            \"tableName\": \"nec_lkp_per_diem_request_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 24,\n            \"tableName\": \"nec_lkp_performance_criteria_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 4,\n            \"tableName\": \"nec_lkp_portal_user_types\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 9,\n            \"tableName\": \"nec_lkp_scoring_types\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 11,\n            \"tableName\": \"nec_lkp_skill_levels\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 28,\n            \"tableName\": \"nec_lkp_staff_allocation_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 25,\n            \"tableName\": \"nec_lkp_staff_appraisal_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 27,\n            \"tableName\": \"nec_lkp_staff_category_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 30,\n            \"tableName\": \"nec_lkp_temporary_contract_payment_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 20,\n            \"tableName\": \"nec_lkp_temporary_contract_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 31,\n            \"tableName\": \"nec_lkp_thirdparty_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 18,\n            \"tableName\": \"nec_lkp_training_management_status\",\n            \"isActive\": 1\n        },\n        {\n            \"id\": 6,\n            \"tableName\": \"nec_lkp_training_types\",\n            \"isActive\": 1\n        }\n    ]\n}"
+            }
+          ]
         },
         {
           "name": "Get Lookup Values by Table Name",
@@ -100,12 +196,284 @@
             ],
             "url": {
               "raw": "{{base_url}}/api/v1/lookups/{{lookup_table_name}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "lookups", "{{lookup_table_name}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lookups",
+                "{{lookup_table_name}}"
+              ]
             },
             "description": "Fetches all lookup values for a given active lookup table.\n\nPath variable:\n- tableName: The lookup table name (must follow pattern nec_lkp_<name>)\n\nCommon table names:\n  nec_lkp_gender\n  nec_lkp_roles\n  nec_lkp_payment_methods\n  nec_lkp_status\n  nec_lkp_contract_types\n  nec_lkp_contract_payment_types\n  nec_lkp_deployment_types\n  nec_lkp_deployment_status\n  nec_lkp_training_types\n  nec_lkp_certification_types\n\nResponse shape:\n{\n  \"success\": true,\n  \"message\": \"Lookup values retrieved successfully\",\n  \"data\": [\n    { \"id\": 1, \"code\": \"LKP001\", \"value\": \"Male\", \"description\": null, \"isActive\": 1, \"displayOrder\": 1 },\n    { \"id\": 2, \"code\": \"LKP002\", \"value\": \"Female\", \"description\": null, \"isActive\": 1, \"displayOrder\": 2 }\n  ]\n}"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Get Lookup Values by Table Name",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups/{{lookup_table_name}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups",
+                    "{{lookup_table_name}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 10:14:08 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup values retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"code\": \"MALE\",\n            \"value\": \"Male\",\n            \"description\": \"Male gender\",\n            \"isActive\": 1,\n            \"displayOrder\": 1\n        },\n        {\n            \"id\": 2,\n            \"code\": \"FEMALE\",\n            \"value\": \"Female\",\n            \"description\": \"Female gender\",\n            \"isActive\": 1,\n            \"displayOrder\": 2\n        }\n    ]\n}"
+            },
+            {
+              "name": "Get Lookup Values by Table Name",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups/{{lookup_table_name}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups",
+                    "{{lookup_table_name}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 10:14:24 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup values retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"code\": \"DRAFT\",\n            \"value\": \"Draft\",\n            \"description\": \"Temporary contract draft\",\n            \"isActive\": 1,\n            \"displayOrder\": 1\n        },\n        {\n            \"id\": 2,\n            \"code\": \"ACTIVE\",\n            \"value\": \"Active\",\n            \"description\": \"Temporary contract active\",\n            \"isActive\": 1,\n            \"displayOrder\": 2\n        },\n        {\n            \"id\": 3,\n            \"code\": \"COMPLETED\",\n            \"value\": \"Completed\",\n            \"description\": \"Temporary contract completed\",\n            \"isActive\": 1,\n            \"displayOrder\": 3\n        },\n        {\n            \"id\": 4,\n            \"code\": \"TERMINATED\",\n            \"value\": \"Terminated\",\n            \"description\": \"Temporary contract terminated\",\n            \"isActive\": 1,\n            \"displayOrder\": 4\n        },\n        {\n            \"id\": 5,\n            \"code\": \"EXPIRED\",\n            \"value\": \"Expired\",\n            \"description\": \"Temporary contract expired\",\n            \"isActive\": 1,\n            \"displayOrder\": 5\n        }\n    ]\n}"
+            },
+            {
+              "name": "Get Lookup Values by Table Name",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups/{{lookup_table_name}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups",
+                    "{{lookup_table_name}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 10:14:48 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup values retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"code\": \"HRM\",\n            \"value\": \"Human Resource Management\",\n            \"description\": \"Staff management, recruitment, training, per diem, contracts, leave, performance\",\n            \"isActive\": 1,\n            \"displayOrder\": 1\n        },\n        {\n            \"id\": 2,\n            \"code\": \"FINANCE\",\n            \"value\": \"Finance & PFM\",\n            \"description\": \"Budgeting, commitments, payments, bank management\",\n            \"isActive\": 1,\n            \"displayOrder\": 2\n        },\n        {\n            \"id\": 3,\n            \"code\": \"PROCUREMENT\",\n            \"value\": \"Procurement & Supply Chain\",\n            \"description\": \"Vendor management, tenders, purchase orders\",\n            \"isActive\": 1,\n            \"displayOrder\": 3\n        },\n        {\n            \"id\": 4,\n            \"code\": \"WAREHOUSE\",\n            \"value\": \"Warehouse & Inventory\",\n            \"description\": \"Goods receipt and stock management\",\n            \"isActive\": 1,\n            \"displayOrder\": 4\n        },\n        {\n            \"id\": 5,\n            \"code\": \"LOGISTICS\",\n            \"value\": \"Logistics & Fleet\",\n            \"description\": \"Dispatch planning and fleet tracking\",\n            \"isActive\": 1,\n            \"displayOrder\": 5\n        },\n        {\n            \"id\": 6,\n            \"code\": \"OPERATIONS\",\n            \"value\": \"Operations Management\",\n            \"description\": \"Operational plans and field coordination\",\n            \"isActive\": 1,\n            \"displayOrder\": 6\n        },\n        {\n            \"id\": 7,\n            \"code\": \"COMMS\",\n            \"value\": \"Communications & Complaints\",\n            \"description\": \"Complaint registration and escalation\",\n            \"isActive\": 1,\n            \"displayOrder\": 7\n        },\n        {\n            \"id\": 8,\n            \"code\": \"BULK_PAY\",\n            \"value\": \"Bulk Payments\",\n            \"description\": \"Mass payment processing\",\n            \"isActive\": 1,\n            \"displayOrder\": 8\n        },\n        {\n            \"id\": 9,\n            \"code\": \"REPORTING\",\n            \"value\": \"Reporting & Analytics\",\n            \"description\": \"Reports and dashboards\",\n            \"isActive\": 1,\n            \"displayOrder\": 9\n        },\n        {\n            \"id\": 10,\n            \"code\": \"RBAC\",\n            \"value\": \"RBAC – Access Control\",\n            \"description\": \"Users, roles, permissions\",\n            \"isActive\": 1,\n            \"displayOrder\": 10\n        },\n        {\n            \"id\": 11,\n            \"code\": \"WORKFLOW\",\n            \"value\": \"Approval Workflow Engine\",\n            \"description\": \"Approval routing and escalation\",\n            \"isActive\": 1,\n            \"displayOrder\": 11\n        },\n        {\n            \"id\": 12,\n            \"code\": \"MASTER_DATA\",\n            \"value\": \"Master Data Management\",\n            \"description\": \"Organizational data management\",\n            \"isActive\": 1,\n            \"displayOrder\": 12\n        },\n        {\n            \"id\": 13,\n            \"code\": \"CONFIG\",\n            \"value\": \"Configuration Management\",\n            \"description\": \"Business rules and thresholds\",\n            \"isActive\": 1,\n            \"displayOrder\": 13\n        },\n        {\n            \"id\": 14,\n            \"code\": \"AUDIT\",\n            \"value\": \"Audit & Compliance\",\n            \"description\": \"Audit logs and compliance reports\",\n            \"isActive\": 1,\n            \"displayOrder\": 14\n        },\n        {\n            \"id\": 15,\n            \"code\": \"DOC_MGMT\",\n            \"value\": \"Document Management\",\n            \"description\": \"Document repository and attachments\",\n            \"isActive\": 1,\n            \"displayOrder\": 15\n        },\n        {\n            \"id\": 16,\n            \"code\": \"NOTIFY\",\n            \"value\": \"Notification System\",\n            \"description\": \"Email and SMS notifications\",\n            \"isActive\": 1,\n            \"displayOrder\": 16\n        },\n        {\n            \"id\": 17,\n            \"code\": \"INTEGRATION\",\n            \"value\": \"Integration Layer\",\n            \"description\": \"API integrations\",\n            \"isActive\": 1,\n            \"displayOrder\": 17\n        },\n        {\n            \"id\": 18,\n            \"code\": \"DATA_IO\",\n            \"value\": \"Data Import / Export\",\n            \"description\": \"Bulk uploads and migrations\",\n            \"isActive\": 1,\n            \"displayOrder\": 18\n        },\n        {\n            \"id\": 19,\n            \"code\": \"RISK\",\n            \"value\": \"Risk Management\",\n            \"description\": \"Operational risk register\",\n            \"isActive\": 1,\n            \"displayOrder\": 19\n        },\n        {\n            \"id\": 20,\n            \"code\": \"QUESTIONNAIRE\",\n            \"value\": \"Questionnaire / Data Collect\",\n            \"description\": \"Questionnaire creation\",\n            \"isActive\": 1,\n            \"displayOrder\": 20\n        }\n    ]\n}"
+            }
+          ]
         },
         {
           "name": "Add Lookup Value",
@@ -137,7 +505,9 @@
                   "    }",
                   "}"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -157,7 +527,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tableName\": \"nec_lkp_gender\",\n  \"value\": \"Other\",\n  \"description\": \"Non-binary or unspecified gender\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+              "raw": "{\n  \"tableName\": \"nec_lkp_payment_methods\",\n  \"value\": \"Net Banking\",\n  \"description\": \"Net-banking\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -166,12 +536,221 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/lookups",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "lookups"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lookups"
+              ]
             },
             "description": "Creates a new lookup value in the specified table.\n\nLeave 'id' out (or set to null) to CREATE a new value.\n\nRequired fields:\n- tableName: Active lookup table (pattern: nec_lkp_<name>)\n- value: The display value (must be unique within the table)\n- isActive: 1 (active) or 0 (inactive)\n\nOptional:\n- description: Additional context\n- displayOrder: Integer for ordering (auto-assigned if omitted)\n\nA 'code' is automatically generated in the format LKPxxx."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Add Lookup Value",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tableName\": \"nec_lkp_genders\",\n  \"value\": \"Other\",\n  \"description\": \"Non-binary or unspecified gender\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 10:21:06 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup value created successfully\",\n    \"data\": {\n        \"id\": 3,\n        \"code\": \"LKP002\",\n        \"value\": \"Other\",\n        \"description\": \"Non-binary or unspecified gender\",\n        \"isActive\": 1,\n        \"displayOrder\": 3\n    }\n}"
+            },
+            {
+              "name": "Add Lookup Value",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tableName\": \"nec_lkp_payment_methods\",\n  \"value\": \"Net Banking\",\n  \"description\": \"Net-banking\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 10:25:03 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup value created successfully\",\n    \"data\": {\n        \"id\": 6,\n        \"code\": \"LKP003\",\n        \"value\": \"Net Banking\",\n        \"description\": \"Net-banking\",\n        \"isActive\": 1,\n        \"displayOrder\": 3\n    }\n}"
+            }
+          ]
         },
         {
           "name": "Edit Lookup Value",
@@ -194,7 +773,9 @@
                   "    pm.expect(jsonData.data).to.have.property(\"value\");",
                   "});"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -214,7 +795,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": {{lookup_value_id}},\n  \"tableName\": \"nec_lkp_gender\",\n  \"value\": \"Other (Updated)\",\n  \"description\": \"Updated description\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+              "raw": "{\n  \"id\": {{lookup_value_id}},\n  \"tableName\": \"nec_lkp_genders\",\n  \"value\": \"Male (Updated)\",\n  \"description\": \"Updated description\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -223,12 +804,120 @@
             },
             "url": {
               "raw": "{{base_url}}/api/v1/lookups",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "lookups"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lookups"
+              ]
             },
             "description": "Edits an existing lookup value. Provide 'id' to UPDATE.\n\nRequired fields:\n- id: The ID of the lookup value to update\n- tableName: The lookup table name the value belongs to\n- value: The updated display value (must be unique within the table)\n- isActive: 1 (active) or 0 (inactive)\n\nOptional:\n- description: Updated description\n- displayOrder: Updated display order"
           },
-          "response": []
+          "response": [
+            {
+              "name": "Edit Lookup Value",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": {{lookup_value_id}},\n  \"tableName\": \"nec_lkp_genders\",\n  \"value\": \"Male (Updated)\",\n  \"description\": \"Updated description\",\n  \"isActive\": 1,\n  \"displayOrder\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/lookups",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "lookups"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 16 Jun 2026 10:28:11 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Lookup value updated successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"code\": \"MALE\",\n        \"value\": \"Male (Updated)\",\n        \"description\": \"Updated description\",\n        \"isActive\": 1,\n        \"displayOrder\": 3\n    }\n}"
+            }
+          ]
         }
       ],
       "description": "All endpoints for managing Lookup tables and their values. The same POST /api/v1/lookups endpoint handles both Add (id=null) and Edit (id=non-null) operations."

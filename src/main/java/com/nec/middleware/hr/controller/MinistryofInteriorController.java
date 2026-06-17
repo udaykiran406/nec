@@ -13,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Tag(
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
         description = "Ministry of Interior Management APIs"
 )
 @RestController
-@RequestMapping("/api/hr/ministry-of-interior")
+@RequestMapping("/api/v1/hr/ministry-of-interior")
 @RequiredArgsConstructor
 public class MinistryofInteriorController {
 
@@ -30,12 +32,14 @@ public class MinistryofInteriorController {
 
     // ------------------------------------------------------------------ SAVE
 
-    @Operation(summary = "Create Ministry of Interior")
-    @PostMapping("/save")
+    @Operation(summary = "Create Ministry of Interior",
+            description = "multipart/form-data: 'requestDto' part is the JSON payload, 'photo' part is the image file (jpg/jpeg/png/webp, max 5MB).")
+    @PostMapping(value= "/save", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<MinistryofInteriorResponseDto>> createMinistryofInterior(
-            @Valid @RequestBody MinistryofInteriorRequestDto requestDto) {
+            @Valid @ModelAttribute MinistryofInteriorRequestDto requestDto,
+            @RequestParam("photo") MultipartFile photo) {
 
-        MinistryofInteriorResponseDto response = ministryofInteriorService.saveMinistryofInterior(requestDto);
+        MinistryofInteriorResponseDto response = ministryofInteriorService.saveMinistryofInterior(requestDto, photo);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
                         MinistryofInteriorConstants.MINISTRY_OF_INTERIOR_CREATED,
@@ -44,18 +48,21 @@ public class MinistryofInteriorController {
 
     // ------------------------------------------------------------------ UPDATE
 
-    @Operation(summary = "Update Ministry of Interior")
-    @PatchMapping("/{ministryofInteriorId}")
+    @Operation(summary = "Update Ministry of Interior",
+            description = "multipart/form-data: flat fields + optional photo")
+    @PatchMapping(value="/{ministryofInteriorId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<MinistryofInteriorResponseDto>> updateMinistryofInterior(
             @PathVariable String ministryofInteriorId,
-            @Valid @RequestBody MinistryofInteriorRequestDto requestDto) {
+            @Valid @ModelAttribute MinistryofInteriorRequestDto requestDto,
+            @RequestParam (value = "photo", required = false) MultipartFile photo) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         MinistryofInteriorConstants.MINISTRY_OF_INTERIOR_UPDATED,
                         ministryofInteriorService.updateMinistryofInterior(
                                 ministryofInteriorId,
-                                requestDto)));
+                                requestDto,
+                                photo)));
     }
 
     // ------------------------------------------------------------------ GET BY ID

@@ -14,6 +14,7 @@ import com.nec.middleware.hr.mapper.UniversityTraineeMapper;
 import com.nec.middleware.hr.repository.UniversityTraineeRepository;
 import com.nec.middleware.hr.service.UniversityTraineeService;
 import com.nec.middleware.hr.specification.UniversityTraineeSearchSpecification;
+import com.nec.middleware.hr.util.FileStorageUtil;
 import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.repository.CityRepository;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Year;
 
@@ -49,11 +51,14 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
     private final DistrictRepository districtRepository;
     private final CityRepository cityRepository;
 
+    private final FileStorageUtil fileStorageUtil;
+    private static final String PHOTO_SUB_FOLDER = "university-trainees";
+
     // ------------------------------------------------------------------ CREATE
     @Override
     @Transactional
     public UniversityTraineeResponseDto createTrainee(
-            UniversityTraineeRequestDto requestDto) {
+            UniversityTraineeRequestDto requestDto, MultipartFile photo) {
 
         log.info("Creating university trainee");
 
@@ -104,6 +109,15 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
                 generateUniversityTraineeNumber()
         );
 
+        // store photo AFTER portalUserId is generated
+        String storedPhotoPath = fileStorageUtil.storePhoto(
+                photo,
+                PHOTO_SUB_FOLDER,
+                universityTraineeEntity.getUniversityTraineeId()
+        );
+        universityTraineeEntity.setPhotoPath(storedPhotoPath);
+
+
         UniversityTrainee savedEntity = universityTraineerepository.save(universityTraineeEntity);
 
         return universityTraineeMapper.toResponseDto(savedEntity);
@@ -114,7 +128,7 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
     @Transactional
     public UniversityTraineeResponseDto updateTrainee(
             String universityTraineeId,
-            UniversityTraineeRequestDto requestDto) {
+            UniversityTraineeRequestDto requestDto,MultipartFile photo) {
 
         log.info("Updating university trainee id: {}", universityTraineeId);
 
@@ -123,6 +137,20 @@ public class UniversityTraineeServiceImpl implements UniversityTraineeService {
 
         universityTraineeMapper.updateUniversityTraineeEntity(universityTrainee, requestDto);
         validateTraineeForUpdate(requestDto, universityTrainee.getId());
+
+        if (photo != null && !photo.isEmpty()) {
+
+            fileStorageUtil.deleteIfExists(universityTrainee.getPhotoPath());
+
+            String newPhotoPath = fileStorageUtil.storePhoto(
+                   photo,
+                    PHOTO_SUB_FOLDER,
+                    universityTrainee.getUniversityTraineeId()
+            );
+
+            universityTrainee.setPhotoPath(newPhotoPath);
+        }
+
         if (requestDto.getGenderId() != null) {
             universityTrainee.setGender(
                     genderRepository.findById(requestDto.getGenderId())

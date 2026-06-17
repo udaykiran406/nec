@@ -18,7 +18,7 @@ public class MinistryofInteriorResponseDto {
     private Short age;
     private String phone;
     private String email;
-    private String photoUrl;
+    private String photoPath;
     // ------------------------------------------------------------------ Lookups → IdValueDto
     private IdValueDto moiTitle;;
     private IdValueDto gender;

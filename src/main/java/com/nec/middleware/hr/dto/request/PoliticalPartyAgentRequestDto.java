@@ -33,8 +33,9 @@ public class PoliticalPartyAgentRequestDto {
     @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
 
-    @Size(max = 500, message = "Photo URL must not exceed 500 characters")
-    private String photoUrl;
+    // Populated by the service layer after storing the uploaded multipart file.
+    // Not settable by the client directly (no @Size/manual-entry validation needed).
+    private String photoPath;
 
     @NotNull(message = "Polling station is required")
     private Long pollingStationId;

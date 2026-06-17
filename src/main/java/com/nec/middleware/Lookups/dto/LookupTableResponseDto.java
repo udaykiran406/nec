@@ -15,5 +15,7 @@ public class LookupTableResponseDto {
 
     private String tableName;
 
+    private String displayName;
+
     private Integer isActive;
 }

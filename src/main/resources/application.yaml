@@ -91,7 +91,8 @@ admin:
 file:
   # Upload directory used by the Document Upload API (com.emis.sms.uploads)
   # Windows local path – sub-folders are created automatically on first upload
-  upload-dir: C:/Users/hp/Downloads/emis-uploads
+  upload:
+    base-dir: C:/nec-uploads
 
 # ── OFBiz connection ──────────────────────────────────────────────────────────
   ofbiz:
