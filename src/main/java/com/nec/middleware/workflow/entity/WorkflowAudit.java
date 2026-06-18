@@ -1,6 +1,5 @@
 package com.nec.middleware.workflow.entity;
 
-import com.nec.middleware.hr.entity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -57,6 +56,11 @@ public class WorkflowAudit {
     private String actionBy;
     @Column(name = "requested_by")
     private String requestedBy;
+
+    @Column(name = "requested_role")
+    private String requesterRole;
     @Column(name = "action_date")
     private LocalDateTime actionDate;
+    @Column(name = "revision_no")
+    private Integer revisionNo;
 }

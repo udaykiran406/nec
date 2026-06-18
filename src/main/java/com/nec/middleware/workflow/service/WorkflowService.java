@@ -1,16 +1,16 @@
 package com.nec.middleware.workflow.service;
 
 import com.nec.middleware.constants.Constants;
-import com.nec.middleware.dto.IdValueDto;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.hr.repository.TemporaryContractRepository;
 import com.nec.middleware.masterdata.entity.ApprovalWorkflowLevel;
 import com.nec.middleware.masterdata.repository.ApprovalWorkflowLevelRepository;
 import com.nec.middleware.workflow.Enum.WorkflowAction;
 import com.nec.middleware.workflow.dto.request.WorkflowActionRequestDto;
-import com.nec.middleware.workflow.dto.response.ApprovalLevelStatusDto;
 import com.nec.middleware.workflow.dto.response.WorkflowInboxDto;
 import com.nec.middleware.workflow.entity.WorkflowAudit;
+import com.nec.middleware.workflow.factory.WorkflowEntityFactory;
+import com.nec.middleware.workflow.factory.WorkflowEntityService;
 import com.nec.middleware.workflow.factory.WorkflowModuleFactory;
 import com.nec.middleware.workflow.factory.WorkflowModuleHandler;
 import com.nec.middleware.workflow.repository.WorkflowAuditRepository;
@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,32 +45,29 @@ public class WorkflowService {
 
     private final ApprovalWorkflowLevelRepository approvalWorkflowLevelRepository;
 
-    private final  WorkflowAuditRepository workflowAuditRepository;
+    private final WorkflowAuditRepository workflowAuditRepository;
 
     private final WorkflowModuleFactory workflowModuleFactory;
+    private final WorkflowEntityFactory workflowEntityFactory;
+    private static final String loggedInUser = "admin";
 
-    private static final String loggedInUser="admin";
-
-    public String startApprovalWorkflow(ApprovalWorkflowLevel approverLevel, String entityId, String moduleName, String requestedBy) {
+    public String startApprovalWorkflow(ApprovalWorkflowLevel approverLevel, String entityId, String moduleName, String requestedBy, String requesterRole) {
 
         Map<String, Object> variables = new HashMap<>();
 
-        variables.put("currentApprovalLevel",approverLevel.getLevelOrder());
-        variables.put("approvalRole",approverLevel.getApprovalRole());
-        variables.put("currentApproval",approverLevel.getApprovalRole());
-        variables.put("moduleName",moduleName);
-        variables.put("entityId",entityId);
-        variables.put("requestBy",requestedBy);
-
-        ProcessInstance processInstance =
-                runtimeService.startProcessInstanceByKey(
-                        "approvalWorkflow",
-                        variables);
+        variables.put("currentApprovalLevel", approverLevel.getLevelOrder());
+        variables.put("approvalRole", approverLevel.getApprovalRole());
+        variables.put("currentApproval", approverLevel.getApprovalRole());
+        variables.put("moduleName", moduleName);
+        variables.put("entityId", entityId);
+        variables.put("requestedBy", requestedBy);
+        variables.put("requestedRole", requesterRole);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approvalWorkflow", variables);
 
         return processInstance.getProcessInstanceId();
     }
 
-    public void createWorkflowAuditRecords(String entityId, String moduleName, String processInstanceId, String createdBy) {
+    public void createWorkflowAuditRecords(String entityId, String moduleName, String processInstanceId, String createdBy, String requesterRole) {
 
         List<ApprovalWorkflowLevel> levels = approvalWorkflowLevelRepository.findByModuleNameOrderByLevelOrder(moduleName);
 
@@ -85,6 +81,8 @@ public class WorkflowService {
                             .approvalLevel(level.getLevelOrder())
                             .approvalRole(level.getApprovalRole())
                             .requestedBy(createdBy)
+                            .requesterRole(requesterRole)
+                            .revisionNo(1)
                             .action(
                                     level.getLevelOrder() == 1
                                             ? Constants.WORKFLOW_PENDING_STATUS
@@ -96,9 +94,9 @@ public class WorkflowService {
     }
 
     @Transactional(readOnly = true)
-    public Object getWorkflowDetails(String moduleName,String entityId) {
+    public Object getWorkflowDetails(String moduleName, String entityId) {
 
-        WorkflowModuleHandler handler =workflowModuleFactory.getHandler(moduleName);
+        WorkflowModuleHandler handler = workflowModuleFactory.getHandler(moduleName);
 
         if (handler == null) {
             throw new ResourceNotFoundException("Workflow handler not found");
@@ -114,6 +112,10 @@ public class WorkflowService {
                 taskService.createTaskQuery()
                         .taskId(workflowActionRequestDto.getTaskId())
                         .singleResult();
+        if (task == null) {
+            throw new ResourceNotFoundException(
+                    "Task not found");
+        }
         String entityId =
                 (String) runtimeService.getVariable(
                         task.getExecutionId(),
@@ -129,38 +131,86 @@ public class WorkflowService {
                         task.getExecutionId(),
                         "currentApprovalLevel");
 
-        if (task == null) {
-            throw new ResourceNotFoundException(
-                    "Task not found");
-        }
-
-        Map<String, Object> variables =
-                new HashMap<>();
-
+        Map<String, Object> variables = new HashMap<>();
         boolean approved =
                 workflowActionRequestDto.getAction() ==
                         WorkflowAction.APPROVE;
 
-        variables.put("approved",approved);
+        variables.put("approved", approved);
+        variables.put("actionBy", loggedInUser);
+        variables.put("remarks", workflowActionRequestDto.getRemarks());
 
-//        variables.put(
-//                "actionBy",
-//                SecurityContextHolder
-//                        .getContext()
-//                        .getAuthentication()
-//                        .getName());
-        variables.put("actionBy",loggedInUser);
-        updateAuditEntity(moduleName,entityId,currentLevel,workflowActionRequestDto.getRemarks(),loggedInUser);
-        taskService.complete(
-                task.getId(),
-                variables);
+        if (approved) {
+            updateApprovedAudit(moduleName, entityId, currentLevel,
+                    workflowActionRequestDto.getRemarks(), loggedInUser);
+
+        } else if (workflowActionRequestDto.getAction() ==
+                WorkflowAction.REJECT) {
+            updateRejectedAudit(moduleName, entityId, currentLevel,
+                    workflowActionRequestDto.getRemarks(),
+                    loggedInUser);
+        } else {
+
+            variables.put("resubmitted", workflowActionRequestDto.getAction() ==
+                    WorkflowAction.RESUBMIT);
+        }
+        taskService.complete(task.getId(), variables);
     }
+
     @Transactional(readOnly = true)
-    public Page<WorkflowInboxDto> getInbox( String role,int page,int size) {
+    public Page<WorkflowInboxDto> getRejectedWorkflowsByRequesterRole(String role, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<WorkflowAudit> auditPage =
+                workflowAuditRepository
+                        .findRejectedForRequesterRole(
+                                role,
+                                pageable);
+
+        List<String> processInstanceIds =
+                auditPage.getContent()
+                        .stream()
+                        .map(WorkflowAudit::getProcessInstanceId)
+                        .distinct()
+                        .toList();
+
+        Map<String, String> taskMap;
+
+        if (!processInstanceIds.isEmpty()) {
+
+            List<Task> tasks =
+                    taskService.createTaskQuery()
+                            .processInstanceIdIn(processInstanceIds)
+                            .active()
+                            .list();
+
+            taskMap =
+                    tasks.stream()
+                            .collect(Collectors.toMap(
+                                    Task::getProcessInstanceId,
+                                    Task::getId,
+                                    (existing, replacement) -> existing));
+        } else {
+
+            taskMap = Collections.emptyMap();
+        }
+
+        Map<String, String> finalTaskMap = taskMap;
+
+        return auditPage.map(audit ->
+                buildRejectedDto(
+                        audit,
+                        finalTaskMap.get(
+                                audit.getProcessInstanceId())));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<WorkflowInboxDto> getInbox(String role, int page, int size) {
 
         Pageable pageable =
                 PageRequest.of(page, size, Sort.by(
-                        Sort.Direction.DESC,
+                        Sort.Direction.ASC,
                         "createdAt"));
 
         Page<WorkflowAudit> auditPage =
@@ -185,30 +235,18 @@ public class WorkflowService {
                             .active()
                             .list();
 
-            taskMap =
-                    tasks.stream()
-                            .collect(Collectors.toMap(
-                                    Task::getProcessInstanceId,
-                                    Task::getId));
+            taskMap = tasks.stream().collect(Collectors.toMap(Task::getProcessInstanceId, Task::getId));
         } else {
             taskMap = Collections.emptyMap();
         }
-
         Map<String, String> finalTaskMap = taskMap;
-        return auditPage.map(audit ->
-                buildInboxDto(
-                        audit,
-                        finalTaskMap.get(
-                                audit.getProcessInstanceId())));
+        return auditPage.map(audit -> buildInboxDto(audit, finalTaskMap.get(audit.getProcessInstanceId())));
     }
 
-
-    public void updateAuditEntity(String moduleName,String entityId,Integer currentLevel, String remarks,String loggedInUser){
+    @Transactional
+    public void updateApprovedAudit(String moduleName, String entityId, Integer currentLevel, String remarks, String loggedInUser) {
         List<WorkflowAudit> currentAudit =
-                workflowAuditRepository
-                        .findByModuleNameAndEntityId(
-                                moduleName,
-                                entityId);
+                workflowAuditRepository.findLatestRevisionAudits(moduleName, entityId);
         WorkflowAudit currentLevelRecord =
                 currentAudit.stream()
                         .filter(a ->
@@ -232,34 +270,51 @@ public class WorkflowService {
         workflowAuditRepository.saveAll(currentAudit);
     }
 
+    @Transactional
+    public void updateRejectedAudit(String moduleName, String entityId, Integer currentLevel, String remarks, String loggedInUser) {
 
-    private WorkflowInboxDto buildInboxDto(WorkflowAudit audit,String taskId) {
+        List<WorkflowAudit> audits =
+                workflowAuditRepository.findLatestRevisionAudits(moduleName, entityId);
+        WorkflowAudit current = audits.stream().filter(a -> a.getApprovalLevel().equals(currentLevel)).findFirst().orElseThrow();
+        current.setAction(
+                Constants.WORKFLOW_REJECTED_STATUS);
+        current.setRemarks(remarks);
+        current.setActionBy(loggedInUser);
+        current.setActionDate(LocalDateTime.now());
+        workflowAuditRepository.save(current);
+        WorkflowEntityService entityService =
+                workflowEntityFactory.getService(
+                        moduleName);
+        entityService.markRejected(entityId, remarks);
+    }
+
+    private WorkflowInboxDto buildInboxDto(WorkflowAudit audit, String taskId) {
 
         return WorkflowInboxDto.builder()
-                .createdDateTime(
-                        audit.getCreatedAt())
+                .createdDateTime(audit.getCreatedAt())
                 .taskId(taskId)
-                .entityId(
-                        audit.getEntityId())
-                .moduleName(
-                        audit.getModuleName())
+                .entityId(audit.getEntityId())
+                .moduleName(audit.getModuleName())
                 .requestedBy(audit.getRequestedBy())
-                .processInstanceId(
-                        audit.getProcessInstanceId())
+                .processInstanceId(audit.getProcessInstanceId())
                 .status(audit.getAction())
-                .currentApprovalRole(
-                        audit.getApprovalRole())
+                .currentApprovalRole(audit.getApprovalRole())
                 .build();
     }
 
-//    public void processApproval(WorkflowRequestDto request) {
-//
-//        Map<String, Object> variables = new HashMap<>();
-//
-//        variables.put("approved",request.getApproved());
-//
-//        taskService.complete(request.getTaskId(),variables);
-//    }
+    private WorkflowInboxDto buildRejectedDto(WorkflowAudit audit, String taskId) {
+
+        return WorkflowInboxDto.builder()
+                .entityId(audit.getEntityId())
+                .taskId(taskId)
+                .moduleName(audit.getModuleName())
+                .processInstanceId(audit.getProcessInstanceId())
+                .requestedBy(audit.getRequestedBy())
+                .status(audit.getAction())
+                .currentApprovalRole(audit.getApprovalRole())
+                .createdDateTime(audit.getCreatedAt())
+                .build();
+    }
 
     public void approveTask(String taskId) {
 
@@ -267,9 +322,6 @@ public class WorkflowService {
     }
 
     public long activeWorkFlowCount() {
-        return runtimeService
-                .createProcessInstanceQuery()
-                .active()
-                .count();
+        return runtimeService.createProcessInstanceQuery().active().count();
     }
 }

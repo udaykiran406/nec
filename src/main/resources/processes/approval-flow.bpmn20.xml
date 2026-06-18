@@ -9,51 +9,143 @@
              name="Approval Workflow"
              isExecutable="true">
 
+        <!-- Start -->
+
         <startEvent id="startEvent"/>
 
         <sequenceFlow id="flow1"
                       sourceRef="startEvent"
                       targetRef="approvalTask"/>
 
+        <!-- Approval Task -->
+
         <userTask id="approvalTask"
                   name="${currentApproval}"
-                  flowable:candidateGroups="${approvalRole}" />
+                  flowable:candidateGroups="${approvalRole}"/>
 
         <sequenceFlow id="flow2"
                       sourceRef="approvalTask"
-                      targetRef="checkNextLevel"/>
+                      targetRef="approvalDecision"/>
+
+        <!-- Approve / Reject -->
+
+        <exclusiveGateway id="approvalDecision"/>
+
+        <!-- APPROVE -->
+
+        <sequenceFlow id="approveFlow"
+                      sourceRef="approvalDecision"
+                      targetRef="checkNextLevel">
+
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
+                ${approved == true}
+            ]]></conditionExpression>
+
+        </sequenceFlow>
+
+        <!-- REJECT -->
+
+        <sequenceFlow id="rejectFlow"
+                      sourceRef="approvalDecision"
+                      targetRef="requesterTask">
+
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
+                ${approved == false}
+            ]]></conditionExpression>
+
+        </sequenceFlow>
+
+        <!-- Check Next Level -->
 
         <serviceTask id="checkNextLevel"
                      name="Check Next Approval Level"
-                     flowable:delegateExpression="${approvalLevelDelegate}" />
+                     flowable:delegateExpression="${approvalLevelDelegate}"/>
 
         <sequenceFlow id="flow3"
                       sourceRef="checkNextLevel"
                       targetRef="hasNextLevelGateway"/>
 
+        <!-- Has Next Level -->
+
         <exclusiveGateway id="hasNextLevelGateway"/>
+
+        <!-- Next Level Exists -->
 
         <sequenceFlow id="flow4"
                       sourceRef="hasNextLevelGateway"
                       targetRef="approvalTask">
 
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[${hasNextLevel == true}]]>
-            </conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
+                ${hasNextLevel == true}
+            ]]></conditionExpression>
 
         </sequenceFlow>
+
+        <!-- Final Approval -->
 
         <sequenceFlow id="flow5"
                       sourceRef="hasNextLevelGateway"
                       targetRef="approvedEnd">
 
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[${hasNextLevel == false}]]>
-            </conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
+                ${hasNextLevel == false}
+            ]]></conditionExpression>
 
         </sequenceFlow>
 
+        <!-- Requester Correction -->
+
+        <userTask id="requesterTask"
+                  name="Requester Correction"
+                  flowable:candidateGroups="${requestedRole}"/>
+
+        <sequenceFlow id="flow6"
+                      sourceRef="requesterTask"
+                      targetRef="resubmitGateway"/>
+
+        <!-- Resubmit Decision -->
+
+        <exclusiveGateway id="resubmitGateway"/>
+
+        <!-- RESUBMIT -->
+
+        <sequenceFlow id="resubmitFlow"
+                      sourceRef="resubmitGateway"
+                      targetRef="resubmissionTask">
+
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
+                ${resubmitted == true}
+            ]]></conditionExpression>
+
+        </sequenceFlow>
+
+        <!-- CANCEL -->
+
+        <sequenceFlow id="cancelFlow"
+                      sourceRef="resubmitGateway"
+                      targetRef="rejectedEnd">
+
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
+                ${resubmitted == false}
+            ]]></conditionExpression>
+
+        </sequenceFlow>
+
+        <!-- Resubmission Delegate -->
+
+        <serviceTask id="resubmissionTask"
+                     name="Prepare Resubmission"
+                     flowable:delegateExpression="${resubmissionDelegate}"/>
+
+        <sequenceFlow id="flow7"
+                      sourceRef="resubmissionTask"
+                      targetRef="approvalTask"/>
+
+        <!-- End Events -->
+
         <endEvent id="approvedEnd"/>
+
+        <endEvent id="rejectedEnd"/>
 
     </process>
 

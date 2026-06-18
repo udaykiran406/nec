@@ -1,5 +1,6 @@
 package com.nec.middleware.workflow.service;
 
+import com.nec.middleware.constants.Constants;
 import com.nec.middleware.masterdata.entity.ApprovalWorkflowLevel;
 import com.nec.middleware.masterdata.repository.ApprovalWorkflowLevelRepository;
 import com.nec.middleware.workflow.dto.response.ApprovalLevelStatusDto;
@@ -28,7 +29,7 @@ public class WorkflowAuditService {
 
         List<WorkflowAudit> auditRecords =
                 workflowAuditRepository
-                        .findByModuleNameAndEntityIdOrderByApprovalLevel(
+                        .findLatestRevisionAudits(
                                 moduleName,
                                 entityId);
 
@@ -40,12 +41,15 @@ public class WorkflowAuditService {
 
         return approvalLevels.stream()
                 .map(level -> {
+
                     WorkflowAudit audit =
                             auditMap.get(level.getLevelOrder());
 
                     if (audit != null) {
 
                         return ApprovalLevelStatusDto.builder()
+                                .createdDate(
+                                        audit.getCreatedAt())
                                 .approvalLevel(
                                         level.getLevelOrder())
                                 .approvalRole(
@@ -66,7 +70,8 @@ public class WorkflowAuditService {
                                     level.getLevelOrder())
                             .approvalRole(
                                     level.getApprovalRole())
-                            .status("PENDING")
+                            .status(
+                                    Constants.WORKFLOW_NOT_STARTED_STATUS)
                             .build();
                 })
                 .toList();

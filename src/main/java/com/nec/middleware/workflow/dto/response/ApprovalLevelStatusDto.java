@@ -17,6 +17,7 @@ public class ApprovalLevelStatusDto {
 
     private String status;
 
+    private LocalDateTime createdDate;
     private String actionBy;
 
     private LocalDateTime actionDate;
