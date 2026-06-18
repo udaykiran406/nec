@@ -15,6 +15,8 @@ public interface TrainingScheduleRepository
 
     Optional<TrainingSchedule> findByScheduleCode(String scheduleCode);
 
+    Optional<TrainingSchedule> findByTrainingClassId(Long trainingClassId);
+
     @Query("""
         SELECT COALESCE(
             MAX(CAST(SUBSTRING(t.scheduleCode, 3) AS int)),

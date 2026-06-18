@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "NEC - Training Trainee Allocation API",
+    "_postman_id": "nec-training-trainee-allocation-collection",
+    "description": "Training Trainee Allocation API endpoints for NEC Middleware.\n\nBase URL: http://localhost:8080/nec\nClass-level path: /api/hr/trainingTraineeAllocation\n\nResponse wrapper:\n{\n  \"status\": 200 | 201,\n  \"message\": \"...\",\n  \"data\": { ... }\n}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/nec",
+      "type": "string"
+    },
+    {
+      "key": "allocationCode",
+      "value": "TA-001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Allocation",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/hr/trainingTraineeAllocation",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "hr", "trainingTraineeAllocation"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"traineeId\": 1,\n  \"trainingClassId\": 1,\n  \"allocationDate\": \"2026-06-18\",\n  \"statusId\": 1,\n  \"notes\": \"Allocated for batch training session.\",\n  \"createdBy\": \"admin\",\n  \"updatedBy\": null\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Creates a new training trainee allocation.\n\nReturns HTTP 201 on success.\n\nRequest body fields:\n- traineeId: Long (required)\n- trainingClassId: Long (required)\n- allocationDate: LocalDate (required) — format: YYYY-MM-DD\n- statusId: Long (required)\n- notes: String (optional, max 1000 chars)\n- createdBy: String\n- updatedBy: String"
+      }
+    },
+    {
+      "name": "Update Allocation",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/hr/trainingTraineeAllocation/{{allocationCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "hr", "trainingTraineeAllocation", "{{allocationCode}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"traineeId\": 1,\n  \"trainingClassId\": 1,\n  \"allocationDate\": \"2026-06-18\",\n  \"statusId\": 2,\n  \"notes\": \"Updated allocation notes.\",\n  \"createdBy\": \"admin\",\n  \"updatedBy\": \"admin\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Updates an existing training trainee allocation by its allocation code.\n\nPath variable:\n- allocationCode: String (e.g. TA-001)\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Get Allocation By Code",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/hr/trainingTraineeAllocation/{{allocationCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "hr", "trainingTraineeAllocation", "{{allocationCode}}"]
+        },
+        "description": "Fetches a single training trainee allocation by its allocation code.\n\nPath variable:\n- allocationCode: String (e.g. TA-001)\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Get All Allocations (Paginated + Filtered)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/hr/trainingTraineeAllocation/getAllTrainingTraineeAllocations?page=0&size=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "hr", "trainingTraineeAllocation", "getAllTrainingTraineeAllocations"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "10" }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"allocationCode\": null,\n  \"traineeId\": null,\n  \"universityId\": null,\n  \"regionId\": null,\n  \"trainingClassId\": null,\n  \"trainingTypeId\": null,\n  \"statusId\": null,\n  \"isActive\": null\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Returns a paginated list of training trainee allocations with optional filters.\n\nQuery params:\n- page: int (default 0)\n- size: int (default 10)\n\nRequest body (all fields optional — send {} or null to get all):\n- allocationCode: String\n- traineeId: Long\n- universityId: Long\n- regionId: Long\n- trainingClassId: Long\n- trainingTypeId: Long\n- statusId: Long\n- isActive: Boolean"
+      }
+    },
+    {
+      "name": "Change Allocation Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/hr/trainingTraineeAllocation/{{allocationCode}}/status?isActive=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "hr", "trainingTraineeAllocation", "{{allocationCode}}", "status"],
+          "query": [
+            { "key": "isActive", "value": "true" }
+          ]
+        },
+        "description": "Activates or deactivates a training trainee allocation.\n\nPath variable:\n- allocationCode: String (e.g. TA-001)\n\nQuery param:\n- isActive: Boolean (required) — true to activate, false to deactivate\n\nReturns HTTP 200 on success."
+      }
+    }
+  ]
+}

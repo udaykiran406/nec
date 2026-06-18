@@ -1,0 +1,105 @@
+{
+  "info": {
+    "name": "NEC - Training Attendance API",
+    "_postman_id": "nec-training-attendance-collection",
+    "description": "Training Attendance API endpoints for NEC Middleware.\n\nBase URL: http://localhost:8080/nec\nClass-level path: /api/training/attendance\n\nNOTE: The Create Attendance endpoint uses multipart/form-data (not JSON body).\nMax file size: 20MB, Max request size: 50MB.\n\nResponse wrapper:\n{\n  \"status\": 200 | 201,\n  \"message\": \"...\",\n  \"data\": { ... }\n}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/nec",
+      "type": "string"
+    },
+    {
+      "key": "attendanceId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Attendance",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/attendance/create",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "attendance", "create"]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "trainingClassId",
+              "value": "1",
+              "description": "Long (required) — ID of the training class",
+              "type": "text"
+            },
+            {
+              "key": "attendanceDate",
+              "value": "2026-06-18",
+              "description": "LocalDate (required) — format: YYYY-MM-DD",
+              "type": "text"
+            },
+            {
+              "key": "attendanceRecords",
+              "value": "[{\"universityTraineeId\": 1, \"isPresent\": true}, {\"universityTraineeId\": 2, \"isPresent\": false}]",
+              "description": "String (required) — JSON array of attendance records. Each item: { universityTraineeId: Long, isPresent: Boolean }",
+              "type": "text"
+            },
+            {
+              "key": "signedSheet",
+              "value": "",
+              "description": "File (optional) — Signed attendance sheet (max 20MB). Leave empty if not uploading.",
+              "type": "file",
+              "disabled": true
+            }
+          ]
+        },
+        "description": "Creates a new training attendance record.\n\nThis endpoint uses multipart/form-data (NOT JSON body).\n\nForm fields:\n- trainingClassId: Long (required)\n- attendanceDate: LocalDate (required) — format YYYY-MM-DD\n- attendanceRecords: String (required) — JSON array string, e.g.:\n  [{\"universityTraineeId\": 1, \"isPresent\": true}, {\"universityTraineeId\": 2, \"isPresent\": false}]\n- signedSheet: MultipartFile (optional) — PDF/image of signed sheet, max 20MB\n\nReturns HTTP 201 on success."
+      }
+    },
+    {
+      "name": "Get All Attendance (Paginated + Filtered)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/attendance/getAllTrainingAttendance?page=0&size=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "attendance", "getAllTrainingAttendance"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "10" }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"trainingClassId\": null,\n  \"traineeId\": null,\n  \"fromDate\": null,\n  \"toDate\": null,\n  \"isPresent\": null,\n  \"isActive\": null\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Returns a paginated list of training attendance records, sorted by createdAt DESC.\n\nQuery params:\n- page: int (default 0)\n- size: int (default 10)\n\nRequest body (all fields optional — send {} or null to get all):\n- trainingClassId: Long\n- traineeId: Long\n- fromDate: LocalDate (format: YYYY-MM-DD)\n- toDate: LocalDate (format: YYYY-MM-DD)\n- isPresent: Boolean\n- isActive: Boolean\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Change Attendance Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/attendance/status/{{attendanceId}}?isActive=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "attendance", "status", "{{attendanceId}}"],
+          "query": [
+            { "key": "isActive", "value": "true" }
+          ]
+        },
+        "description": "Activates or deactivates a training attendance record by its numeric DB ID.\n\nPath variable:\n- id: Long — the attendance record's database ID\n\nQuery param:\n- isActive: Boolean (required) — true to activate, false to deactivate\n\nReturns HTTP 200 on success."
+      }
+    }
+  ]
+}

@@ -26,6 +26,10 @@ public interface TrainingTraineeAllocationRepository
             Long traineeId,
             Long id);
 
+    boolean existsByTrainingClassIdAndTraineeIdAndIsActiveTrue(
+            Long trainingClassId,
+            Long traineeId);
+
     @Query("""
         SELECT COALESCE(
             MAX(CAST(SUBSTRING(a.allocationCode, 3) AS int)),
