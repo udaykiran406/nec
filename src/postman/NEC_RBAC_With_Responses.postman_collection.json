@@ -1,0 +1,4336 @@
+{
+  "info": {
+    "_postman_id": "nec-rbac-api-with-responses",
+    "name": "NEC RBAC Complete API Collection - With Responses",
+    "description": "NEC Middleware REST API aligned with Spring controllers.\n\n**Endpoints follow REST conventions:** POST to create, PUT /{id} to update.\n\n**Sample values** match V000 seed data (gender/department/region/district/city id=1). Run **Create Role** before **Create User**, then **Login**, then **Get User Context**.\n\n`accessToken`, `refreshToken`, and `userId` are auto-captured from Login / Create User / Get User Context responses. `{{userContext}}` holds the full user-context JSON.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081/nec",
+      "type": "string",
+      "description": "API root"
+    },
+    {
+      "key": "loginEmail",
+      "value": "john.doe@nec.go.tz",
+      "type": "string",
+      "description": "Login email"
+    },
+    {
+      "key": "userEmail",
+      "value": "john.doe@nec.go.tz",
+      "type": "string",
+      "description": "User create/update email"
+    },
+    {
+      "key": "userName",
+      "value": "John Doe",
+      "type": "string",
+      "description": "Display name"
+    },
+    {
+      "key": "phoneNumber",
+      "value": "+255700000001",
+      "type": "string",
+      "description": "E.164 phone"
+    },
+    {
+      "key": "password",
+      "value": "Pass@1234",
+      "type": "string",
+      "description": "Login + user-create password"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "Auto-set by Login test script"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string",
+      "description": "Auto-set by Login test script"
+    },
+    {
+      "key": "resetToken",
+      "value": "",
+      "type": "string",
+      "description": "From forgot-password email"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-set from Save User (Create) response"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string",
+      "description": "Auto-updated from Save Role (Create)"
+    },
+    {
+      "key": "parentRoleId",
+      "value": "1",
+      "type": "string",
+      "description": "Parent role for child-role APIs"
+    },
+    {
+      "key": "moduleId",
+      "value": "1",
+      "type": "string",
+      "description": "Auto-updated from Save Permission Group"
+    },
+    {
+      "key": "groupId",
+      "value": "1",
+      "type": "string",
+      "description": "Auto-updated from Save Permission Group"
+    },
+    {
+      "key": "permissionId",
+      "value": "1",
+      "type": "string",
+      "description": "Auto-updated from Save Permission Group"
+    },
+    {
+      "key": "rolePermissionId",
+      "value": "1",
+      "type": "string",
+      "description": "From role-permission list response"
+    },
+    {
+      "key": "userContext",
+      "value": "",
+      "type": "string",
+      "description": "Full JSON from Get User Context (auto-set by test script)"
+    },
+    {
+      "key": "userContextUserId",
+      "value": "",
+      "type": "string",
+      "description": "Authenticated user UUID from Get User Context"
+    },
+    {
+      "key": "userContextRoleId",
+      "value": "",
+      "type": "string",
+      "description": "Authenticated user roleId from Get User Context"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health & Welcome",
+      "item": [
+        {
+          "name": "Welcome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Welcome Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "NEC Middleware Service is UP and Running.....",
+              "cookie": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. AUTHENTICATION",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"john.doe@nec.go.tz\",\n  \"password\": \"Pass@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"user@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJSUzI1NiIsInR5cC...\",\n    \"refreshToken\": \"eyJhbGciOiJSUzI1NiIsInR5cC...\",\n    \"tokenType\": \"Bearer\",\n    \"expiresIn\": 1800,\n    \"passwordToBeChanged\": false\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Validation Error (Missing Fields)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"Password is required\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Invalid Credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"invalid@example.com\",\n  \"password\": \"wrongpassword\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid username/email or password\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"user@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.data) {",
+                  "    if (json.data.accessToken) pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "    if (json.data.refreshToken) pm.collectionVariables.set('refreshToken', json.data.refreshToken);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "refresh-token",
+                "value": "{{refreshToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Token Refreshed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "refresh-token",
+                    "value": "{{refreshToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Token refreshed successfully\",\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJSUzI1NiIsInR5cC...\",\n    \"refreshToken\": \"eyJhbGciOiJSUzI1NiIsInR5cC...\",\n    \"tokenType\": \"Bearer\",\n    \"expiresIn\": 1800\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Invalid or Expired Refresh Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "refresh-token",
+                    "value": "invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired refresh token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "refresh-token",
+                    "value": "{{refreshToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "refresh-token",
+                "value": "{{refreshToken}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Logout Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "refresh-token",
+                    "value": "{{refreshToken}}"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Logout successful\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Missing Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "refresh-token",
+                    "value": "{{refreshToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Missing or invalid Bearer token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "refresh-token",
+                    "value": "{{refreshToken}}"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"john.doe@nec.go.tz\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Email Sent",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"user@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Password reset link has been sent to the provided email\",\n  \"data\": {\n    \"message\": \"Password reset link has been sent to the provided email\",\n    \"emailSent\": true\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Validation Error (Invalid Email)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"invalid-email\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"Invalid email format\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"nonexistent@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"User not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"usernameOrEmail\": \"user@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resetToken\": \"paste-reset-token-from-email\",\n  \"newPassword\": \"Pass@1234\",\n  \"confirmPassword\": \"Pass@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/update-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "update-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Pass@1234\",\n  \"newPassword\": \"NewPass@1234\",\n  \"confirmNewPassword\": \"NewPass@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Context",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.data) {",
+                  "    const ctx = json.data;",
+                  "    pm.collectionVariables.set('userContext', JSON.stringify(ctx));",
+                  "    if (ctx.userId) {",
+                  "      pm.collectionVariables.set('userId', ctx.userId);",
+                  "      pm.collectionVariables.set('userContextUserId', ctx.userId);",
+                  "    }",
+                  "    if (ctx.roleId != null) {",
+                  "      pm.collectionVariables.set('roleId', String(ctx.roleId));",
+                  "      pm.collectionVariables.set('userContextRoleId', String(ctx.roleId));",
+                  "    }",
+                  "    if (ctx.userName) pm.collectionVariables.set('userName', ctx.userName);",
+                  "    if (ctx.email) {",
+                  "      pm.collectionVariables.set('loginEmail', ctx.email);",
+                  "      pm.collectionVariables.set('userEmail', ctx.email);",
+                  "    }",
+                  "    console.log('User context saved — userId:', ctx.userId, 'roleId:', ctx.roleId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/user-context",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "user-context"
+              ]
+            },
+            "description": "Returns the authenticated user's profile, role, and audit fields. Requires a valid Bearer token from Login. Test script saves userId, roleId, and full context to collection variables."
+          },
+          "response": [
+            {
+              "name": "200 - User Context",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/user-context",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "user-context"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Success\",\n  \"data\": {\n    \"userId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"userName\": \"John Doe\",\n    \"email\": \"john.doe@nec.go.tz\",\n    \"phone\": \"+255700000001\",\n    \"regionId\": 1,\n    \"districtId\": 1,\n    \"cityId\": 1,\n    \"status\": \"ACTIVE\",\n    \"isActive\": 1,\n    \"roleId\": 1,\n    \"roles\": [],\n    \"roleIds\": [1],\n    \"attributes\": {},\n    \"createdAt\": \"2026-06-18T10:00:00\",\n    \"updatedAt\": \"2026-06-18T10:00:00\",\n    \"createdBy\": 1,\n    \"updatedBy\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"sessionId\": null,\n    \"tokenExpiry\": null\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/user-context",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "user-context"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Unauthorized\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. USERS MANAGEMENT",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"John Doe\",\n  \"genderId\": 1,\n  \"roleId\": 1,\n  \"phone\": \"+255700000001\",\n  \"email\": \"john.doe@nec.go.tz\",\n  \"photoPath\": \"/photos/john.jpg\",\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"password\": \"Pass@1234\",\n  \"passwordToBeChanged\": false,\n  \"emailVerified\": false,\n  \"mobileVerified\": false,\n  \"isActive\": 1,\n  \"createdBy\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201 - User Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"userName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 1,\n  \"isActive\": 1,\n  \"genderId\": 1,\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"password\": \"{{password}}\",\n  \"passwordToBeChanged\": false,\n  \"emailVerified\": false,\n  \"mobileVerified\": false,\n  \"createdBy\": \"{{createdByUserId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 201,\n  \"message\": \"User created successfully\",\n  \"data\": {\n    \"id\": \"{{userId}}\",\n    \"keycloakUserId\": \"{{userId}}\",\n    \"userName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"isActive\": 1,\n    \"passwordToBeChanged\": false,\n    \"emailVerified\": false,\n    \"mobileVerified\": false,\n    \"lastLoginAt\": null,\n    \"failedLoginAttempts\": 0\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "200 - User Updated",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"{{userId}}\",\n  \"userName\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 2,\n  \"isActive\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"User updated successfully\",\n  \"data\": {\n    \"id\": \"{{userId}}\",\n    \"userName\": \"Jane Doe\",\n    \"email\": \"jane@example.com\",\n    \"phone\": \"9876543210\",\n    \"isActive\": 1,\n    \"passwordToBeChanged\": false,\n    \"emailVerified\": false,\n    \"mobileVerified\": false,\n    \"lastLoginAt\": null,\n    \"failedLoginAttempts\": 0\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Missing Password",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"userName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 1,\n  \"genderId\": 1,\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"createdBy\": \"{{createdByUserId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Password hash is required for user creation\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"userName\": \"\",\n  \"email\": \"invalid-email\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"User name is required, Invalid email format\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"userName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "409 - Duplicate Email",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"userName\": \"Another User\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 409,\n  \"message\": \"Email already exists\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"userName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.data && json.data.id) {",
+                  "    pm.collectionVariables.set('userId', json.data.id);",
+                  "    if (json.data.email) pm.collectionVariables.set('loginEmail', json.data.email);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \"userName\": \"Jane Doe\",\n  \"genderId\": 2,\n  \"roleId\": 1,\n  \"phone\": \"+255700000002\",\n  \"email\": \"jane.doe@nec.go.tz\",\n  \"photoPath\": \"/photos/jane.jpg\",\n  \"departmentId\": 2,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"emailVerified\": true,\n  \"mobileVerified\": true,\n  \"passwordToBeChanged\": false,\n  \"isActive\": 1,\n  \"createdBy\": 1,\n  \"updatedBy\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - User Updated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"{{userId}}\",\n  \"userName\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"9876543210\",\n  \"roleId\": 2,\n  \"isActive\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"User updated successfully\",\n  \"data\": {\n    \"id\": \"{{userId}}\",\n    \"userName\": \"Jane Doe\",\n    \"email\": \"jane@example.com\",\n    \"phone\": \"9876543210\",\n    \"isActive\": 1,\n    \"passwordToBeChanged\": false,\n    \"emailVerified\": true,\n    \"mobileVerified\": true,\n    \"lastLoginAt\": null,\n    \"failedLoginAttempts\": 0\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Validation Error",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"{{userId}}\",\n  \"userName\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"User name is required\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"{{userId}}\",\n  \"userName\": \"Jane Doe\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"invalid-uuid\",\n  \"userName\": \"Jane Doe\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"User not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"{{userId}}\",\n  \"userName\": \"Jane Doe\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - User Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"User fetched successfully\",\n  \"data\": {\n    \"id\": \"{{userId}}\",\n    \"keycloakUserId\": \"{{userId}}\",\n    \"userName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"isActive\": 1,\n    \"passwordToBeChanged\": false,\n    \"emailVerified\": false,\n    \"mobileVerified\": false,\n    \"lastLoginAt\": null,\n    \"failedLoginAttempts\": 0\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/invalid-id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "invalid-id"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"User not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "all"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - All Users Retrieved",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/all",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "all"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Users fetched successfully\",\n  \"data\": [\n    {\n      \"id\": \"{{userId}}\",\n      \"userName\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"isActive\": 1,\n      \"passwordToBeChanged\": false,\n      \"emailVerified\": false,\n      \"mobileVerified\": false,\n      \"lastLoginAt\": null,\n      \"failedLoginAttempts\": 0\n    },\n    {\n      \"id\": \"{{userId}}\",\n      \"userName\": \"Jane Smith\",\n      \"email\": \"jane@example.com\",\n      \"isActive\": 1,\n      \"passwordToBeChanged\": false,\n      \"emailVerified\": true,\n      \"mobileVerified\": false,\n      \"lastLoginAt\": \"2026-06-18T09:15:00\",\n      \"failedLoginAttempts\": 0\n    }\n  ]\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/all",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "all"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/all",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "all"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get Users by Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/role/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "role",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Users by Role Retrieved",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/role/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "role",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Users fetched successfully\",\n  \"data\": [\n    {\n      \"id\": \"{{userId}}\",\n      \"userName\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"isActive\": 1,\n      \"passwordToBeChanged\": false,\n      \"emailVerified\": false,\n      \"mobileVerified\": false,\n      \"lastLoginAt\": null,\n      \"failedLoginAttempts\": 0\n    }\n  ]\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/role/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "role",
+                    "1"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - Role Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/role/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "role",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"Role not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/role/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "role",
+                    "1"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Change User Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/status?isActive=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}",
+                "status"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Status Changed",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/status?isActive=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "status"
+                  ],
+                  "query": [
+                    {
+                      "key": "isActive",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"User status changed successfully\",\n  \"data\": {\n    \"id\": \"{{userId}}\",\n    \"userName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"isActive\": 0,\n    \"passwordToBeChanged\": false,\n    \"emailVerified\": false,\n    \"mobileVerified\": false,\n    \"lastLoginAt\": null,\n    \"failedLoginAttempts\": 0\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Invalid Parameter",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/status?isActive=invalid",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "status"
+                  ],
+                  "query": [
+                    {
+                      "key": "isActive",
+                      "value": "invalid"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"isActive must be 0 or 1\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/status?isActive=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "status"
+                  ],
+                  "query": [
+                    {
+                      "key": "isActive",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/invalid-id/status?isActive=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "invalid-id",
+                    "status"
+                  ],
+                  "query": [
+                    {
+                      "key": "isActive",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"User not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/status?isActive=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "status"
+                  ],
+                  "query": [
+                    {
+                      "key": "isActive",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - User Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ],
+                  "query": []
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"User deleted successfully\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ],
+                  "query": []
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/invalid-id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "invalid-id"
+                  ],
+                  "query": []
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"User not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}"
+                  ],
+                  "query": []
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "List Users (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"createdAt\",\n  \"sortDirection\": \"DESC\",\n  \"search\": \"\",\n  \"roleId\": 1,\n  \"genderId\": 1,\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"userName\": \"\",\n  \"email\": \"\",\n  \"mobileNumber\": \"\",\n  \"isActive\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/user/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "user",
+                "list"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Users List Paginated",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"userName\",\n  \"sortDirection\": \"ASC\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/user/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "user",
+                    "list"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Data fetched successfully\",\n  \"data\": {\n    \"content\": [\n      {\n        \"id\": \"{{userId}}\",\n        \"userName\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"isActive\": 1,\n        \"passwordToBeChanged\": false,\n        \"emailVerified\": false,\n        \"mobileVerified\": false,\n        \"lastLoginAt\": null,\n        \"failedLoginAttempts\": 0\n      },\n      {\n        \"id\": \"{{userId}}\",\n        \"userName\": \"Jane Smith\",\n        \"email\": \"jane@example.com\",\n        \"isActive\": 1,\n        \"passwordToBeChanged\": false,\n        \"emailVerified\": true,\n        \"mobileVerified\": false,\n        \"lastLoginAt\": \"2026-06-18T09:15:00\",\n        \"failedLoginAttempts\": 0\n      }\n    ],\n    \"pageable\": {\n      \"pageNumber\": 0,\n      \"pageSize\": 10,\n      \"totalElements\": 2,\n      \"totalPages\": 1\n    }\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Invalid Page Parameter",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page\": -1,\n  \"size\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/user/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "user",
+                    "list"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"Page number cannot be negative\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/user/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "user",
+                    "list"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/user/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "user",
+                    "list"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. ROLES MANAGEMENT",
+      "item": [
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Full system access for NEC administrators\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": true,\n  \"parentRoleId\": null,\n  \"approvalLimit\": null,\n  \"createdByUserId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201 - Role Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleId\": null,\n  \"roleName\": \"Administrator\",\n  \"description\": \"Full system access\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": \"{{createdByUserId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 201,\n  \"message\": \"Role created successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"description\": \"Full system access\",\n    \"status\": \"ACTIVE\",\n    \"parentRoleId\": null,\n    \"createdAt\": \"2026-06-18T10:30:00\",\n    \"updatedAt\": \"2026-06-18T10:30:00\"\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "400 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleId\": null,\n  \"roleName\": \"\",\n  \"status\": \"INVALID_STATUS\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 400,\n  \"message\": \"Validation error\",\n  \"data\": \"Role name is required, Invalid status value\"\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleId\": null,\n  \"roleName\": \"Administrator\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "409 - Duplicate Role Name",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleId\": null,\n  \"roleName\": \"Administrator\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 409,\n  \"message\": \"Role name already exists\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleId\": null,\n  \"roleName\": \"Administrator\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.data && json.data.roleId != null) {",
+                  "    pm.collectionVariables.set('roleId', String(json.data.roleId));",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Role (Child)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"HR Manager\",\n  \"description\": \"Human resources manager role\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": false,\n  \"parentRoleId\": 1,\n  \"approvalLimit\": 50000,\n  \"createdByUserId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Updated description\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": true,\n  \"parentRoleId\": null,\n  \"approvalLimit\": null,\n  \"modifiedByUserId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "{{roleId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Role Updated",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role updated successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"description\": \"Updated description\",\n    \"status\": \"ACTIVE\",\n    \"parentRoleId\": null,\n    \"createdAt\": \"2026-06-18T10:30:00\",\n    \"updatedAt\": \"2026-06-18T10:30:00\"\n  }\n}",
+              "cookie": [],
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Updated description\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles",
+                    "{{roleId}}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Role Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role fetched successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"description\": \"Full system access\",\n    \"status\": \"ACTIVE\",\n    \"parentRoleId\": null,\n    \"createdAt\": \"2026-06-18T10:30:00\",\n    \"updatedAt\": \"2026-06-18T10:30:00\"\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles",
+                    "1"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - Role Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles/999",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 404,\n  \"message\": \"Role not found\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "roles",
+                    "1"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "all"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "All Roles Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Roles fetched successfully\",\n  \"data\": [\n    {\n      \"roleId\": 1,\n      \"roleName\": \"Administrator\",\n      \"description\": \"Full system access\",\n      \"status\": \"ACTIVE\",\n      \"parentRoleId\": null,\n      \"createdAt\": \"2026-06-18T10:30:00\",\n      \"updatedAt\": \"2026-06-18T10:30:00\"\n    },\n    {\n      \"roleId\": 2,\n      \"roleName\": \"Manager\",\n      \"description\": \"Manager access\",\n      \"status\": \"ACTIVE\",\n      \"parentRoleId\": 1,\n      \"createdAt\": \"2026-06-18T10:35:00\",\n      \"updatedAt\": \"2026-06-18T10:35:00\"\n    }\n  ]\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get Roles by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/status/ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "status",
+                "ACTIVE"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Active Roles Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Roles fetched successfully\",\n  \"data\": [\n    {\n      \"roleId\": 1,\n      \"roleName\": \"Administrator\",\n      \"description\": \"Full system access\",\n      \"status\": \"ACTIVE\",\n      \"parentRoleId\": null,\n      \"createdAt\": \"2026-06-18T10:30:00\",\n      \"updatedAt\": \"2026-06-18T10:30:00\"\n    },\n    {\n      \"roleId\": 2,\n      \"roleName\": \"Manager\",\n      \"description\": \"Manager access\",\n      \"status\": \"ACTIVE\",\n      \"parentRoleId\": 1,\n      \"createdAt\": \"2026-06-18T10:35:00\",\n      \"updatedAt\": \"2026-06-18T10:35:00\"\n    }\n  ]\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get Child Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/parent/1/children",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "parent",
+                "1",
+                "children"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Child Roles Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Roles fetched successfully\",\n  \"data\": [\n    {\n      \"roleId\": 2,\n      \"roleName\": \"Manager\",\n      \"description\": \"Manager access\",\n      \"status\": \"ACTIVE\",\n      \"parentRoleId\": 1,\n      \"createdAt\": \"2026-06-18T10:35:00\",\n      \"updatedAt\": \"2026-06-18T10:35:00\"\n    },\n    {\n      \"roleId\": 3,\n      \"roleName\": \"User\",\n      \"description\": \"User access\",\n      \"status\": \"ACTIVE\",\n      \"parentRoleId\": 1,\n      \"createdAt\": \"2026-06-18T10:40:00\",\n      \"updatedAt\": \"2026-06-18T10:40:00\"\n    }\n  ]\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Change Role Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INACTIVE\",\n  \"modifiedByUserId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/1/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "1",
+                "status"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Role Status Changed",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role status changed successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"description\": \"Full system access\",\n    \"status\": \"INACTIVE\",\n    \"updatedAt\": \"2026-06-18T11:00:00\",\n    \"updatedBy\": \"{{createdByUserId}}\"\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Role Deleted",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role deleted successfully\",\n  \"data\": null\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "List Roles (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"roleName\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"roleId\": null,\n  \"parentRoleId\": null,\n  \"parentRoleName\": \"\",\n  \"roleCode\": \"\",\n  \"roleName\": \"\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role",
+                "list"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Roles List Paginated",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Data fetched successfully\",\n  \"data\": {\n    \"content\": [\n      {\n        \"roleId\": 1,\n        \"roleName\": \"Administrator\",\n        \"description\": \"Full system access\",\n        \"status\": \"ACTIVE\",\n        \"parentRoleId\": null,\n        \"createdAt\": \"2026-06-18T10:30:00\",\n        \"updatedAt\": \"2026-06-18T10:30:00\"\n      },\n      {\n        \"roleId\": 2,\n        \"roleName\": \"Manager\",\n        \"description\": \"Manager access\",\n        \"status\": \"ACTIVE\",\n        \"parentRoleId\": 1,\n        \"createdAt\": \"2026-06-18T10:35:00\",\n        \"updatedAt\": \"2026-06-18T10:35:00\"\n      }\n    ],\n    \"pageable\": {\n      \"pageNumber\": 0,\n      \"pageSize\": 10,\n      \"totalElements\": 2,\n      \"totalPages\": 1\n    }\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. ROLE PERMISSIONS MAPPING",
+      "item": [
+        {
+          "name": "Save Role Permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rolePermissionId\": null,\n  \"roleId\": 1,\n  \"roleName\": \"Administrator\",\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleName\": \"User Management\",\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupName\": \"User Operations\",\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionName\": \"Create User\"\n            },\n            {\n              \"permissionId\": 2,\n              \"permissionName\": \"Read User\"\n            },\n            {\n              \"permissionId\": 3,\n              \"permissionName\": \"Update User\"\n            },\n            {\n              \"permissionId\": 4,\n              \"permissionName\": \"Delete User\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Permissions Saved",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 201,\n  \"message\": \"Role permissions saved successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"modules\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"groups\": [\n          {\n            \"groupId\": 1,\n            \"groupName\": \"Operations\",\n            \"permissions\": [\n              {\n                \"permissionId\": 1,\n                \"permissionName\": \"Create User\",\n                \"permissionCode\": \"USER_CREATE\"\n              },\n              {\n                \"permissionId\": 2,\n                \"permissionName\": \"Read User\",\n                \"permissionCode\": \"USER_READ\"\n              },\n              {\n                \"permissionId\": 3,\n                \"permissionName\": \"Update User\",\n                \"permissionCode\": \"USER_UPDATE\"\n              },\n              {\n                \"permissionId\": 4,\n                \"permissionName\": \"Delete User\",\n                \"permissionCode\": \"USER_DELETE\"\n              }\n            ]\n          }\n        ]\n      }\n    ]\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get Role Permissions by Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Role Permissions Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role permissions fetched successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"modules\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"groups\": [\n          {\n            \"groupId\": 1,\n            \"groupName\": \"Operations\",\n            \"permissions\": [\n              {\n                \"permissionId\": 1,\n                \"permissionName\": \"Create User\",\n                \"permissionCode\": \"USER_CREATE\"\n              },\n              {\n                \"permissionId\": 2,\n                \"permissionName\": \"Read User\",\n                \"permissionCode\": \"USER_READ\"\n              },\n              {\n                \"permissionId\": 3,\n                \"permissionName\": \"Update User\",\n                \"permissionCode\": \"USER_UPDATE\"\n              },\n              {\n                \"permissionId\": 4,\n                \"permissionName\": \"Delete User\",\n                \"permissionCode\": \"USER_DELETE\"\n              }\n            ]\n          }\n        ]\n      }\n    ]\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get All Role Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/get-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "get-all"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "All Role Permissions Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role permissions fetched successfully\",\n  \"data\": [\n    {\n      \"roleId\": 1,\n      \"roleName\": \"Administrator\",\n      \"modules\": [\n        {\n          \"moduleId\": 1,\n          \"moduleName\": \"User Management\",\n          \"groups\": [\n            {\n              \"groupId\": 1,\n              \"groupName\": \"Operations\",\n              \"permissions\": [\n                {\n                  \"permissionId\": 1,\n                  \"permissionCode\": \"USER_CREATE\"\n                },\n                {\n                  \"permissionId\": 2,\n                  \"permissionCode\": \"USER_READ\"\n                },\n                {\n                  \"permissionId\": 3,\n                  \"permissionCode\": \"USER_UPDATE\"\n                },\n                {\n                  \"permissionId\": 4,\n                  \"permissionCode\": \"USER_DELETE\"\n                }\n              ]\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"roleId\": 2,\n      \"roleName\": \"Manager\",\n      \"modules\": [\n        {\n          \"moduleId\": 1,\n          \"moduleName\": \"User Management\",\n          \"groups\": [\n            {\n              \"groupId\": 1,\n              \"groupName\": \"Operations\",\n              \"permissions\": [\n                {\n                  \"permissionId\": 2,\n                  \"permissionCode\": \"USER_READ\"\n                },\n                {\n                  \"permissionId\": 3,\n                  \"permissionCode\": \"USER_UPDATE\"\n                }\n              ]\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Delete Role Permission",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Permission Deleted",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Role permission deleted successfully\",\n  \"data\": {\n    \"roleId\": 1,\n    \"roleName\": \"Administrator\",\n    \"modules\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"groups\": []\n      }\n    ]\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "List Role Permissions (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "list"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"createdDate\",\n  \"sortDirection\": \"DESC\",\n  \"search\": \"\",\n  \"rolePermissionId\": null,\n  \"roleId\": 1,\n  \"moduleId\": 1,\n  \"groupId\": 1,\n  \"permissionId\": null,\n  \"roleName\": \"\",\n  \"moduleName\": \"\",\n  \"groupName\": \"\",\n  \"permissionName\": \"\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. PERMISSIONS & MODULES",
+      "item": [
+        {
+          "name": "Create Permission Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modules\": [\n    {\n      \"moduleCode\": \"USER_MGMT\",\n      \"moduleName\": \"User Management\",\n      \"description\": \"User management module\",\n      \"displayOrder\": 1,\n      \"status\": \"ACTIVE\",\n      \"createdByUserId\": 1,\n      \"groups\": [\n        {\n          \"groupCode\": \"USER_OPS\",\n          \"groupName\": \"User Operations\",\n          \"description\": \"User CRUD operations\",\n          \"displayOrder\": 1,\n          \"status\": \"ACTIVE\",\n          \"createdByUserId\": 1,\n          \"permissions\": [\n            {\n              \"permissionCode\": \"USER_CREATE\",\n              \"permissionName\": \"Create User\",\n              \"description\": \"Create new user accounts\",\n              \"displayOrder\": 1,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": false,\n              \"createdByUserId\": 1\n            },\n            {\n              \"permissionCode\": \"USER_READ\",\n              \"permissionName\": \"Read User\",\n              \"description\": \"View user records\",\n              \"displayOrder\": 2,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": true,\n              \"createdByUserId\": 1\n            },\n            {\n              \"permissionCode\": \"USER_UPDATE\",\n              \"permissionName\": \"Update User\",\n              \"description\": \"Modify user records\",\n              \"displayOrder\": 3,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": false,\n              \"createdByUserId\": 1\n            },\n            {\n              \"permissionCode\": \"USER_DELETE\",\n              \"permissionName\": \"Delete User\",\n              \"description\": \"Soft-delete user accounts\",\n              \"displayOrder\": 4,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": false,\n              \"createdByUserId\": 1\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-groups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-groups"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Permission Group Saved",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 201,\n  \"message\": \"Permission group saved successfully\",\n  \"data\": {\n    \"modules\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"displayOrder\": 1,\n        \"groups\": [\n          {\n            \"groupId\": 1,\n            \"groupName\": \"Operations\",\n            \"displayOrder\": 1,\n            \"permissions\": [\n              {\n                \"permissionId\": 1,\n                \"permissionName\": \"Create User\",\n                \"permissionCode\": \"USER_CREATE\",\n                \"displayOrder\": 1\n              },\n              {\n                \"permissionId\": 2,\n                \"permissionName\": \"Read User\",\n                \"permissionCode\": \"USER_READ\",\n                \"displayOrder\": 2\n              },\n              {\n                \"permissionId\": 3,\n                \"permissionName\": \"Update User\",\n                \"permissionCode\": \"USER_UPDATE\",\n                \"displayOrder\": 3\n              },\n              {\n                \"permissionId\": 4,\n                \"permissionName\": \"Delete User\",\n                \"permissionCode\": \"USER_DELETE\",\n                \"displayOrder\": 4\n              }\n            ]\n          }\n        ]\n      }\n    ]\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  const mod = json.data && json.data.modules && json.data.modules[0];",
+                  "  if (mod) {",
+                  "    if (mod.moduleId != null) pm.collectionVariables.set('moduleId', String(mod.moduleId));",
+                  "    const grp = mod.groups && mod.groups[0];",
+                  "    if (grp && grp.groupId != null) pm.collectionVariables.set('groupId', String(grp.groupId));",
+                  "    const perm = grp && grp.permissions && grp.permissions[0];",
+                  "    if (perm && perm.permissionId != null) pm.collectionVariables.set('permissionId', String(perm.permissionId));",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Permission Group",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-groups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-groups"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleCode\": \"USER_MGMT\",\n      \"moduleName\": \"User Management\",\n      \"description\": \"Updated user management module\",\n      \"displayOrder\": 1,\n      \"status\": \"ACTIVE\",\n      \"modifiedByUserId\": 1,\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupCode\": \"USER_OPS\",\n          \"groupName\": \"User Operations\",\n          \"description\": \"Updated user operations group\",\n          \"displayOrder\": 1,\n          \"status\": \"ACTIVE\",\n          \"modifiedByUserId\": 1,\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionCode\": \"USER_CREATE\",\n              \"permissionName\": \"Create User\",\n              \"description\": \"Create new user accounts\",\n              \"displayOrder\": 1,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": false,\n              \"modifiedByUserId\": 1\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Permission Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "all"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "All Permission Groups Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Permission group fetched successfully\",\n  \"data\": {\n    \"modules\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"displayOrder\": 1,\n        \"groups\": [\n          {\n            \"groupId\": 1,\n            \"groupName\": \"Operations\",\n            \"displayOrder\": 1,\n            \"permissions\": [\n              {\n                \"permissionId\": 1,\n                \"permissionName\": \"Create User\",\n                \"permissionCode\": \"USER_CREATE\",\n                \"displayOrder\": 1\n              },\n              {\n                \"permissionId\": 2,\n                \"permissionName\": \"Read User\",\n                \"permissionCode\": \"USER_READ\",\n                \"displayOrder\": 2\n              },\n              {\n                \"permissionId\": 3,\n                \"permissionName\": \"Update User\",\n                \"permissionCode\": \"USER_UPDATE\",\n                \"displayOrder\": 3\n              },\n              {\n                \"permissionId\": 4,\n                \"permissionName\": \"Delete User\",\n                \"permissionCode\": \"USER_DELETE\",\n                \"displayOrder\": 4\n              }\n            ]\n          }\n        ]\n      },\n      {\n        \"moduleId\": 2,\n        \"moduleName\": \"Role Management\",\n        \"displayOrder\": 2,\n        \"groups\": [\n          {\n            \"groupId\": 2,\n            \"groupName\": \"Operations\",\n            \"displayOrder\": 1,\n            \"permissions\": [\n              {\n                \"permissionId\": 5,\n                \"permissionName\": \"Create Role\",\n                \"permissionCode\": \"ROLE_CREATE\"\n              },\n              {\n                \"permissionId\": 6,\n                \"permissionName\": \"Read Role\",\n                \"permissionCode\": \"ROLE_READ\"\n              }\n            ]\n          }\n        ]\n      }\n    ]\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Get Permission Group by Module",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Module Permission Group Retrieved",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Permission group fetched successfully\",\n  \"data\": {\n    \"modules\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"displayOrder\": 1,\n        \"groups\": [\n          {\n            \"groupId\": 1,\n            \"groupName\": \"Operations\",\n            \"displayOrder\": 1,\n            \"permissions\": [\n              {\n                \"permissionId\": 1,\n                \"permissionName\": \"Create User\",\n                \"permissionCode\": \"USER_CREATE\"\n              },\n              {\n                \"permissionId\": 2,\n                \"permissionName\": \"Read User\",\n                \"permissionCode\": \"USER_READ\"\n              },\n              {\n                \"permissionId\": 3,\n                \"permissionName\": \"Update User\",\n                \"permissionCode\": \"USER_UPDATE\"\n              },\n              {\n                \"permissionId\": 4,\n                \"permissionName\": \"Delete User\",\n                \"permissionCode\": \"USER_DELETE\"\n              }\n            ]\n          }\n        ]\n      }\n    ]\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "List Permission Groups (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"displayOrder\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"moduleId\": null,\n  \"moduleCode\": \"\",\n  \"moduleName\": \"\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "list"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Permission Groups List Paginated",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": 200,\n  \"message\": \"Data fetched successfully\",\n  \"data\": {\n    \"content\": [\n      {\n        \"moduleId\": 1,\n        \"moduleName\": \"User Management\",\n        \"displayOrder\": 1,\n        \"groups\": [\n          {\n            \"groupId\": 1,\n            \"groupName\": \"Operations\",\n            \"permissions\": [\n              {\n                \"permissionId\": 1,\n                \"permissionCode\": \"USER_CREATE\"\n              },\n              {\n                \"permissionId\": 2,\n                \"permissionCode\": \"USER_READ\"\n              }\n            ]\n          }\n        ]\n      }\n    ],\n    \"pageable\": {\n      \"pageNumber\": 0,\n      \"pageSize\": 10,\n      \"totalElements\": 1,\n      \"totalPages\": 1\n    }\n  }\n}",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "List Modules (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/module/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "module",
+                "list"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"displayOrder\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"moduleId\": null,\n  \"moduleCode\": \"\",\n  \"moduleName\": \"\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Groups (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/group/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "group",
+                "list"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"displayOrder\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"moduleId\": 1,\n  \"moduleCode\": \"USER_MGMT\",\n  \"moduleName\": \"\",\n  \"groupId\": null,\n  \"groupCode\": \"\",\n  \"groupName\": \"\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
