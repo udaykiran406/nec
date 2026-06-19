@@ -63,61 +63,14 @@ public class PortalUserServiceImpl implements PortalUserService {
     public PortalUserResponseDto createPortalUser(PortalUserRequestDto portalUserRequest , MultipartFile photo) {
 
 
-        log.info("Creating portal user {}", portalUserRequest.getUserName());
+        log.info("Create portal user request received");
         validateDuplicateUser(portalUserRequest);
 
 
         PortalUser portalUserEntity = portalUserMapper.portalUserEntity(portalUserRequest);
 
-        // ---------------- LOOKUPS ----------------
-        portalUserEntity.setGender(
-                genderRepository.findById(portalUserRequest.getGenderId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Gender not found"))
-        );
-        portalUserEntity.setRole(
-                roleRepository.findById(portalUserRequest.getRoleId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Role not found"))
-        );
-        portalUserEntity.setPortalUserType(
-                portalUserTypeRepository.findById(
-                                portalUserRequest.getPortalUserTypeId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Portal User Type not found"))
-        );
-// ---------------- MASTER DATA ----------------
+        resolveAndSetForeignKeys(portalUserEntity, portalUserRequest);
 
-
-        MasterData masterData = resolveMasterData(portalUserRequest.getPortalUserTypeId());
-
-        if (!isMasterDataExists(masterData, portalUserRequest.getMasterdataId())) {
-            throw new ResourceNotFoundException(
-                    masterData + " not found with id: " + portalUserRequest.getMasterdataId()
-            );
-        }
-
-        portalUserEntity.setMasterData(masterData);
-        portalUserEntity.setMasterdataId(portalUserRequest.getMasterdataId());
-
-        portalUserEntity.setRegion(
-                regionRepository.findById(
-                                portalUserRequest.getRegionId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Region not found"))
-        );
-        portalUserEntity.setDistrict(
-                districtRepository.findById(
-                                portalUserRequest.getDistrictId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("District not found"))
-        );
-        portalUserEntity.setCity(
-                cityRepository.findById(
-                                portalUserRequest.getCityId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("City not found"))
-        );
         // 4. Generate code — only after all lookups succeeded
         portalUserEntity.setPortalUserId(generatePortalUserNumber());
          // store photo AFTER portalUserId is generated
@@ -134,10 +87,9 @@ public class PortalUserServiceImpl implements PortalUserService {
                 portalUserMapper.portalUserResponseDto(savedEntity);
 
         // Enrich masterData as IdValueDto: { id: masterdataId, value: "University Name / Party Name / MOI Value" }
-        response.setMasterData(
-                buildMasterDataIdValueDto(savedEntity.getMasterData(), savedEntity.getMasterdataId()));
+        enrichMasterData(response, savedEntity.getMasterData(), savedEntity.getMasterdataId());
 
-
+        log.info("Portal user created: portalUserId='{}'", savedEntity.getPortalUserId());
 
         return response;
     }
@@ -194,12 +146,12 @@ public class PortalUserServiceImpl implements PortalUserService {
 
 // ------------------------------------------------------------------ UPDATE
 
-
     @Override
     @Transactional
     public PortalUserResponseDto updatePortalUser(
             String portalUserId,
             PortalUserRequestDto portalUserRequestDto, MultipartFile photo) {
+        log.info("Update portal user request, portalUserId='{}'", portalUserId);
 
         PortalUser portalUser = findByPortalUserId(portalUserId);
         validateDuplicateUserForUpdate(
@@ -309,6 +261,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         prtalUserResponse.setMasterData(
                 buildMasterDataIdValueDto(updatedEntity.getMasterData(), updatedEntity.getMasterdataId())
         );
+        log.info("Portal user updated: portalUserId='{}'", updatedEntity.getPortalUserId());
 
         return prtalUserResponse;
     }
@@ -323,13 +276,9 @@ public class PortalUserServiceImpl implements PortalUserService {
 
         portalUser.setIsActive(isActive);
 
-        log.info("Changing status for portal user id: {} -> isActive={}",
-                portalUserId,
-                isActive
-        );
-
-        return portalUserMapper.portalUserResponseDto(
-                portalUserrepository.save(portalUser));
+        PortalUser savedPortalUser = portalUserrepository.save(portalUser);
+        log.info("Portal user status changed: portalUserId='{}', isActive={}", savedPortalUser.getPortalUserId(), isActive);
+        return portalUserMapper.portalUserResponseDto(savedPortalUser);
     }
 //--------------------------------------------------------------------code generation
     public String generatePortalUserNumber() {
@@ -346,7 +295,7 @@ public class PortalUserServiceImpl implements PortalUserService {
     // Validation
     // ------------------------------------------------------------------
 
-    private void validateDuplicateUser(PortalUserRequestDto request) {
+    public void validateDuplicateUser(PortalUserRequestDto request) {
 
         if (portalUserrepository.existsByEmail(request.getEmail()) || portalUserrepository.existsByPhone(request.getPhone())) {
             throw new DuplicateResourceException(
@@ -382,12 +331,74 @@ public class PortalUserServiceImpl implements PortalUserService {
                         new ResourceNotFoundException(
                                 PortalUserConstants.USER_NOT_FOUND + portalUserId));
     }
+
+    public void resolveAndSetForeignKeys(
+            PortalUser entity,
+            PortalUserRequestDto dto) {
+        log.debug("Resolving FKs for portalUserId='{}'", entity.getPortalUserId());
+
+        entity.setGender(
+                genderRepository.findById(dto.getGenderId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Gender not found with id: " + dto.getGenderId()))
+        );
+
+        entity.setRole(
+                roleRepository.findById(dto.getRoleId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Role not found with id: " + dto.getRoleId()))
+        );
+
+        entity.setPortalUserType(
+                portalUserTypeRepository.findById(dto.getPortalUserTypeId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Portal User Type not found with id: " + dto.getPortalUserTypeId()))
+        );
+
+        MasterData masterData = resolveMasterData(dto.getPortalUserTypeId());
+
+        if (!isMasterDataExists(masterData, dto.getMasterdataId())) {
+            throw new ResourceNotFoundException(
+                    masterData + " not found with id: " + dto.getMasterdataId()
+            );
+        }
+
+        entity.setMasterData(masterData);
+        entity.setMasterdataId(dto.getMasterdataId());
+
+        entity.setRegion(
+                regionRepository.findById(dto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Region not found with id: " + dto.getRegionId()))
+        );
+
+        entity.setDistrict(
+                districtRepository.findById(dto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("District not found with id: " + dto.getDistrictId()))
+        );
+
+        entity.setCity(
+                cityRepository.findById(dto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("City not found with id: " + dto.getCityId()))
+        );
+    }
+
+    public void enrichMasterData(
+            PortalUserResponseDto response,
+            MasterData masterData,
+            Long masterdataId) {
+        response.setMasterData(buildMasterDataIdValueDto(masterData, masterdataId));
+    }
+
     private MasterData resolveMasterData(Long portalUserTypeId) {
         return switch (portalUserTypeId.intValue()) {
             case 1 -> MasterData.UNIVERSITY;
             case 2 -> MasterData.POLITICAL_PARTY;
             case 3 -> MasterData.MINISTRY_OF_INTERIOR;
-            default -> throw new ResourceNotFoundException("Invalid portal user type");
+            default ->
+                    throw new ResourceNotFoundException("Invalid portal user type");
         };
     }
 // checks if the master data exists for the given type and id, used in both create and update flows to validate the masterdataId before setting it on the entity
@@ -399,21 +410,17 @@ public class PortalUserServiceImpl implements PortalUserService {
         };
     }
 
-
-
     /**
      * Resolves the human-readable name/value for the given master data type and id,
      * and returns it as an {@link IdValueDto} so the response is consistent with
      * all other FK fields:
-     *
      * <pre>
      *   portalUserTypeId=1  →  "masterData": { "id": 3, "value": "Hargeisa University" }
-     *   portalUserTypeId=2  →  "masterData": { "id": 2, "value": "Peace Party"         }
-     *   portalUserTypeId=3  →  "masterData": { "id": 1, "value": "Senior Aaqil"        }
      * </pre>
      */
     private IdValueDto buildMasterDataIdValueDto(MasterData masterData, Long masterdataId) {
         String name = switch (masterData) {
+
             case UNIVERSITY -> universityRepository.findById(masterdataId)
                     .map(MasterDataUniversity::getUniversityName)
                     .orElseThrow(() -> new ResourceNotFoundException("University not found"));

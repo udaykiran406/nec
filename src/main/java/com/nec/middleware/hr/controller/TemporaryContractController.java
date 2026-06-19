@@ -32,12 +32,15 @@ public class TemporaryContractController {
                     "If the request contains an ID, it will attempt to update the corresponding contract; otherwise, it will create a new contract.")
     @PostMapping("/createOrUpdateTemporaryContract")
     public ResponseEntity<ApiResponse<TemporaryContractResponseDto>> createorUpdateTemporaryContract( @RequestBody @Valid TemporaryContractRequestDto requestDto) {
+        log.info("Create-or-update temporary contract request, id='{}'", requestDto.getContractId());
 
          return ResponseEntity.ok(
                 ApiResponse.success(
                         "Temporary Contract Created Successfully",
                         temporaryContractService
                                 .createOrUpdateContract(requestDto))
+
         );
+
     }
 }

@@ -1,6 +1,7 @@
 package com.nec.middleware.hr.dto.request;
 
-import com.nec.middleware.template.annotation.ExcelColumn;
+
+import com.nec.middleware.template.ExcelColumn;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -11,10 +12,6 @@ import lombok.*;
 @Builder
 public class UniversityTraineeRequestDto {
 
-    @ExcelColumn(
-            name = "University Trainee ID",
-            sample = "UT001"
-    )
     private String universityTraineeId;
 
     @ExcelColumn(
@@ -82,7 +79,7 @@ public class UniversityTraineeRequestDto {
     @ExcelColumn(
             name = "University ID",
             mandatory = true,
-            sample = "10",
+            sample = "5",
             description = "Reference ID from university master"
     )
     @NotNull(message = "University is required")
@@ -118,7 +115,7 @@ public class UniversityTraineeRequestDto {
     @ExcelColumn(
             name = "District ID",
             mandatory = true,
-            sample = "12",
+            sample = "3",
             description = "Reference ID from district master"
     )
     @NotNull(message = "District is required")
@@ -127,7 +124,7 @@ public class UniversityTraineeRequestDto {
     @ExcelColumn(
             name = "City ID",
             mandatory = true,
-            sample = "120",
+            sample = "5",
             description = "Reference ID from city master"
     )
     @NotNull(message = "City is required")
@@ -140,26 +137,7 @@ public class UniversityTraineeRequestDto {
     )
     private String photoPath;
 
-//    @ExcelColumn(
-//            name = "Status ID",
-//            mandatory = true,
-//            sample = "1",
-//            description = "Reference ID from status master"
-//    )
-//    @NotNull(message = "Status is required")
-//    private Long statusId;
-
-    @ExcelColumn(
-            name = "Created By",
-            sample = "system",
-            description = "Auto populated"
-    )
     private String createdBy;
 
-    @ExcelColumn(
-            name = "Updated By",
-            sample = "system",
-            description = "Auto populated"
-    )
     private String updatedBy;
 }

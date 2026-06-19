@@ -34,16 +34,11 @@ public class PoliticalPartyAgentMapper {
      * {@code code} is deliberately excluded — it is immutable after creation.
      */
     public void updateEntity(PoliticalPartyAgent entity, PoliticalPartyAgentRequestDto dto) {
-//        entity.setPoliticalPartyNameId(dto.getPoliticalPartyNameId());
         entity.setAgentName(dto.getAgentName());
         entity.setPhone(dto.getPhone());
         entity.setEmail(dto.getEmail());
         entity.setPhotoPath(dto.getPhotoPath());
-//        entity.setPollingStation(dto.getPollingStationId());
-//        entity.setRegion(dto.getRegionId());
-//        entity.setDistrict(dto.getDistrictId());
-//        entity.setCity(dto.getCityId());
-//        entity.setStatusId(dto.getStatusId());
+
         entity.setUpdatedBy(dto.getUpdatedBy());
     }
 

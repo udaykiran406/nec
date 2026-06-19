@@ -35,7 +35,6 @@ public class UniversityTraineeMapper {
                 .semester(universityTraineeRequestDto.getSemester())
                 .faculty(universityTraineeRequestDto.getFaculty())
                 .photoPath(universityTraineeRequestDto.getPhotoPath())
-//                .status(universityTraineeRequestDto.getStatus())
                 .build();
 
         universityTraineeEntity.setIsActive(Boolean.TRUE);
@@ -62,7 +61,6 @@ public class UniversityTraineeMapper {
         if (universityTraineeRequesDto.getSemester()  != null) UniversityTraineEntity.setSemester(universityTraineeRequesDto.getSemester());
         if (universityTraineeRequesDto.getFaculty()   != null) UniversityTraineEntity.setFaculty(universityTraineeRequesDto.getFaculty());
         if (universityTraineeRequesDto.getPhotoPath()  != null) UniversityTraineEntity.setPhotoPath(universityTraineeRequesDto.getPhotoPath());
-//        if (universityTraineeRequesDto.getStatusId()  != null) UniversityTraineEntity.setStatusId(universityTraineeRequesDto.getStatusId());
         if (universityTraineeRequesDto.getUpdatedBy() != null) UniversityTraineEntity.setUpdatedBy(universityTraineeRequesDto.getUpdatedBy());
     }
 
@@ -80,69 +78,77 @@ public class UniversityTraineeMapper {
      *   "paymentMethod": { "id": 2, "value": "Cash"      }
      * </pre>
      */
-    public UniversityTraineeResponseDto toResponseDto(UniversityTrainee universityTraineEentity) {
+    public UniversityTraineeResponseDto toResponseDto(UniversityTrainee universityTraineeEntity) {
         return UniversityTraineeResponseDto.builder()
                 // Identity
-                .universityTraineeId(universityTraineEentity.getUniversityTraineeId())
-                .fullName(universityTraineEentity.getFullName())
-                .age(universityTraineEentity.getAge())
-                .phone(universityTraineEentity.getPhone())
-                .email(universityTraineEentity.getEmail())
-                .semester(universityTraineEentity.getSemester())
-                .faculty(universityTraineEentity.getFaculty())
-                .photoPath(universityTraineEentity.getPhotoPath())
-                .status(universityTraineEentity.getStatus())
+                .universityTraineeId(universityTraineeEntity.getUniversityTraineeId())
+                .fullName(universityTraineeEntity.getFullName())
+                .age(universityTraineeEntity.getAge())
+                .phone(universityTraineeEntity.getPhone())
+                .email(universityTraineeEntity.getEmail())
+                .semester(universityTraineeEntity.getSemester())
+                .faculty(universityTraineeEntity.getFaculty())
+                .photoPath(universityTraineeEntity.getPhotoPath())
 
                 // Lookup FKs → IdValueDto (lazy-loaded via @ManyToOne)
-                .gender(universityTraineEentity.getGender() != null
+                .gender(universityTraineeEntity.getGender() != null
                         ? IdValueDto.builder()
-                          .id(universityTraineEentity.getGender().getId())
-                          .value(universityTraineEentity.getGender().getValue())
+                          .id(universityTraineeEntity.getGender().getId())
+                          .value(universityTraineeEntity.getGender().getValue())
                           .build()
                         : null)
 
-                .paymentMethod(universityTraineEentity.getPaymentMethod() != null
+                .paymentMethod(universityTraineeEntity.getPaymentMethod() != null
                         ? IdValueDto.builder()
-                          .id(universityTraineEentity.getPaymentMethod().getId())
-                          .value(universityTraineEentity.getPaymentMethod().getValue())
+                          .id(universityTraineeEntity.getPaymentMethod().getId())
+                          .value(universityTraineeEntity.getPaymentMethod().getValue())
                           .build()
                         : null)
 
                 // Master Data FKs → IdValueDto (lazy-loaded via @ManyToOne)
-                .university(universityTraineEentity.getUniversity() != null
+                .university(universityTraineeEntity.getUniversity() != null
                         ? IdValueDto.builder()
-                          .id(universityTraineEentity.getUniversity().getId())
-                          .value(universityTraineEentity.getUniversity().getUniversityName())
+                          .id(universityTraineeEntity.getUniversity().getId())
+                          .value(universityTraineeEntity.getUniversity().getUniversityName())
                           .build()
                         : null)
 
-                .region(universityTraineEentity.getRegion() != null
+                .region(universityTraineeEntity.getRegion() != null
                         ? IdValueDto.builder()
-                          .id(universityTraineEentity.getRegion().getId())
-                          .value(universityTraineEentity.getRegion().getRegionName())
+                          .id(universityTraineeEntity.getRegion().getId())
+                          .value(universityTraineeEntity.getRegion().getRegionName())
                           .build()
                         : null)
 
-                .district(universityTraineEentity.getDistrict() != null
+                .district(universityTraineeEntity.getDistrict() != null
                         ? IdValueDto.builder()
-                          .id(universityTraineEentity.getDistrict().getId())
-                          .value(universityTraineEentity.getDistrict().getDistrictName())
+                          .id(universityTraineeEntity.getDistrict().getId())
+                          .value(universityTraineeEntity.getDistrict().getDistrictName())
                           .build()
                         : null)
 
-                .city(universityTraineEentity.getCity() != null
+                .city(universityTraineeEntity.getCity() != null
                         ? IdValueDto.builder()
-                          .id(universityTraineEentity.getCity().getId())
-                          .value(universityTraineEentity.getCity().getCityName())
+                          .id(universityTraineeEntity.getCity().getId())
+                          .value(universityTraineeEntity.getCity().getCityName())
                           .build()
                         : null)
+
+                .status(
+                        universityTraineeEntity.getStatus() != null
+                                ? IdValueDto.builder()
+                                  .id(universityTraineeEntity.getStatus().getId())
+                                  .value(universityTraineeEntity.getStatus().getValue())
+                                  .build()
+                                : null
+                )
 
                 // Audit
-                .isActive(universityTraineEentity.getIsActive())
-                .createdBy(universityTraineEentity.getCreatedBy())
-                .createdAt(universityTraineEentity.getCreatedAt())
-                .updatedBy(universityTraineEentity.getUpdatedBy())
-                .updatedAt(universityTraineEentity.getUpdatedAt())
+                .isActive(universityTraineeEntity.getIsActive())
+                .createdBy(universityTraineeEntity.getCreatedBy())
+                .createdAt(universityTraineeEntity.getCreatedAt())
+                .updatedBy(universityTraineeEntity.getUpdatedBy())
+                .updatedAt(universityTraineeEntity.getUpdatedAt())
                 .build();
     }
 }

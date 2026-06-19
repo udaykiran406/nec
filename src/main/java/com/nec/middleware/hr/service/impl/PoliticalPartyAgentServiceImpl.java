@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.service.impl;
 
+import com.nec.middleware.Lookups.entity.ThirdPartyStatus;
 import com.nec.middleware.Lookups.repository.LookupGenderRepository;
 import com.nec.middleware.Lookups.repository.ThirdPartyStatusRepository;
 import com.nec.middleware.exception.DuplicateResourceException;
@@ -58,42 +59,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         log.info("Creating political party agent. AgentName: {}",politicalPartyAgentRequestDto.getAgentName());
         PoliticalPartyAgent politicalPartyAgentEntity = politicalPartyAgentMapper.toPoliticalPartyAgentEntity(politicalPartyAgentRequestDto);
 
-        politicalPartyAgentEntity.setPollingStation(
-                pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId()).orElseThrow(
-                ()->new ResourceNotFoundException("Polling Station Not Found")));
-
-        politicalPartyAgentEntity.setPoliticalPartyName(
-                politicalPartyRepository.findById(politicalPartyAgentRequestDto.getPoliticalPartyNameId()).orElseThrow(
-                        () -> new ResourceNotFoundException("Political Party Name Not Found")));
-
-        politicalPartyAgentEntity.setGender(
-                genderRepository.findById(politicalPartyAgentRequestDto.getGenderId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Gender Not Found"))
-        );
-
-        politicalPartyAgentEntity.setRegion(
-                regionRepository.findById(
-                                politicalPartyAgentRequestDto.getRegionId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Region Not Found"))
-        );
-        politicalPartyAgentEntity.setDistrict(
-                districtRepository.findById(
-                                politicalPartyAgentRequestDto.getDistrictId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("District Not Found"))
-        );
-        politicalPartyAgentEntity.setCity(
-                cityRepository.findById(
-                                politicalPartyAgentRequestDto.getCityId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("City Not Found"))
-        );
-        politicalPartyAgentEntity.setStatus(
-                statusRepository.findById(politicalPartyAgentRequestDto.getStatusId())
-                        .orElseThrow(()->
-                                new ResourceNotFoundException("Status Not Found")));
+        resolveAndSetForeignKeys(politicalPartyAgentEntity, politicalPartyAgentRequestDto);
 
         // 4. Generate code — only after all lookups succeeded
         politicalPartyAgentEntity.setPoliticalPartyAgentUserId(
@@ -107,6 +73,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
                 politicalPartyAgentEntity.getPoliticalPartyAgentUserId()
         );
         politicalPartyAgentEntity.setPhotoPath(storedPhotoPath);
+        log.info("Political party agent created: partyAgentUserId='{}'", politicalPartyAgentEntity.getPoliticalPartyAgentUserId());
 
         PoliticalPartyAgent politicalPartyAgent = politicalPartyAgentRepository.save(politicalPartyAgentEntity);
         return politicalPartyAgentMapper.politicalPartyResponseDto(politicalPartyAgent);
@@ -146,7 +113,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
 
         PoliticalPartyAgent partyAgent = findByAgentUserId(partyAgentId);
         partyAgent.setIsActive(isActiveFlag);
-        log.info("Political party agent soft deleted with id: {}", partyAgent);
+        log.info("Political party agent status changed with id: {}", partyAgent);
         return politicalPartyAgentMapper.politicalPartyResponseDto(
                 politicalPartyAgentRepository.save(politicalPartyAgentRepository.save(partyAgent)));
     }
@@ -156,6 +123,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     public PoliticalPartyAgentResponseDto updatePoliticalPartyAgent(
             String agentUserId,
             PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto,MultipartFile photo) {
+        log.info("Update political party agent request, agentUserId='{}'", agentUserId);
 
         PoliticalPartyAgent politicalPartyAgent =
                 findByAgentUserId(agentUserId);
@@ -185,6 +153,7 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
         );
 
         politicalPartyAgentRepository.save(politicalPartyAgent);
+        log.info("Political party agent updated: partyAgentUserId='{}'", politicalPartyAgent.getPoliticalPartyAgentUserId());
 
         return politicalPartyAgentMapper.politicalPartyResponseDto(
                 politicalPartyAgent
@@ -205,12 +174,12 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
     // Validation
     // ------------------------------------------------------------------
 
-    private void validateAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequest) {
+    public void validateAgent(PoliticalPartyAgentRequestDto politicalPartyAgentRequest) {
 
-            if (politicalPartyAgentRepository.existsByEmail(politicalPartyAgentRequest.getEmail()) ||
-                    politicalPartyAgentRepository.existsByPhone(politicalPartyAgentRequest.getPhone())) {
-                throw new DuplicateResourceException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
-            }
+        if (politicalPartyAgentRepository.existsByEmail(politicalPartyAgentRequest.getEmail()) ||
+                politicalPartyAgentRepository.existsByPhone(politicalPartyAgentRequest.getPhone())) {
+            throw new DuplicateResourceException(PoliticalPartyAgentConstants.AGENT_ALREADY_EXISTS);
+        }
     }
 
     private void validateAgentForUpdate(
@@ -237,91 +206,114 @@ public class PoliticalPartyAgentServiceImpl implements PoliticalPartyAgentServic
                                 PoliticalPartyAgentConstants.AGENT_NOT_FOUND + agentUserId));
     }
 
+    /**
+     * Shared FK resolution used by both {@code savePartyAgent} and
+     */
+    public void resolveAndSetForeignKeys(
+            PoliticalPartyAgent entity,
+            PoliticalPartyAgentRequestDto dto) {
+        log.debug("Resolving FKs for partyAgentUserId='{}'", entity.getPoliticalPartyAgentUserId());
+
+        entity.setPollingStation(
+                pollingStationRepository.findById(dto.getPollingStationId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Polling Station not found with id: " + dto.getPollingStationId()))
+        );
+
+        entity.setPoliticalPartyName(
+                politicalPartyRepository.findById(dto.getPoliticalPartyNameId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Political Party not found with id: " + dto.getPoliticalPartyNameId()))
+        );
+
+        entity.setGender(
+                genderRepository.findById(dto.getGenderId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Gender not found with id: " + dto.getGenderId()))
+        );
+
+        entity.setRegion(
+                regionRepository.findById(dto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Region not found with id: " + dto.getRegionId()))
+        );
+
+        entity.setDistrict(
+                districtRepository.findById(dto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("District not found with id: " + dto.getDistrictId()))
+        );
+
+        entity.setCity(
+                cityRepository.findById(dto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("City not found with id: " + dto.getCityId()))
+        );
+
+        ThirdPartyStatus pendingStatus =
+                statusRepository
+                        .findByCode("PENDING")
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "PENDING status not configured"));
+
+        entity.setStatus(pendingStatus);
+    }
+
     public void updatePoliticalPartyAgents(
             PoliticalPartyAgent politicalPartyAgent,
             PoliticalPartyAgentRequestDto politicalPartyAgentRequestDto) {
 
-        if (politicalPartyAgentRequestDto.getAgentName() != null) {
-            politicalPartyAgent.setAgentName(politicalPartyAgentRequestDto.getAgentName());
-        }
+        politicalPartyAgent.setAgentName(politicalPartyAgentRequestDto.getAgentName());
 
-        if (politicalPartyAgentRequestDto.getPhone() != null) {
-            politicalPartyAgent.setPhone(politicalPartyAgentRequestDto.getPhone());
-        }
+        politicalPartyAgent.setPhone(politicalPartyAgentRequestDto.getPhone());
 
-        if (politicalPartyAgentRequestDto.getEmail() != null) {
-            politicalPartyAgent.setEmail(politicalPartyAgentRequestDto.getEmail());
-        }
+        politicalPartyAgent.setEmail(politicalPartyAgentRequestDto.getEmail());
 
-        if (politicalPartyAgentRequestDto.getPhotoPath() != null) {
-            politicalPartyAgent.setPhotoPath(politicalPartyAgentRequestDto.getPhotoPath());
-        }
+        politicalPartyAgent.setUpdatedBy(politicalPartyAgentRequestDto.getUpdatedBy());
 
-        if (politicalPartyAgentRequestDto.getUpdatedBy() != null) {
-            politicalPartyAgent.setUpdatedBy(politicalPartyAgentRequestDto.getUpdatedBy());
-        }
 
         // Political Party
-        if (politicalPartyAgentRequestDto.getPoliticalPartyNameId() != null) {
-            politicalPartyAgent.setPoliticalPartyName(
-                    politicalPartyRepository.findById(politicalPartyAgentRequestDto.getPoliticalPartyNameId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Political Party not found"))
-            );
-        }
+
+        politicalPartyAgent.setPoliticalPartyName(
+                politicalPartyRepository.findById(politicalPartyAgentRequestDto.getPoliticalPartyNameId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Political Party not found"))
+        );
 
         // Gender
-        if (politicalPartyAgentRequestDto.getGenderId() != null) {
-            politicalPartyAgent.setGender(
-                    genderRepository.findById(politicalPartyAgentRequestDto.getGenderId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Gender not found"))
-            );
-        }
+        politicalPartyAgent.setGender(
+                genderRepository.findById(politicalPartyAgentRequestDto.getGenderId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Gender not found"))
+        );
 
         // Polling Station
-        if (politicalPartyAgentRequestDto.getPollingStationId() != null) {
-            politicalPartyAgent.setPollingStation(
-                    pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Polling Station not found"))
-            );
-        }
+        politicalPartyAgent.setPollingStation(
+                pollingStationRepository.findById(politicalPartyAgentRequestDto.getPollingStationId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Polling Station not found"))
+        );
 
         // Region
-        if (politicalPartyAgentRequestDto.getRegionId() != null) {
-            politicalPartyAgent.setRegion(
-                    regionRepository.findById(politicalPartyAgentRequestDto.getRegionId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Region not found"))
-            );
-        }
+        politicalPartyAgent.setRegion(
+                regionRepository.findById(politicalPartyAgentRequestDto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Region not found"))
+        );
 
         // District
-        if (politicalPartyAgentRequestDto.getDistrictId() != null) {
-            politicalPartyAgent.setDistrict(
-                    districtRepository.findById(politicalPartyAgentRequestDto.getDistrictId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("District not found"))
-            );
-        }
+        politicalPartyAgent.setDistrict(
+                districtRepository.findById(politicalPartyAgentRequestDto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("District not found"))
+        );
 
         // City
-        if (politicalPartyAgentRequestDto.getCityId() != null) {
-            politicalPartyAgent.setCity(
-                    cityRepository.findById(politicalPartyAgentRequestDto.getCityId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("City not found"))
-            );
-        }
-
-        // Status
-        if (politicalPartyAgentRequestDto.getStatusId() != null) {
-            politicalPartyAgent.setStatus(
-                    statusRepository.findById(politicalPartyAgentRequestDto.getStatusId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Status not found"))
-            );
-        }
+        politicalPartyAgent.setCity(
+                cityRepository.findById(politicalPartyAgentRequestDto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("City not found"))
+        );
     }
 }

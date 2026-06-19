@@ -33,26 +33,12 @@ public class PortalUserMapper {
      * Merge RequestDto → existing Entity (for UPDATE)
      */
     public void updatePortalUserEntity(PortalUser portalUser, PortalUserRequestDto portalUserRequestDto) {
-
-        if (portalUserRequestDto.getUserName() != null) {
             portalUser.setUserName(portalUserRequestDto.getUserName());
-        }
-
-        if (portalUserRequestDto.getPhone() != null) {
             portalUser.setPhone(portalUserRequestDto.getPhone());
-        }
-
-        if (portalUserRequestDto.getEmail() != null) {
             portalUser.setEmail(portalUserRequestDto.getEmail());
-        }
-
-        if (portalUserRequestDto.getPhotoPath() != null) {
             portalUser.setPhotoPath(portalUserRequestDto.getPhotoPath());
-        }
-
-        if (portalUserRequestDto.getFaculty() != null) {
             portalUser.setFaculty(portalUserRequestDto.getFaculty());
-        }
+
     }
 
 

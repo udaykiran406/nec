@@ -38,8 +38,11 @@ public class MinistryofInteriorController {
     public ResponseEntity<ApiResponse<MinistryofInteriorResponseDto>> createMinistryofInterior(
             @Valid @ModelAttribute MinistryofInteriorRequestDto requestDto,
             @RequestParam("photo") MultipartFile photo) {
+        log.info("Create ministry of interior request received, photo='{}'", photo != null ? photo.getOriginalFilename() : "none");
 
         MinistryofInteriorResponseDto response = ministryofInteriorService.saveMinistryofInterior(requestDto, photo);
+        log.info("Ministry of interior created: ministryofInteriorId='{}'", response.getMinistryofInteriorId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
                         MinistryofInteriorConstants.MINISTRY_OF_INTERIOR_CREATED,
@@ -55,6 +58,7 @@ public class MinistryofInteriorController {
             @PathVariable String ministryofInteriorId,
             @Valid @ModelAttribute MinistryofInteriorRequestDto requestDto,
             @RequestParam (value = "photo", required = false) MultipartFile photo) {
+        log.info("Update ministry of interior request, ministryofInteriorId='{}'", ministryofInteriorId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -71,6 +75,7 @@ public class MinistryofInteriorController {
     @GetMapping("/{ministryofInteriorId}")
     public ResponseEntity<ApiResponse<MinistryofInteriorResponseDto>> getMinistryofInteriorById(
             @PathVariable String ministryofInteriorId) {
+        log.info("Get ministry of interior request: ministryofInteriorId='{}'", ministryofInteriorId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -108,6 +113,7 @@ public class MinistryofInteriorController {
     public ResponseEntity<ApiResponse<MinistryofInteriorResponseDto>> changeStatus(
             @PathVariable String ministryofInteriorId,
             @RequestParam Boolean isActive) {
+        log.info("Change status request: ministryofInteriorId='{}', isActive={}", ministryofInteriorId, isActive);
 
         return ResponseEntity.ok(
                 ApiResponse.success(

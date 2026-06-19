@@ -89,9 +89,9 @@ public class UniversityTraineeSearchSpecification {
             }
 
             // statusId — stored as plain String on the entity
-            if (request.getStatus() != null) {
+            if (request.getStatusId() != null) {
                 predicates.add(
-                        criteriaBuilder.equal(entityRoot.get("statusId"), request.getStatus())
+                        criteriaBuilder.equal(entityRoot.get("statusId"), request.getStatusId())
                 );
             }
 

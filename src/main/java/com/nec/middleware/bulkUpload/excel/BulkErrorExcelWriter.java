@@ -1,6 +1,7 @@
-package com.nec.middleware.hr.util;
+package com.nec.middleware.bulkUpload.excel;
 
-import com.nec.middleware.hr.dto.response.RowErrorDto;
+
+import com.nec.middleware.bulkUpload.dto.RowErrorDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,6 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,17 +39,8 @@ public class BulkErrorExcelWriter {
 
     private static final String ERROR_REASON_HEADER = "Error Reason";
 
-    /**
-     * Write {@code errors} to a new temp {@code .xlsx} file.
-     *
-     * @param columnLabels header labels for the original data columns, in
-     *                     order (e.g. from {@code UniversityTraineeCsvImportService.columnLabels()})
-     * @param errors       failed rows to write back out, each carrying its
-     *                     original {@code rawData} and failure {@code message}
-     * @param baseFileName used to build a readable, unique temp filename,
-     *                     e.g. "university-trainee-bulk-errors"
-     * @return the written temp file, ready to be streamed and then deleted
-     */
+
+
     public File write(String[] columnLabels, List<RowErrorDto> errors, String baseFileName) {
 
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -126,7 +120,7 @@ public class BulkErrorExcelWriter {
     private File writeToTempFile(Workbook workbook, String baseFileName) throws IOException {
         Path tempDir = Files.createTempDirectory(TEMP_SUBFOLDER);
         // Unique suffix avoids collisions if multiple uploads fail concurrently.
-        String fileName = baseFileName + "-" + UUID.randomUUID() + ".xlsx";
+        String fileName = baseFileName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".xlsx";
         File outFile = new File(tempDir.toFile(), fileName);
 
         try (FileOutputStream fos = new FileOutputStream(outFile)) {

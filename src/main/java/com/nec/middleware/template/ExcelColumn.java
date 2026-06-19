@@ -1,4 +1,4 @@
-package com.nec.middleware.template.annotation;
+package com.nec.middleware.template;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -22,7 +22,7 @@ public class UniversityTraineeFilterRequestDto {
     private Long regionId;
     private Long districtId;
     private Long cityId;
-    private String status;
+    private Long statusId;
     private Boolean isActive;
 
 }

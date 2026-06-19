@@ -1,6 +1,7 @@
 package com.nec.middleware.template.service;
 
-import com.nec.middleware.template.annotation.ExcelColumn;
+
+import com.nec.middleware.template.ExcelColumn;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

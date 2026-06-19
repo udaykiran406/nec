@@ -34,12 +34,11 @@ public class UniversityTraineeResponseDto {
     private String semester;
     private String faculty;
     private String photoPath;
-    private String  status;
 
     // ------------------------------------------------------------------ Lookup FKs → IdValueDto
     private IdValueDto gender;
     private IdValueDto paymentMethod;
-
+    private IdValueDto  status;
     // ------------------------------------------------------------------ Master Data FKs → IdValueDto
     private IdValueDto university;
     private IdValueDto region;

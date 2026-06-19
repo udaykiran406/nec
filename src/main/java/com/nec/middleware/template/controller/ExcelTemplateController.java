@@ -1,6 +1,6 @@
 package com.nec.middleware.template.controller;
 
-import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
+import com.nec.middleware.hr.dto.request.*;
 import com.nec.middleware.template.service.ExcelTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +29,20 @@ public class ExcelTemplateController {
 
     private final ExcelTemplateService excelTemplateService;
 
-    @GetMapping("/university-trainee")
+
+    @GetMapping("/portalUser")
+    @Operation(
+            summary = "Download Portal User Excel import template",
+            description = "Generates Excel template from PortalUserRequestDto"
+    )
+    public ResponseEntity<byte[]> portalUserTemplate() throws Exception {
+        return buildResponse(
+                PortalUserRequestDto.class,
+                "portal_user_template.xlsx"
+        );
+    }
+
+    @GetMapping("/universityTrainee")
     @Operation(
             summary = "Download University Trainee Excel import template",
             description = "Generates a ready-to-fill .xlsx template (header row, sample row, "
@@ -40,13 +53,38 @@ public class ExcelTemplateController {
         return buildResponse(UniversityTraineeRequestDto.class, "university_trainee_template.xlsx");
     }
 
-    // Add more modules here later, e.g.:
-    //
-    // @GetMapping("/employee")
-    // @Operation(summary = "Download Employee Excel import template")
-    // public ResponseEntity<byte[]> employeeTemplate() throws Exception {
-    //     return buildResponse(EmployeeCreateDto.class, "employee_template.xlsx");
-    // }
+    @GetMapping("/politicalPartyAgent")
+    @Operation(
+            summary = "Download Political Party Agent Excel import template"
+    )
+    public ResponseEntity<byte[]> politicalPartyAgentTemplate() throws Exception {
+        return buildResponse(
+                PoliticalPartyAgentRequestDto.class,
+                "political_party_agent_template.xlsx"
+        );
+    }
+
+    @GetMapping("/ministryOfInteriors")
+    @Operation(
+            summary = "Download Ministry Of Interior Excel import template"
+    )
+    public ResponseEntity<byte[]> ministryOfInterior() throws Exception {
+        return buildResponse(
+                MinistryofInteriorRequestDto.class,
+                "ministry_of_interior_template.xlsx"
+        );
+    }
+
+    @GetMapping("/temporaryContracts")
+    @Operation(
+            summary = "Download Temporary Contract Excel import template"
+    )
+    public ResponseEntity<byte[]> temporaryContractTemplate() throws Exception {
+        return buildResponse(
+                TemporaryContractRequestDto.class,
+                "temporary_contract_template.xlsx"
+        );
+    }
 
     private ResponseEntity<byte[]> buildResponse(Class<?> dtoClass, String fileName) throws Exception {
         byte[] excelBytes = excelTemplateService.createTemplate(dtoClass);

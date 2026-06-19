@@ -27,7 +27,7 @@ public class MinistryofInteriorSearchSpecification {
                 filterPredicates.add(
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(
-                                        entityRoot.get("MinistryofInteriorId")),
+                                        entityRoot.get("ministryofInteriorId")),
                                 "%" + filterRequest.getMinistryofInteriorId()
                                         .toLowerCase() + "%"
                         )

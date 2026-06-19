@@ -37,12 +37,13 @@ public class MinistryofInteriorMapper {
      * {@code aaqilId} is immutable and deliberately excluded.
      */
     public void updateEntity(MinistryofInterior entity, MinistryofInteriorRequestDto dto) {
-        if (dto.getName() != null) entity.setName(dto.getName());
-        if (dto.getAge()      != null) entity.setAge(dto.getAge());
-        if (dto.getPhone()    != null) entity.setPhone(dto.getPhone());
-        if (dto.getEmail()    != null) entity.setEmail(dto.getEmail());
-        if (dto.getPhotoPath()  != null) entity.setPhotoPath(dto.getPhotoPath());
-        if (dto.getUpdatedBy()!= null) entity.setUpdatedBy(dto.getUpdatedBy());
+       entity.setName(dto.getName());
+         entity.setAge(dto.getAge());
+        entity.setPhone(dto.getPhone());
+        entity.setEmail(dto.getEmail());
+       entity.setPhotoPath(dto.getPhotoPath());
+       entity.setUpdatedBy(dto.getUpdatedBy());
+
     }
 
     /**

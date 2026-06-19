@@ -1,12 +1,20 @@
-package com.nec.middleware.hr.dto.response;
+package com.nec.middleware.bulkUpload.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Describes a single row-level failure during a bulk upload.
+ *
+ * <p>Identical in shape to the original {@code hr.dto.response.RowErrorDto}
+ * — moved here so it's shared by every module (not just HR) without any
+ * module depending on another module's package.
  *
  * <pre>
  * {
@@ -17,15 +25,13 @@ import java.util.Map;
  * </pre>
  *
  * {@code field} is optional — set it when the error is attributable to a
- * specific column (e.g. duplicate email).  Leave it {@code null} for
- * row-level failures (e.g. FK not found, unexpected exception).
+ * specific column. Leave it {@code null} for row-level failures (FK not
+ * found, unexpected exception, structural parse error).
  *
  * <p>{@code rawData} retains the original column values for this row
- * (header label → raw string value, in file column order) so that an error
- * report file can be regenerated with the user's original data plus the
- * failure reason appended as a trailing column. For rows that failed
- * during parsing, this map may be partially populated (only the columns
- * that were successfully read before the error occurred).
+ * (header label → raw string value) so the error report file can be
+ * regenerated with the user's original input plus the failure reason
+ * appended as a trailing column.
  */
 @Getter
 @Setter
@@ -44,8 +50,7 @@ public class RowErrorDto {
     private String message;
 
     /**
-     * Original column values for this row, header label → raw string value,
-     * in file column order. Used to rebuild the failed row in the error report.
+     * Original column values for this row, header label → raw string value.
      * Builder default ensures this is never null even if not explicitly set.
      */
     @Builder.Default
