@@ -151,6 +151,23 @@ public class UserServiceImpl implements UserService {
         try {
             userMapper.updateEntity(existing, request);
             RbacUser saved = userRepository.saveAndFlush(existing);
+
+            // Sync profile changes to Keycloak (email, username)
+            // DB change is already committed — a Keycloak failure must not roll it back.
+            try {
+                // Sync email and/or username if present in request
+                if (RbacUtil.isNotBlank(request.getEmail()) || RbacUtil.isNotBlank(request.getUserName())) {
+                    keycloakAuthProvider.updateUserProfile(
+                            saved.getKeycloakUserId(),
+                            request.getEmail(),
+                            request.getUserName());
+                }
+            } catch (Exception ex) {
+                // Include throwable so the stacktrace is available in logs for debugging
+                log.warn("User {} profile updated locally but Keycloak sync failed (will retry on next login)",
+                        saved.getKeycloakUserId(), ex);
+            }
+
             return mapUserWithAssociations(saved);
         } catch (DataIntegrityViolationException e) {
             log.warn("Data integrity violation during user update. UserId: {}", id, e);
@@ -227,8 +244,9 @@ public class UserServiceImpl implements UserService {
         try {
             keycloakAuthProvider.setUserEnabled(saved.getKeycloakUserId(), isActive.equals(1));
         } catch (Exception ex) {
-            log.warn("User {} status updated locally but Keycloak sync failed (will retry on next login): {}",
-                    saved.getKeycloakUserId(), ex.getMessage());
+            // Include throwable so the stacktrace is available in logs for debugging
+            log.warn("User {} status updated locally but Keycloak sync failed (will retry on next login)",
+                    saved.getKeycloakUserId(), ex);
         }
 
         return mapUserWithAssociations(saved);
@@ -246,12 +264,41 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(user);
 
-        // Attempt to delete from Keycloak, but don't block local deletion if it fails
+        // Soft-delete in Keycloak by disabling the user (keep user in Keycloak for audit/restore purposes)
         try {
-            keycloakAuthProvider.deleteUserInKeycloak(user.getKeycloakUserId());
+            keycloakAuthProvider.setUserEnabled(user.getKeycloakUserId(), false);
         } catch (Exception ex) {
-            log.warn("Failed to delete user from Keycloak (ID: {}): {}", user.getKeycloakUserId(), ex.getMessage());
+            // Include throwable so the stacktrace is available in logs for debugging
+            log.warn("User {} soft-deleted locally but Keycloak disable failed (will retry on next login)",
+                    user.getKeycloakUserId(), ex);
         }
+    }
+
+    @Override
+    public RbacUserResponse restoreUser(String id) {
+        // Find the soft-deleted user
+        RbacUser user = userRepository.findByUserIdAndIsDeleted(id, RbacConstants.IS_DELETED_TRUE)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        RbacUtil.buildMessage(RbacConstants.USER_NOT_FOUND, id)));
+
+        // Restore in database
+        user.setIsDeleted(RbacConstants.IS_DELETED_FALSE);
+        String actingUserId = resolveActingUserId();
+        if (org.springframework.util.StringUtils.hasText(actingUserId)) {
+            user.setUpdatedBy(actingUserId);
+        }
+        RbacUser saved = userRepository.saveAndFlush(user);
+
+        // Re-enable in Keycloak to sync with database restoration
+        try {
+            keycloakAuthProvider.setUserEnabled(saved.getKeycloakUserId(), true);
+        } catch (Exception ex) {
+            // Include throwable so the stacktrace is available in logs for debugging
+            log.warn("User {} restored locally but Keycloak enable failed (will retry on next login)",
+                    saved.getKeycloakUserId(), ex);
+        }
+
+        return mapUserWithAssociations(saved);
     }
 
     // Helper methods
@@ -312,7 +359,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private String resolveActingUserId() {
-        return NecSecurityUtils.getCurrentUser().getUserId();
+        var user = NecSecurityUtils.getCurrentUserOrNull();
+        return user != null ? user.getUserId() : null;
     }
 
     private RbacUserResponse mapUserWithAssociations(RbacUser user) {

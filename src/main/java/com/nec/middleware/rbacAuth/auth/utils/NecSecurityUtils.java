@@ -35,6 +35,22 @@ public final class NecSecurityUtils {
     }
 
     /**
+     * Safely returns the current RbacUser or null if the security context does not contain one.
+     * This method does not throw and is suitable for code paths that allow anonymous/system calls.
+     */
+    public static RbacUser getCurrentUserOrNull() {
+        var context = SecurityContextHolder.getContext();
+        if (context == null || context.getAuthentication() == null) {
+            return null;
+        }
+        Object principal = context.getAuthentication().getPrincipal();
+        if (principal instanceof RbacUser) {
+            return (RbacUser) principal;
+        }
+        return null;
+    }
+
+    /**
      * Builds a {@link NecUserContextDTO} from the current authenticated user.
      *
      * <p>This method extracts all relevant user information from the authenticated {@link RbacUser}

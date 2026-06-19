@@ -88,8 +88,8 @@ public class PortalUserMapper {
 
                 .role(entity.getRole() != null
                         ? IdValueDto.builder()
-                          .id(entity.getRole().getId())
-                          .value(entity.getRole().getValue())
+                          .id(entity.getRole().getRoleId())
+                          .value(entity.getRole().getRoleName())
                           .build()
                         : null)
 

@@ -28,6 +28,14 @@ public interface UserService {
 
 
 
+
+    /**
+     * Restores a soft-deleted user (is_deleted = false) and re-enables them in Keycloak.
+     *
+     * @param id the primary key of the user
+     * @return the restored user as a response DTO
+     */
+    RbacUserResponse restoreUser(String id);
     /**
 
      * Creates a new user record (INSERT).

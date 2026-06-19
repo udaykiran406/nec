@@ -371,7 +371,8 @@ public class RolePermissionServiceImpl implements RolePermissionService {
     }
 
     private String resolveActingUserId() {
-        return NecSecurityUtils.getCurrentUser().getUserId();
+        var user = NecSecurityUtils.getCurrentUserOrNull();
+        return user != null ? user.getUserId() : null;
     }
 }
 

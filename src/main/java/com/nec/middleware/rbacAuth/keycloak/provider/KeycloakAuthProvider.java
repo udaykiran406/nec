@@ -9,8 +9,8 @@ import com.nec.middleware.rbacAuth.auth.exception.InvalidCredentialsException;
 import com.nec.middleware.rbacAuth.keycloak.KeycloakProperties;
 import com.nec.middleware.rbacAuth.keycloak.client.KeycloakClient;
 import com.nec.middleware.rbacAuth.keycloak.client.KeycloakTokenClient;
-import com.nec.middleware.rbacAuth.keycloak.client.request.KeycloakUserCreateRequest;
 import com.nec.middleware.rbacAuth.keycloak.client.request.KeycloakCredentialRequest;
+import com.nec.middleware.rbacAuth.keycloak.client.request.KeycloakUserCreateRequest;
 import com.nec.middleware.rbacAuth.keycloak.client.response.KeycloakTokenResponse;
 import com.nec.middleware.rbacAuth.keycloak.util.ClientCredentials;
 import com.nec.middleware.rbacAuth.keycloak.util.ClientCredentialsUtil;
@@ -112,7 +112,7 @@ public class KeycloakAuthProvider {
             Map<String, Object> tokenInfo = objectMapper.convertValue(
                     response.getBody(), new TypeReference<>() {});
 
-            if (!Boolean.TRUE.equals(tokenInfo.get("active"))) {
+            if (Boolean.FALSE.equals(tokenInfo.get("active"))) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "TOKEN_INACTIVE_OR_INVALID");
             }
 
@@ -378,6 +378,58 @@ public class KeycloakAuthProvider {
         }
     }
 
+    /**
+     * Updates a user's profile in Keycloak (email, username, firstName, lastName, etc.).
+     * Email and username updates are synchronized with Keycloak to keep both systems in sync.
+     *
+     * @param keycloakUserId the Keycloak user ID
+     * @param email the new email (optional, can be null)
+     * @param username the new username (optional, can be null)
+     * @throws ResponseStatusException on failure
+     */
+    public void updateUserProfile(String keycloakUserId, String email, String username) {
+        log.info("Updating user profile in Keycloak: id={}, email={}, username={}", keycloakUserId, email, username);
+        try {
+            String adminBearer = fetchAdminBearerToken();
+
+            Map<String, Object> updateRequest = new java.util.HashMap<>();
+
+            if (StringUtils.hasText(email)) {
+                updateRequest.put("email", email);
+                updateRequest.put("emailVerified", false);  // Reset email verification after change
+            }
+
+            if (StringUtils.hasText(username)) {
+                updateRequest.put("username", username);
+            }
+
+            // Don't send empty update
+            if (updateRequest.isEmpty()) {
+                log.warn("No profile fields to update for Keycloak user id={}", keycloakUserId);
+                return;
+            }
+
+            // Log outgoing payload at debug so we can inspect what we send to Keycloak
+            log.debug("Keycloak update payload for user {}: {}", keycloakUserId, updateRequest);
+
+            keycloakClient.setUserEnabled(
+                    keycloakProperties.realmName(),
+                    keycloakUserId,
+                    adminBearer,
+                    updateRequest
+            );
+            log.info("Keycloak user {} profile updated: email={}, username={}", keycloakUserId, email, username);
+        } catch (HttpClientErrorException ex) {
+            log.error("Keycloak updateUserProfile failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString(), ex);
+            throw new ResponseStatusException(ex.getStatusCode(), "updateUserProfile(): " + ex.getMessage(), ex);
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Keycloak updateUserProfile unexpected error", ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "updateUserProfile(): " + ex.getMessage(), ex);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
@@ -388,13 +440,13 @@ public class KeycloakAuthProvider {
      * <p>{@code admin-cli} is a PUBLIC client — it never has a {@code client_secret}.
      * Sending a {@code client_secret} for a public client causes Keycloak 26 to return
      * {@code 401 invalid_grant: Invalid user credentials}.  This method therefore calls
-     * {@link com.nec.middleware.rbacAuth.keycloak.client.KeycloakClient#getAdminToken}
+     * {@link KeycloakClient#getAdminToken}
      * which intentionally omits {@code client_secret}.
      *
      * <p>Parameters are POSTed as {@code application/x-www-form-urlencoded} body — NOT
      * appended to the URL.  Spring 6 routes {@code @RequestParam} values to the form body
      * only when no class-level {@code contentType} conflicts with the method-level value;
-     * see the {@link com.nec.middleware.rbacAuth.keycloak.client.KeycloakClient} interface javadoc
+     * see the {@link KeycloakClient} interface javadoc
      * for the full explanation.
      */
     private RuntimeException keycloakTokenFailure(String username, int status, String body, Exception cause) {

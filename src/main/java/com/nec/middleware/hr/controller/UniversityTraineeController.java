@@ -126,7 +126,15 @@ public class UniversityTraineeController {
     @PatchMapping("/{universityTraineeId}/status")
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> changeUniversityTraineeStatus(
             @PathVariable String universityTraineeId,
-            @RequestParam Boolean isActive) {
+            @RequestParam(required = false) Boolean isActive) {
+
+        if (isActive == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<UniversityTraineeResponseDto>builder()
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .message("isActive is required")
+                            .build());
+        }
 
         UniversityTraineeResponseDto response =
                 universityTraineeService.changeStatus(

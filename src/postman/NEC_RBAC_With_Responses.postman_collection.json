@@ -1,4 +1,4 @@
-{
+﻿{
   "info": {
     "_postman_id": "nec-rbac-api-with-responses",
     "name": "NEC RBAC Complete API Collection - With Responses",
@@ -2653,6 +2653,145 @@
                     "{{userId}}"
                   ],
                   "query": []
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"data\": null\n}",
+              "cookie": []
+            }
+          ]
+        },
+        {
+          "name": "Restore User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/restore",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}",
+                "restore"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 - User Restored",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/restore",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "restore"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 200,\n  \"message\": \"User restored successfully\",\n  \"data\": {\n    \"id\": \"{{userId}}\",\n    \"keycloakUserId\": \"{{userId}}\",\n    \"userName\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"isActive\": 1,\n    \"passwordToBeChanged\": false,\n    \"emailVerified\": false,\n    \"mobileVerified\": false,\n    \"lastLoginAt\": null,\n    \"failedLoginAttempts\": 0\n  }\n}",
+              "cookie": []
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/restore",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "restore"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 401,\n  \"message\": \"Invalid or expired token\",\n  \"data\": null\n}",
+              "cookie": []
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}\"\n                   }\n                 ],\n                 \"url\": {\n                   \"raw\": \"{{baseUrl}}/api/v1/rbac/users/invalid-id/restore\",\n                   \"host\": [\n                     \"{{baseUrl}}\"\n                   ],\n                   \"path\": [\n                     \"api\",\n                     \"v1\",\n                     \"rbac\",\n                     \"users\",\n                     \"invalid-id\",\n                     \"restore\"\n                   ]\n                 }\n               },\n               \"status\": \"Not Found\",\n               \"code\": 404,\n               \"_postman_previewlanguage\": \"json\",\n               \"header\": [\n                 {\n                   \"key\": \"Content-Type\",\n                   \"value\": \"application/json\"\n                 }\n               ],\n               \"body\": \"{\\n  \\\"success\\\": 404,\\n  \\\"message\\\": \\\"User not found\\\",\\n  \\\"data\\\": null\\n}\",\n               \"cookie\": []\n             },\n             {\n               \"name\": \"500 - Internal Server Error\",\n               \"originalRequest\": {\n                 \"method\": \"POST\",\n                 \"header\": [\n                   {\n                     \"key\": \"Authorization\",\n                     \"value\": \"Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/restore",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "rbac",
+                    "users",
+                    "{{userId}}",
+                    "restore"
+                  ]
                 }
               },
               "status": "Internal Server Error",

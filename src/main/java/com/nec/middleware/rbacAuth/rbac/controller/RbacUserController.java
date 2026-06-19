@@ -1,6 +1,7 @@
 package com.nec.middleware.rbacAuth.rbac.controller;
 
 import com.nec.middleware.rbacAuth.rbac.constant.ApiMessageConstants;
+import com.nec.middleware.rbacAuth.rbac.constant.ErrorCodeConstants;
 import com.nec.middleware.rbacAuth.rbac.constant.RbacConstants;
 import com.nec.middleware.rbacAuth.rbac.dto.request.RbacUserRequest;
 import com.nec.middleware.rbacAuth.rbac.dto.request.UserListRequestDto;
@@ -55,7 +56,15 @@ public class RbacUserController {
     @PatchMapping("/users/{id}/status")
     public ResponseEntity<ApiResponse<RbacUserResponse>> changeUserActiveStatus(
             @PathVariable String id,
-            @RequestParam Integer isActive) {
+            @RequestParam(required = false) Integer isActive) {
+
+        if (isActive == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(),
+                            ErrorCodeConstants.MISSING_REQUIRED_FIELDS,
+                            "isActive is required"));
+        }
+
         return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_STATUS_CHANGED,
                 userService.changeUserActiveStatus(id, isActive)));
     }
@@ -64,6 +73,11 @@ public class RbacUserController {
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_DELETED));
+    }
+
+    @PostMapping("/users/{id}/restore")
+    public ResponseEntity<ApiResponse<RbacUserResponse>> restoreUser(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_RESTORED, userService.restoreUser(id)));
     }
 
     /**

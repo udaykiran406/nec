@@ -227,7 +227,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private String resolveActingUserId() {
-        return NecSecurityUtils.getCurrentUser().getUserId();
+        var user = NecSecurityUtils.getCurrentUserOrNull();
+        return user != null ? user.getUserId() : null;
     }
 
     // Helper methods

@@ -78,6 +78,7 @@ public class AuthController {
 
     @Operation(summary = "Update password", description = "Authenticated user changes their own password. Requires a valid Bearer token.")
     @PutMapping("/update-password")
+    @Authorize()
     public ResponseEntity<ApiResponse<UpdatePasswordResponse>> updatePassword(
             @Valid @RequestBody UpdatePasswordRequest request) {
         UpdatePasswordResponse response = authService.updatePassword(request);

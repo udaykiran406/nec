@@ -3,10 +3,10 @@ package com.nec.middleware.rbacAuth.keycloak.client;
 import com.nec.middleware.rbacAuth.keycloak.client.request.KeycloakUserCreateRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -116,13 +116,5 @@ public interface KeycloakClient {
             @PathVariable String userId,
             @RequestHeader("Authorization") String adminToken,
             @RequestBody Object userUpdateRequest
-    );
-
-    /** Get a user by ID from the realm */
-    @org.springframework.web.service.annotation.GetExchange(value = "/admin/realms/{realm}/users/{userId}")
-    ResponseEntity<Object> getUser(
-            @PathVariable String realm,
-            @PathVariable String userId,
-            @RequestHeader("Authorization") String adminToken
     );
 }
