@@ -53,7 +53,7 @@ public class MinistryofInteriorController {
 
     @Operation(summary = "Update Ministry of Interior",
             description = "multipart/form-data: flat fields + optional photo")
-    @PatchMapping(value="/{ministryofInteriorId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value="/{ministryofInteriorId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<MinistryofInteriorResponseDto>> updateMinistryofInterior(
             @PathVariable String ministryofInteriorId,
             @Valid @ModelAttribute MinistryofInteriorRequestDto requestDto,
@@ -88,7 +88,7 @@ public class MinistryofInteriorController {
     // ------------------------------------------------------------------ GET ALL
 
     @Operation(summary = "Get Paginated & Filtered Ministry of Interior List")
-    @PostMapping("/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<ApiResponse<Page<MinistryofInteriorResponseDto>>> getAllMinistryofInterior(
             @RequestBody(required = false) MinistryofInteriorFilterRequestDto filterDto,
             @RequestParam(defaultValue = "0") int page,

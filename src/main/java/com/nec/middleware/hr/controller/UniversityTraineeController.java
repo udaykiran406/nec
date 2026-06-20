@@ -54,7 +54,7 @@ public class UniversityTraineeController {
 
     @Operation(summary = "Update University Trainee",
             description = "multipart/form-data: flat fields + optional photo")
-    @PatchMapping(value = "/{universityTraineeId}",
+    @PutMapping(value = "/{universityTraineeId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> updateUniversityTrainee(
             @PathVariable String universityTraineeId,
@@ -99,7 +99,7 @@ public class UniversityTraineeController {
     // ------------------------------------------------------------------ GET ALL
 
     @Operation(summary = "Get All University Trainees")
-    @PostMapping("/getAllUniversityTrainees")
+    @GetMapping("/getAllUniversityTrainees")
     public ResponseEntity<ApiResponse<Page<UniversityTraineeResponseDto>>> getAllUniversityTrainee(
             @RequestBody(required = false) UniversityTraineeFilterRequestDto request,
             @RequestParam(defaultValue = "0") int page,

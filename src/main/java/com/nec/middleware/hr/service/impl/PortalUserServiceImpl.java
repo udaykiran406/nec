@@ -254,16 +254,16 @@ public class PortalUserServiceImpl implements PortalUserService {
 
         PortalUser updatedEntity = portalUserrepository.save(portalUser);
 
-        PortalUserResponseDto prtalUserResponse =
+        PortalUserResponseDto portalUserResponse =
                 portalUserMapper.portalUserResponseDto(updatedEntity);
 
         // Enrich masterData as IdValueDto
-        prtalUserResponse.setMasterData(
+        portalUserResponse.setMasterData(
                 buildMasterDataIdValueDto(updatedEntity.getMasterData(), updatedEntity.getMasterdataId())
         );
         log.info("Portal user updated: portalUserId='{}'", updatedEntity.getPortalUserId());
 
-        return prtalUserResponse;
+        return portalUserResponse;
     }
 
     // ------------------------------------------------------------------ SOFT DELETE

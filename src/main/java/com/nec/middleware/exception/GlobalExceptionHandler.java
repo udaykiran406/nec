@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -590,6 +591,32 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 ErrorCodeConstants.INTERNAL_SERVER_ERROR,
                 ErrorCodeConstants.INTERNAL_SERVER_ERROR_MSG);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMissingServletRequestPart(
+            MissingServletRequestPartException ex) {
+        log.warn("Missing request part: {}", ex.getRequestPartName());
+
+        String message = String.format(
+                "Required request part '%s' is missing",
+                ex.getRequestPartName());
+
+        return errorResponse(
+                HttpStatus.BAD_REQUEST,
+                ErrorCodeConstants.INVALID_REQUEST,
+                message
+        );
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateResourceException(
+            DuplicateResourceException ex) {
+        return errorResponse(
+                HttpStatus.CONFLICT,
+                "DUPLICATE_RESOURCE",
+                ex.getMessage()
+        );
     }
 }
 
