@@ -11,12 +11,14 @@ import com.nec.middleware.rbacAuth.rbac.dto.response.RbacUserResponse;
 import com.nec.middleware.rbacAuth.rbac.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/rbac")
 @AllArgsConstructor
@@ -27,30 +29,45 @@ public class RbacUserController {
     @PostMapping("/users")
     public ResponseEntity<ApiResponse<RbacUserResponse>> createUser(
             @Valid @RequestBody RbacUserRequest request) {
+        log.info("Create RBAC user request received: email={}", request.getEmail());
+        RbacUserResponse response = userService.createUser(request);
+        log.info("RBAC user created successfully: userId={}", response.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.created(RbacConstants.USER_CREATED, userService.createUser(request)));
+                .body(ApiResponse.created(RbacConstants.USER_CREATED, response));
     }
 
     @PutMapping("/users/{id}")
     public ResponseEntity<ApiResponse<RbacUserResponse>> updateUser(
             @PathVariable String id,
             @Valid @RequestBody RbacUserRequest request) {
-        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_UPDATED, userService.updateUser(id, request)));
+        log.info("Update RBAC user request received: userId={}, email={}", id, request.getEmail());
+        RbacUserResponse response = userService.updateUser(id, request);
+        log.info("RBAC user updated successfully: userId={}", response.getId());
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_UPDATED, response));
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<ApiResponse<RbacUserResponse>> getUserById(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_FETCHED, userService.getUserById(id)));
+        log.info("Fetch RBAC user request received: userId={}", id);
+        RbacUserResponse response = userService.getUserById(id);
+        log.debug("RBAC user fetched successfully: userId={}", id);
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_FETCHED, response));
     }
 
     @GetMapping("/users/all")
     public ResponseEntity<ApiResponse<List<RbacUserResponse>>> getAllUsers() {
-        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USERS_FETCHED, userService.getAllUsers()));
+        log.info("Fetching all RBAC users");
+        List<RbacUserResponse> response = userService.getAllUsers();
+        log.debug("Fetched {} RBAC users", response.size());
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USERS_FETCHED, response));
     }
 
     @GetMapping("/users/role/{roleId}")
     public ResponseEntity<ApiResponse<List<RbacUserResponse>>> getUsersByRoleId(@PathVariable Long roleId) {
-        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USERS_FETCHED, userService.getUsersByRoleId(roleId)));
+        log.info("Fetching RBAC users by role: roleId={}", roleId);
+        List<RbacUserResponse> response = userService.getUsersByRoleId(roleId);
+        log.debug("Fetched {} RBAC users for roleId={}", response.size(), roleId);
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USERS_FETCHED, response));
     }
 
     @PatchMapping("/users/{id}/status")
@@ -59,25 +76,33 @@ public class RbacUserController {
             @RequestParam(required = false) Integer isActive) {
 
         if (isActive == null) {
+            log.warn("Change RBAC user status rejected: userId={}, reason=isActive missing", id);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(),
                             ErrorCodeConstants.MISSING_REQUIRED_FIELDS,
                             "isActive is required"));
         }
 
-        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_STATUS_CHANGED,
-                userService.changeUserActiveStatus(id, isActive)));
+        log.info("Change RBAC user status request received: userId={}, isActive={}", id, isActive);
+        RbacUserResponse response = userService.changeUserActiveStatus(id, isActive);
+        log.info("RBAC user status changed successfully: userId={}, isActive={}", id, isActive);
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_STATUS_CHANGED, response));
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String id) {
+        log.info("Soft deleting RBAC user: userId={}", id);
         userService.deleteUser(id);
+        log.info("RBAC user soft-deleted successfully: userId={}", id);
         return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_DELETED));
     }
 
     @PostMapping("/users/{id}/restore")
     public ResponseEntity<ApiResponse<RbacUserResponse>> restoreUser(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_RESTORED, userService.restoreUser(id)));
+        log.info("Restore RBAC user request received: userId={}", id);
+        RbacUserResponse response = userService.restoreUser(id);
+        log.info("RBAC user restored successfully: userId={}", response.getId());
+        return ResponseEntity.ok(ApiResponse.ok(RbacConstants.USER_RESTORED, response));
     }
 
     /**
@@ -86,7 +111,11 @@ public class RbacUserController {
     @PostMapping("/user/list")
     public ResponseEntity<ApiResponse<PaginatedResponse<RbacUserResponse>>> listUsers(
             @Valid @RequestBody(required = false) UserListRequestDto request) {
-        return ResponseEntity.ok(ApiResponse.ok(ApiMessageConstants.DATA_FETCHED, userService.listUsers(request)));
+        UserListRequestDto listRequest = request != null ? request : new UserListRequestDto();
+        log.info("Fetching RBAC users with filters: page={}, size={}, search={}",
+                listRequest.getPage(), listRequest.getSize(), listRequest.getSearch());
+        PaginatedResponse<RbacUserResponse> response = userService.listUsers(request);
+        return ResponseEntity.ok(ApiResponse.ok(ApiMessageConstants.DATA_FETCHED, response));
     }
 
 }

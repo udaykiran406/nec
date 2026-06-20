@@ -52,7 +52,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RbacUser implements Persistable<String> {
+public class RbacUser extends BaseAuditEntity implements Persistable<String> {
 
     // ==================== PRIMARY KEY ====================
     @Id
@@ -197,26 +197,6 @@ public class RbacUser implements Persistable<String> {
     @Column(name = "mobile_verified", nullable = false)
     @Builder.Default
     private Boolean mobileVerified = false;
-
-    // ==================== AUDIT FIELDS ====================
-
-    /** ID of the user who created this record. */
-    @Column(name = "created_by", nullable = false)
-    private Long createdBy;
-
-    /** Timestamp automatically set on INSERT. */
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    /** ID of the user who last updated this record (Keycloak UUID). */
-    @Column(name = "updated_by", length = 36)
-    private String updatedBy;
-
-    /** Timestamp automatically updated on each UPDATE. */
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     // ==================== SOFT DELETE ====================
 

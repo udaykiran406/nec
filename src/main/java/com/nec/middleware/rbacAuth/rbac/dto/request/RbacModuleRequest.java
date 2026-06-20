@@ -14,8 +14,7 @@ import lombok.*;
  *   "moduleCode": "HR",
  *   "moduleName": "Human Resource",
  *   "displayOrder": 1,
- *   "status": "ACTIVE",
- *   "createdByUserId": 1
+ *   "status": "ACTIVE"
  * }
  * </pre>
  *
@@ -26,8 +25,7 @@ import lombok.*;
  *   "moduleCode": "HR",
  *   "moduleName": "Human Resource",
  *   "displayOrder": 1,
- *   "status": "ACTIVE",
- *   "modifiedByUserId": 2
+ *   "status": "ACTIVE"
  * }
  * </pre>
  */
@@ -70,19 +68,6 @@ public class RbacModuleRequest {
     @NotBlank(message = "Status is required.")
     @Pattern(regexp = "^(ACTIVE|INACTIVE)$", message = "Status must be 'ACTIVE' or 'INACTIVE'.")
     private String status;
-
-    /**
-     * ID of the user creating the record (required on create).
-     */
-    @NotNull(message = "Created By User ID is required.")
-    @Min(value = 1, message = "Created By User ID must be a positive number.")
-    private Long createdByUserId;
-
-    /**
-     * ID of the user updating the record (optional on create, recommended on update).
-     */
-    @Min(value = 1, message = "Modified By User ID must be a positive number.")
-    private Long modifiedByUserId;
 }
 
 

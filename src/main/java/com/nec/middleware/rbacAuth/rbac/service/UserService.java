@@ -1,21 +1,10 @@
 package com.nec.middleware.rbacAuth.rbac.service;
 
-
-
 import com.nec.middleware.rbacAuth.rbac.dto.request.RbacUserRequest;
-
 import com.nec.middleware.rbacAuth.rbac.dto.request.UserListRequestDto;
-
 import com.nec.middleware.rbacAuth.rbac.dto.response.RbacUserResponse;
-
 import com.nec.middleware.rbacAuth.rbac.dto.response.PaginatedResponse;
-
-
-
 import java.util.List;
-
-
-
 /**
 
  * Service interface for User-related operations.
@@ -25,10 +14,6 @@ import java.util.List;
  */
 
 public interface UserService {
-
-
-
-
     /**
      * Restores a soft-deleted user (is_deleted = false) and re-enables them in Keycloak.
      *
@@ -44,8 +29,6 @@ public interface UserService {
 
     RbacUserResponse createUser(RbacUserRequest request);
 
-
-
     /**
 
      * Updates an existing user record (UPDATE).
@@ -53,14 +36,10 @@ public interface UserService {
      *
 
      * @param id      the primary key of the user (path variable)
-
      * @param request the updated user data
-
      */
 
     RbacUserResponse updateUser(String id, RbacUserRequest request);
-
-
 
     /**
 
@@ -70,8 +49,6 @@ public interface UserService {
 
     RbacUserResponse getUserById(String id);
 
-
-
     /**
 
      * Retrieves all non-deleted users, ordered alphabetically by user name.
@@ -80,8 +57,6 @@ public interface UserService {
 
     List<RbacUserResponse> getAllUsers();
 
-
-
     /**
 
      * Retrieves users using optional pagination, sorting, search, and dynamic filters.
@@ -89,14 +64,10 @@ public interface UserService {
      *
 
      * @param request the user list request DTO
-
      * @return paginated or full user list response
-
      */
 
     PaginatedResponse<RbacUserResponse> listUsers(UserListRequestDto request);
-
-
 
     /**
 
@@ -106,25 +77,17 @@ public interface UserService {
 
     List<RbacUserResponse> getUsersByRoleId(Long roleId);
 
-
-
     /**
 
      * Changes the {@code is_active} flag of a user.
-
      *
 
      * @param id       the primary key of the user
-
      * @param isActive the new active status
-
      * @return the updated user as a response DTO
-
      */
 
     RbacUserResponse changeUserActiveStatus(String id, Integer isActive);
-
-
 
     /**
 
@@ -133,12 +96,7 @@ public interface UserService {
      *
 
      * @param id the primary key of the user
-
      */
 
     void deleteUser(String id);
-
 }
-
-
-

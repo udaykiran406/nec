@@ -82,12 +82,12 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
 
     private ApiResponse<RbacPermissionGroupResponse> persistPermissionGroup(
             RbacPermissionGroupRequest request, boolean isCreate) {
-        log.info("Starting permission group save process");
+        log.info("Starting permission group {} process", isCreate ? "create" : "update");
 
         try {
             // Validate request
             if (request == null || request.getModules() == null || request.getModules().isEmpty()) {
-                log.error("Invalid permission group request: modules list is null or empty");
+                log.warn("Invalid permission group request: modules list is null or empty");
                 throw new ValidationException(RbacConstants.MODULES_LIST_EMPTY);
             }
 
@@ -110,9 +110,6 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
                     existingModule.setDescription(trimSafe(moduleRequest.getDescription()));
                     existingModule.setDisplayOrder(moduleRequest.getDisplayOrder());
                     existingModule.setStatus(moduleRequest.getStatus());
-                    if (moduleRequest.getModifiedByUserId() != null) {
-                        existingModule.setModifiedByUserId(moduleRequest.getModifiedByUserId());
-                    }
                     savedModule = moduleRepository.save(existingModule);
                 } else {
                     // Create new module
@@ -123,7 +120,7 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
 
                 // Validate groups list
                 if (moduleRequest.getGroups() == null || moduleRequest.getGroups().isEmpty()) {
-                    log.error("Invalid hierarchy: module {} has no groups", moduleRequest.getModuleCode());
+                    log.warn("Invalid hierarchy: module {} has no groups", moduleRequest.getModuleCode());
                     throw new ValidationException(RbacConstants.GROUPS_LIST_EMPTY);
                 }
 
@@ -145,9 +142,6 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
                         existingGroup.setDescription(trimSafe(groupRequest.getDescription()));
                         existingGroup.setDisplayOrder(groupRequest.getDisplayOrder());
                         existingGroup.setStatus(groupRequest.getStatus());
-                        if (groupRequest.getModifiedByUserId() != null) {
-                            existingGroup.setModifiedByUserId(groupRequest.getModifiedByUserId());
-                        }
                         savedGroup = groupRepository.save(existingGroup);
                     } else {
                         // Create new group
@@ -158,7 +152,7 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
 
                     // Validate permissions list
                     if (groupRequest.getPermissions() == null || groupRequest.getPermissions().isEmpty()) {
-                        log.error("Invalid hierarchy: group {} has no permissions", groupRequest.getGroupCode());
+                        log.warn("Invalid hierarchy: group {} has no permissions", groupRequest.getGroupCode());
                         throw new ValidationException(RbacConstants.PERMISSIONS_LIST_EMPTY);
                     }
 
@@ -181,9 +175,6 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
                             existingPermission.setDisplayOrder(permissionRequest.getDisplayOrder());
                             existingPermission.setStatus(permissionRequest.getStatus());
                             existingPermission.setIsSideMenu(permissionRequest.getIsSideMenu() != null ? permissionRequest.getIsSideMenu() : false);
-                            if (permissionRequest.getModifiedByUserId() != null) {
-                                existingPermission.setModifiedByUserId(permissionRequest.getModifiedByUserId());
-                            }
                             savedPermission = permissionRepository.save(existingPermission);
                         } else {
                             // Create new permission
@@ -234,13 +225,13 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
             return ApiResponse.ok(RbacConstants.PERMISSION_GROUP_SAVED_SUCCESS, hierarchyResponse);
 
         } catch (ValidationException e) {
-            log.error("Validation error during permission group save: {}", e.getMessage());
+            log.warn("Validation error during permission group save: {}", e.getMessage());
             throw e;
         } catch (DataIntegrityViolationException e) {
             log.warn("Database constraint violation during permission group save", e);
             throw ExceptionUtil.fromDataIntegrityViolation(e);
         } catch (ResourceNotFoundException e) {
-            log.error("Resource not found during permission group save: {}", e.getMessage());
+            log.warn("Resource not found during permission group save: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error("Unexpected error during permission group save", e);
@@ -256,7 +247,7 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
         // Get module
         RbacModule module = moduleRepository.findByModuleIdAndIsDeleted(moduleId, RbacConstants.IS_DELETED_FALSE)
                 .orElseThrow(() -> {
-                    log.error("Module not found with ID: {}", moduleId);
+                    log.warn("Module not found with ID: {}", moduleId);
                     return new ResourceNotFoundException("Module not found with ID: " + moduleId);
                 });
 
@@ -320,8 +311,9 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
     @Transactional(readOnly = true)
     public PaginatedResponse<RbacPermissionGroupModuleResponse> listPermissionGroups(ModuleListRequestDto request) {
         ModuleListRequestDto listRequest = request != null ? request : new ModuleListRequestDto();
+        log.debug("Listing permission groups: page={}, size={}", listRequest.getPage(), listRequest.getSize());
         Sort sort = RbacPaginationUtil.buildSort(
-                listRequest.getSortBy(), listRequest.getSortDirection(), "createdDate");
+                listRequest.getSortBy(), listRequest.getSortDirection(), "createdAt");
 
         return fetchList(
                 ModuleSpecification.build(listRequest),
@@ -430,19 +422,22 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
 
     @Override
     public void deleteModule(Long moduleId) {
+        log.info("Soft deleting module: moduleId={}", moduleId);
         RbacModule module = moduleRepository.findByModuleIdAndIsDeleted(moduleId, RbacConstants.IS_DELETED_FALSE)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         RbacUtil.buildMessage(RbacConstants.MODULE_NOT_FOUND, moduleId)));
         module.setIsDeleted(RbacConstants.IS_DELETED_TRUE);
         moduleRepository.save(module);
+        log.info("Module soft-deleted successfully: moduleId={}", moduleId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PaginatedResponse<RbacModuleResponse> listModules(ModuleListRequestDto request) {
         ModuleListRequestDto listRequest = request != null ? request : new ModuleListRequestDto();
+        log.debug("Listing modules: page={}, size={}", listRequest.getPage(), listRequest.getSize());
         Sort sort = RbacPaginationUtil.buildSort(
-                listRequest.getSortBy(), listRequest.getSortDirection(), "createdDate");
+                listRequest.getSortBy(), listRequest.getSortDirection(), "createdAt");
         return fetchList(
                 ModuleSpecification.build(listRequest),
                 moduleRepository,
@@ -460,8 +455,9 @@ public class PermissionGroupServiceImpl implements PermissionGroupService {
     @Transactional(readOnly = true)
     public PaginatedResponse<RbacGroupResponse> listGroups(GroupListRequestDto request) {
         GroupListRequestDto listRequest = request != null ? request : new GroupListRequestDto();
+        log.debug("Listing permission groups (flat): page={}, size={}", listRequest.getPage(), listRequest.getSize());
         Sort sort = RbacPaginationUtil.buildSort(
-                listRequest.getSortBy(), listRequest.getSortDirection(), "createdDate");
+                listRequest.getSortBy(), listRequest.getSortDirection(), "createdAt");
         return fetchList(
                 GroupSpecification.build(listRequest),
                 groupRepository,

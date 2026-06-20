@@ -2,9 +2,7 @@ package com.nec.middleware.rbacAuth.rbac.dto.request;
 
 import jakarta.validation.constraints.Min;
 import lombok.*;
-
 import java.time.LocalDate;
-
 /**
  * Request DTO for paginated and filterable role-permission mapping list API.
  */
@@ -14,7 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class RolePermissionListRequestDto {
-
     @Min(value = 0, message = "Page must be zero or greater.")
     private Integer page;
 

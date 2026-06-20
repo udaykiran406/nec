@@ -22,8 +22,7 @@ import lombok.*;
  *   "regionId": 1,
  *   "districtId": 5,
  *   "cityId": 10,
- *   "password": "SecurePass123",
- *   "createdBy": 1
+ *   "password": "SecurePass123"
  * }
  * </pre>
  */
@@ -114,11 +113,4 @@ public class RbacUserRequest {
      */
     @Builder.Default
     private Integer isActive = 1;
-
-    @NotNull(message = "Created By is required.")
-    @Positive(message = "Created By must be a positive number.")
-    private Long createdBy;
-
-    @Positive(message = "Updated By must be a positive number.")
-    private Long updatedBy;
 }

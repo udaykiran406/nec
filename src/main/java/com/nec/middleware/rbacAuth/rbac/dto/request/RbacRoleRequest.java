@@ -16,8 +16,7 @@ import java.math.BigDecimal;
  *   "roleName": "Administrator",
  *   "description": "Administrator role with full access",
  *   "status": "ACTIVE",
- *   "isParentRole": true,
- *   "createdByUserId": 1
+ *   "isParentRole": true
  * }
  * </pre>
  *
@@ -30,8 +29,7 @@ import java.math.BigDecimal;
  *   "description": "Administrator role with full access",
  *   "status": "ACTIVE",
  *   "isParentRole": true,
- *   "approvalLimit": 100000.00,
- *   "modifiedByUserId": 2
+ *   "approvalLimit": 100000.00
  * }
  * </pre>
  */
@@ -90,19 +88,6 @@ public class RbacRoleRequest {
     @NotBlank(message = "Status is required.")
     @Pattern(regexp = "^(ACTIVE|INACTIVE)$", message = "Status must be 'ACTIVE' or 'INACTIVE'.")
     private String status;
-
-    /**
-     * ID of the user creating the record (required on create).
-     */
-    @NotNull(message = "Created By User ID is required.")
-    @Min(value = 1, message = "Created By User ID must be a positive number.")
-    private Long createdByUserId;
-
-    /**
-     * ID of the user updating the record (optional on create, recommended on update).
-     */
-    @Min(value = 1, message = "Modified By User ID must be a positive number.")
-    private Long modifiedByUserId;
 }
 
 

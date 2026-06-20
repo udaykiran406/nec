@@ -3,7 +3,6 @@ package com.nec.middleware.rbacAuth.rbac.mapper;
 import com.nec.middleware.rbacAuth.rbac.dto.request.RbacRoleRequest;
 import com.nec.middleware.rbacAuth.rbac.dto.response.RbacRoleResponse;
 import com.nec.middleware.rbacAuth.rbac.entity.RbacRole;
-import com.nec.middleware.rbacAuth.rbac.util.RbacUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +21,6 @@ public class RbacRoleMapper {
                 .approvalLimit(request.getApprovalLimit())
                 .isParentRole(request.getIsParentRole() != null ? request.getIsParentRole() : false)
                 .status(request.getStatus() != null ? request.getStatus() : "ACTIVE")
-                .createdByUserId(request.getCreatedByUserId())
-                .modifiedByUserId(RbacUtil.toAuditUserId(request.getModifiedByUserId()))
                 .build();
     }
 
@@ -60,9 +57,6 @@ public class RbacRoleMapper {
         }
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
             entity.setStatus(request.getStatus());
-        }
-        if (request.getModifiedByUserId() != null) {
-            entity.setModifiedByUserId(RbacUtil.toAuditUserId(request.getModifiedByUserId()));
         }
     }
 

@@ -18,7 +18,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
@@ -85,7 +86,7 @@ logging:
     com.nec.middleware.rbacAuth.rbac.service.BulkUploadEmailService: DEBUG
     com.nec.middleware.rbacAuth.keycloak: DEBUG
     org.springframework.web: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
     org.springframework.security.oauth2: DEBUG
     org.springframework.security.oauth2.jwt: DEBUG
     org.hibernate.SQL: DEBUG

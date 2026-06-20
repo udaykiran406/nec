@@ -1,6 +1,5 @@
 package com.nec.middleware.rbacAuth.rbac.service.impl;
 
-import com.nec.middleware.rbacAuth.auth.utils.NecSecurityUtils;
 import com.nec.middleware.exception.DuplicateException;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.exception.ValidationException;
@@ -64,17 +63,16 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 
     @Override
     public ApiResponse<RbacRolePermissionResponse> createRolePermission(RbacRolePermissionRequest request) {
-        return persistRolePermission(request, resolveActingUserId(), false);
+        return persistRolePermission(request, false);
     }
 
     @Override
     public ApiResponse<RbacRolePermissionResponse> updateRolePermission(RbacRolePermissionRequest request) {
-        return persistRolePermission(request, resolveActingUserId(), true);
+        return persistRolePermission(request, true);
     }
 
     private ApiResponse<RbacRolePermissionResponse> persistRolePermission(
             RbacRolePermissionRequest request,
-            String currentUserId,
             boolean isUpdate) {
 
         // Validate request
@@ -87,6 +85,8 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         if (!RbacUtil.isNotEmpty(request.getModules())) {
             throw new ValidationException(RbacRolePermissionConstants.MODULE_LIST_MISSING);
         }
+
+        log.info("Starting role-permission {}: roleId={}", isUpdate ? "update" : "create", request.getRoleId());
 
         // Find the role by ID
         RbacRole role = roleRepository.findByRoleIdAndIsDeleted(request.getRoleId(), RbacConstants.IS_DELETED_FALSE)
@@ -147,22 +147,14 @@ public class RolePermissionServiceImpl implements RolePermissionService {
                         RbacRolePermission mapping = existingMapping.get();
                         if (RbacConstants.STATUS_INACTIVE.equals(mapping.getStatus())) {
                             mapping.setStatus(RbacConstants.STATUS_ACTIVE);
-                            // Convert String userId (Keycloak UUID) to Long or use default system user
-                            try {
-                                mapping.setModifiedByUserId(Long.parseLong(currentUserId));
-                            } catch (NumberFormatException e) {
-                                mapping.setModifiedByUserId(1L); // Default system user
-                            }
                             rolePermissionRepository.save(mapping);
                         }
                     } else if (!existingMapping.isPresent()) {
-                        // CREATE: Create new mapping if it doesn't exist
                         RbacRolePermission mapping = rolePermissionMapper.toEntity(
                                 role.getRoleId(),
                                 moduleDto.getModuleId(),
                                 groupDto.getGroupId(),
-                                permissionDto.getPermissionId(),
-                                currentUserId);
+                                permissionDto.getPermissionId());
 
                         rolePermissionRepository.save(mapping);
                     } else if (existingMapping.isPresent() && !isUpdate) {
@@ -175,6 +167,8 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 
         // Retrieve all permissions for this role and build hierarchical response
         RbacRolePermissionResponse hierarchicalResponse = getRolePermissionHierarchy(role.getRoleId());
+
+        log.info("Role-permission mappings persisted for roleId={}", role.getRoleId());
 
         String message = isUpdate ?
                 RbacRolePermissionConstants.ROLE_PERMISSION_UPDATED :
@@ -200,8 +194,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
         RbacRolePermission mapping = rolePermissionRepository.findByRolePermissionId(rolePermissionId)
                 .orElseThrow(() -> new ResourceNotFoundException(RbacRolePermissionConstants.ROLE_PERMISSION_NOT_FOUND));
 
-        String actingUserId = resolveActingUserId();
-        rolePermissionMapper.updateStatus(mapping, status, actingUserId);
+        rolePermissionMapper.updateStatus(mapping, status);
         rolePermissionRepository.save(mapping);
 
         RbacRolePermission updatedMapping = rolePermissionRepository
@@ -217,18 +210,18 @@ public class RolePermissionServiceImpl implements RolePermissionService {
             throw new ValidationException("Role Permission ID must be a positive number");
         }
 
+        log.info("Soft deleting role-permission mapping: rolePermissionId={}", rolePermissionId);
+
         RbacRolePermission mapping = rolePermissionRepository.findByRolePermissionId(rolePermissionId)
                 .orElseThrow(() -> new ResourceNotFoundException(RbacRolePermissionConstants.ROLE_PERMISSION_NOT_FOUND));
 
         // Get the roleId before deletion
         Long roleId = mapping.getRoleId();
 
-        String actingUserId = resolveActingUserId();
-        // Soft delete by setting status to INACTIVE
-        rolePermissionMapper.updateStatus(mapping, RbacConstants.STATUS_INACTIVE, actingUserId);
+        rolePermissionMapper.updateStatus(mapping, RbacConstants.STATUS_INACTIVE);
         rolePermissionRepository.save(mapping);
 
-        log.info("Role permission mapping {} soft-deleted by user {}", rolePermissionId, actingUserId);
+        log.info("Role permission mapping {} soft-deleted", rolePermissionId);
 
         // Retrieve remaining active permissions for the role and return in hierarchical format
         return getRolePermissionHierarchy(roleId);
@@ -237,6 +230,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
     @Override
     @Transactional(readOnly = true)
     public RbacRolePermissionResponse getRolePermissionsByRoleId(Long roleId) {
+        log.debug("Fetching role-permission hierarchy: roleId={}", roleId);
         return getRolePermissionHierarchy(roleId);
     }
 
@@ -324,8 +318,9 @@ public class RolePermissionServiceImpl implements RolePermissionService {
     public PaginatedResponse<RbacRolePermissionResponseDto> listRolePermissions(
             RolePermissionListRequestDto request) {
         RolePermissionListRequestDto listRequest = request != null ? request : new RolePermissionListRequestDto();
+        log.debug("Listing role-permissions: page={}, size={}", listRequest.getPage(), listRequest.getSize());
         Sort sort = RbacPaginationUtil.buildSort(
-                listRequest.getSortBy(), listRequest.getSortDirection(), "createdDate");
+                listRequest.getSortBy(), listRequest.getSortDirection(), "createdAt");
 
         return fetchList(
                 RolePermissionSpecification.build(listRequest),
@@ -368,11 +363,6 @@ public class RolePermissionServiceImpl implements RolePermissionService {
                 .map(mapperFunction)
                 .collect(Collectors.toList());
         return RbacPaginationUtil.fromList(content);
-    }
-
-    private String resolveActingUserId() {
-        var user = NecSecurityUtils.getCurrentUserOrNull();
-        return user != null ? user.getUserId() : null;
     }
 }
 

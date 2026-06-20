@@ -38,7 +38,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> login(
             @Valid @RequestBody LoginRequest request) {
+        log.info("Login request received: usernameOrEmail={}", request.getUsernameOrEmail());
         TokenResponse response = authService.login(request);
+        log.info("Login successful: usernameOrEmail={}", request.getUsernameOrEmail());
         return ResponseEntity.ok(ApiResponse.ok("Login successful", response));
     }
 
@@ -47,7 +49,9 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponse>> refresh(
             @RequestHeader("refresh-token") String refreshToken) {
+        log.info("Token refresh request received");
         TokenResponse response = authService.refresh(refreshToken);
+        log.info("Token refreshed successfully");
         return ResponseEntity.ok(ApiResponse.ok("Token refreshed successfully", response));
     }
 
@@ -56,7 +60,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> logout(
             @RequestHeader("refresh-token") String refreshToken,
             @RequestHeader(value = "Authorization", required = false) String accessToken) {
+        log.info("Logout request received");
         String result = authService.logout(refreshToken, accessToken);
+        log.info("Logout successful");
         return ResponseEntity.ok(ApiResponse.ok("Logout successful", result));
     }
 
@@ -64,7 +70,9 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<ForgotPasswordResponse>> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
+        log.info("Forgot password request received: usernameOrEmail={}", request.getUsernameOrEmail());
         ForgotPasswordResponse response = authService.forgotPassword(request);
+        log.info("Forgot password processed: usernameOrEmail={}", request.getUsernameOrEmail());
         return ResponseEntity.ok(ApiResponse.ok("Password reset link sent", response));
     }
 
@@ -72,7 +80,9 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<ResetPasswordResponse>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
+        log.info("Reset password request received");
         ResetPasswordResponse response = authService.resetPassword(request);
+        log.info("Password reset successful");
         return ResponseEntity.ok(ApiResponse.ok("Password reset successfully", response));
     }
 
@@ -81,13 +91,18 @@ public class AuthController {
     @Authorize()
     public ResponseEntity<ApiResponse<UpdatePasswordResponse>> updatePassword(
             @Valid @RequestBody UpdatePasswordRequest request) {
+        log.info("Update password request received");
         UpdatePasswordResponse response = authService.updatePassword(request);
+        log.info("Password updated successfully");
         return ResponseEntity.ok(ApiResponse.ok("Password updated successfully", response));
     }
 
     @PostMapping("/user-context")
     @Authorize()
     public ResponseEntity<ApiResponse<NecUserContextDTO>> getUserContext() {
-        return ResponseEntity.ok(ApiResponse.ok(API_SUCCESS_MESSAGE, NecSecurityUtils.getUserContext()));
+        log.info("User context request received");
+        NecUserContextDTO context = NecSecurityUtils.getUserContext();
+        log.debug("User context fetched successfully");
+        return ResponseEntity.ok(ApiResponse.ok(API_SUCCESS_MESSAGE, context));
     }
 }

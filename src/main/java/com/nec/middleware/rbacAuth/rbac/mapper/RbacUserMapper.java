@@ -26,7 +26,6 @@ public class RbacUserMapper {
                 .districtId(request.getDistrictId())
                 .cityId(request.getCityId())
                 .isActive(request.getIsActive() != null ? request.getIsActive() : RbacConstants.IS_ACTIVE_TRUE)
-                .createdBy(request.getCreatedBy())
                 .passwordToBeChanged(request.getPasswordToBeChanged() != null
                     ? request.getPasswordToBeChanged() : false)
                 .emailVerified(request.getEmailVerified() != null
@@ -34,7 +33,6 @@ public class RbacUserMapper {
                 .mobileVerified(request.getMobileVerified() != null
                     ? request.getMobileVerified() : false)
                 .failedLoginAttempts(0)
-                .updatedBy(toUserIdString(request.getUpdatedBy()))
                 .build();
     }
 
@@ -96,9 +94,6 @@ public class RbacUserMapper {
             entity.setIsActive(request.getIsActive());
             entity.setStatus(request.getIsActive().equals(1) ? "ACTIVE" : "INACTIVE");
         }
-        if (request.getUpdatedBy() != null) {
-            entity.setUpdatedBy(toUserIdString(request.getUpdatedBy()));
-        }
         if (request.getEmailVerified() != null) {
             entity.setEmailVerified(request.getEmailVerified());
         }
@@ -113,9 +108,4 @@ public class RbacUserMapper {
     private String trimSafe(String value) {
         return value != null ? value.trim() : null;
     }
-
-    private String toUserIdString(Long userId) {
-        return userId != null ? String.valueOf(userId) : null;
-    }
-
 }

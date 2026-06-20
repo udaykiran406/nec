@@ -1,25 +1,12 @@
 package com.nec.middleware.rbacAuth.rbac.service;
 
-
-
 import com.nec.middleware.rbacAuth.rbac.dto.request.RbacRolePermissionRequest;
-
 import com.nec.middleware.rbacAuth.rbac.dto.request.RolePermissionListRequestDto;
-
 import com.nec.middleware.rbacAuth.rbac.dto.response.ApiResponse;
-
 import com.nec.middleware.rbacAuth.rbac.dto.response.RbacRolePermissionResponse;
-
 import com.nec.middleware.rbacAuth.rbac.dto.response.RbacRolePermissionResponseDto;
-
 import com.nec.middleware.rbacAuth.rbac.dto.response.PaginatedResponse;
-
-
-
 import java.util.List;
-
-
-
 /**
 
  * Service interface for Role-Permission mapping operations.
@@ -29,9 +16,6 @@ import java.util.List;
  */
 
 public interface RolePermissionService {
-
-
-
     /**
 
      * Creates new role-permission mappings. Fails if any mapping already exists.
@@ -39,12 +23,9 @@ public interface RolePermissionService {
      *
 
      * @param request the role permission request DTO
-
      */
 
     ApiResponse<RbacRolePermissionResponse> createRolePermission(RbacRolePermissionRequest request);
-
-
 
     /**
 
@@ -55,12 +36,9 @@ public interface RolePermissionService {
      *
 
      * @param request the role permission request DTO
-
      */
 
     ApiResponse<RbacRolePermissionResponse> updateRolePermission(RbacRolePermissionRequest request);
-
-
 
     /**
 
@@ -69,16 +47,11 @@ public interface RolePermissionService {
      *
 
      * @param rolePermissionId the primary key of the mapping to update
-
      * @param status           the new status ('ACTIVE' or 'INACTIVE')
-
      * @return the updated role-permission mapping DTO
-
      */
 
     RbacRolePermissionResponseDto updateRolePermissionStatus(Long rolePermissionId, String status);
-
-
 
     /**
 
@@ -89,14 +62,10 @@ public interface RolePermissionService {
      *
 
      * @param rolePermissionId the primary key of the mapping to delete
-
      * @return hierarchical role-permission response with remaining active permissions
-
      */
 
     RbacRolePermissionResponse deleteRolePermission(Long rolePermissionId);
-
-
 
     /**
 
@@ -107,14 +76,10 @@ public interface RolePermissionService {
      *
 
      * @param roleId the role ID
-
      * @return hierarchical role-permission response
-
      */
 
     RbacRolePermissionResponse getRolePermissionsByRoleId(Long roleId);
-
-
 
     /**
 
@@ -125,14 +90,10 @@ public interface RolePermissionService {
      *
 
      * @param rolePermissionId the primary key of the mapping
-
      * @return hierarchical role-permission response
-
      */
 
     RbacRolePermissionResponse getRolePermissionById(Long rolePermissionId);
-
-
 
     /**
 
@@ -141,14 +102,10 @@ public interface RolePermissionService {
      *
 
      * @param roleId the role ID
-
      * @return list of role-permission mappings
-
      */
 
     List<RbacRolePermissionResponseDto> getRolePermissionsByRoleIdFlat(Long roleId);
-
-
 
     /**
 
@@ -157,16 +114,11 @@ public interface RolePermissionService {
      *
 
      * @param roleId   the role ID
-
      * @param moduleId the module ID
-
      * @return list of role-permission mappings
-
      */
 
     List<RbacRolePermissionResponseDto> getRolePermissionsByRoleIdAndModuleId(Long roleId, Long moduleId);
-
-
 
     /**
 
@@ -177,12 +129,9 @@ public interface RolePermissionService {
      *
 
      * @return list of hierarchical role permission responses (one per role)
-
      */
 
     List<RbacRolePermissionResponse> getAllRolePermissions();
-
-
 
     /**
 
@@ -191,12 +140,8 @@ public interface RolePermissionService {
      *
 
      * @param request the role-permission list request DTO
-
      * @return paginated or full flat role-permission mapping list response
-
      */
 
     PaginatedResponse<RbacRolePermissionResponseDto> listRolePermissions(RolePermissionListRequestDto request);
-
 }
-

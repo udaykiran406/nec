@@ -9,6 +9,7 @@ import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.service.PortalUserService;
 import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 
+import com.nec.middleware.rbacAuth.auth.utils.Authorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,12 +38,15 @@ public class PortalUserController {
 
     @Operation(summary = "Create Portal User",
             description = "multipart/form-data: 'requestDto' part is the JSON payload, 'photo' part is the image file (jpg/jpeg/png/webp, max 5MB).")
+    @Authorize(roles={"HR Officer"})
     @PostMapping(value ="/saveUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PortalUserResponseDto>> savePortalUser(
+            @RequestHeader("Authorization") String authorization,
             @Valid @ModelAttribute PortalUserRequestDto requestDto,
             @RequestParam("photo") MultipartFile photo) {
         log.info("Create portal user request received, photo='{}'", photo != null ? photo.getOriginalFilename() : "none");
         PortalUserResponseDto response = portalUserService.createPortalUser(requestDto,photo);
+        log.info("Token Recieved: {}", authorization);
         log.info("Portal user created: portalUserId='{}'", response.getPortalUserId());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -81,7 +85,8 @@ public class PortalUserController {
     @Operation(summary = "Update Portal User",
             description = "multipart/form-data only — same flat fields as create, 'photo' is optional (only send it when replacing the existing photo)."
     )
-    @PatchMapping(value = "/update/{portalUserId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authorize(roles={"HR Officer"})
+    @PutMapping(value = "/update/{portalUserId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PortalUserResponseDto>> updatePortalUser(
             @PathVariable String portalUserId,
             @Valid @ModelAttribute PortalUserRequestDto requestDto,

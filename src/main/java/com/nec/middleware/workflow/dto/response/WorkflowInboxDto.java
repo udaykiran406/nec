@@ -2,16 +2,13 @@ package com.nec.middleware.workflow.dto.response;
 
 import com.nec.middleware.dto.IdValueDto;
 import lombok.*;
-
 import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkflowInboxDto {
-
     private LocalDateTime createdDateTime;
     private String taskId;
     private String entityId;
@@ -25,5 +22,4 @@ public class WorkflowInboxDto {
     private String status;
 
     private String currentApprovalRole;
-
 }

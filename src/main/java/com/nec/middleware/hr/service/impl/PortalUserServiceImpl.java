@@ -253,7 +253,7 @@ public class PortalUserServiceImpl implements PortalUserService {
         portalUserMapper.updatePortalUserEntity(portalUser, portalUserRequestDto);
 
         PortalUser updatedEntity = portalUserrepository.save(portalUser);
-
+        log.info("updatedEntity={}", updatedEntity);
         PortalUserResponseDto prtalUserResponse =
                 portalUserMapper.portalUserResponseDto(updatedEntity);
 

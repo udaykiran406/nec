@@ -44,13 +44,8 @@ public class KeycloakAuthProvider {
     private final ClientCredentialsUtil clientCredentialsUtil;
     private final HttpServletRequest request;
 
-    // -------------------------------------------------------------------------
-    // Create user
-    // -------------------------------------------------------------------------
-
-    /**
-     * Creates a new user in the Keycloak realm and returns the new Keycloak user ID.
-     */
+     // Creates a new user in the Keycloak realm and returns the new Keycloak user ID.
+     
     public String createUserInKeycloak(KeycloakUserCreateRequest kcUser) {
         log.info("Creating user in Keycloak: {}", kcUser.username());
         try {
@@ -76,7 +71,7 @@ public class KeycloakAuthProvider {
             return keycloakId;
 
         } catch (HttpClientErrorException ex) {
-            log.error("Keycloak createUser failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Keycloak createUser failed: status={}", ex.getStatusCode());
             throw new ResponseStatusException(ex.getStatusCode(), "createUserInKeycloak(): " + ex.getMessage(), ex);
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -86,15 +81,8 @@ public class KeycloakAuthProvider {
         }
     }
 
-    // -------------------------------------------------------------------------
     // Validate token + extract sub (user ID)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Introspects the supplied access token and returns the Keycloak {@code sub} claim (user ID).
-     *
-     * @throws ResponseStatusException 401 if the token is inactive / invalid
-     */
+   
     public String validateTokenGetUid(String accessToken) {
         log.info("Validating token and extracting Keycloak user ID");
         try {
@@ -123,7 +111,7 @@ public class KeycloakAuthProvider {
             return userId;
 
         } catch (HttpClientErrorException ex) {
-            log.error("Token introspection failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.warn("Token introspection failed: status={}", ex.getStatusCode());
             throw new ResponseStatusException(ex.getStatusCode(), "validateTokenGetUid(): " + ex.getMessage(), ex);
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -229,14 +217,17 @@ public class KeycloakAuthProvider {
             );
 
             KeycloakTokenResponse token = objectMapper.convertValue(tokenRes.getBody(), KeycloakTokenResponse.class);
+            log.debug("Keycloak refresh response parsed: accessTokenPresent={}, refreshTokenPresent={}",
+                    token != null && StringUtils.hasText(token.accessToken()),
+                    token != null && StringUtils.hasText(token.refreshToken()));
             log.info("Token refreshed successfully");
             return token;
 
         } catch (HttpClientErrorException.Unauthorized ex) {
-            log.error("Refresh token invalid: {}", ex.getResponseBodyAsString());
+            log.warn("Refresh token invalid: status={}", ex.getStatusCode());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "refreshToken(): " + ex.getMessage(), ex);
         } catch (HttpStatusCodeException ex) {
-            log.error("Refresh error {}: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.warn("Refresh error: status={}", ex.getStatusCode());
             throw new ResponseStatusException(ex.getStatusCode(), "refreshToken(): " + ex.getMessage(), ex);
         } catch (Exception ex) {
             log.error("Unexpected refresh error", ex);
@@ -269,10 +260,10 @@ public class KeycloakAuthProvider {
             return "LOGOUT_SUCCESS";
 
         } catch (HttpClientErrorException.Unauthorized ex) {
-            log.error("Logout failed – invalid token: {}", ex.getResponseBodyAsString());
+            log.warn("Logout failed – invalid token: status={}", ex.getStatusCode());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "logout(): " + ex.getMessage(), ex);
         } catch (HttpStatusCodeException ex) {
-            log.error("Logout error {}: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.warn("Logout error: status={}", ex.getStatusCode());
             throw new ResponseStatusException(ex.getStatusCode(), "logout(): " + ex.getMessage(), ex);
         } catch (Exception ex) {
             log.error("Unexpected logout error", ex);
@@ -295,7 +286,7 @@ public class KeycloakAuthProvider {
             keycloakClient.deleteUser(keycloakProperties.realmName(), keycloakUserId, adminBearer);
             log.info("Keycloak user {} deleted", keycloakUserId);
         } catch (HttpClientErrorException ex) {
-            log.error("Keycloak deleteUser failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Keycloak deleteUser failed: status={}", ex.getStatusCode());
         } catch (Exception ex) {
             log.error("Keycloak deleteUser unexpected error: {}", ex.getMessage());
         }
@@ -336,7 +327,7 @@ public class KeycloakAuthProvider {
             );
             log.info("Keycloak password reset successful for user id={}", keycloakUserId);
         } catch (HttpClientErrorException ex) {
-            log.error("Keycloak resetPassword failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Keycloak resetPassword failed: status={}", ex.getStatusCode());
             throw new ResponseStatusException(ex.getStatusCode(), "resetPassword(): " + ex.getMessage(), ex);
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -368,7 +359,7 @@ public class KeycloakAuthProvider {
             );
             log.info("Keycloak user {} status updated to enabled={}", keycloakUserId, enabled);
         } catch (HttpClientErrorException ex) {
-            log.error("Keycloak setUserEnabled failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            log.error("Keycloak setUserEnabled failed: status={}", ex.getStatusCode());
             throw new ResponseStatusException(ex.getStatusCode(), "setUserEnabled(): " + ex.getMessage(), ex);
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -420,7 +411,7 @@ public class KeycloakAuthProvider {
             );
             log.info("Keycloak user {} profile updated: email={}, username={}", keycloakUserId, email, username);
         } catch (HttpClientErrorException ex) {
-            log.error("Keycloak updateUserProfile failed: status={}, body={}", ex.getStatusCode(), ex.getResponseBodyAsString(), ex);
+            log.error("Keycloak updateUserProfile failed: status={}", ex.getStatusCode(), ex);
             throw new ResponseStatusException(ex.getStatusCode(), "updateUserProfile(): " + ex.getMessage(), ex);
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -450,10 +441,11 @@ public class KeycloakAuthProvider {
      * for the full explanation.
      */
     private RuntimeException keycloakTokenFailure(String username, int status, String body, Exception cause) {
-        log.warn("Keycloak token endpoint error for user {}: status={}, body={}", username, status, body);
-
         KeycloakErrorResponse keycloakError = parseKeycloakErrorBody(body);
-        log.debug("Keycloak error response: error={}, errorDescription={}", keycloakError.getError(), keycloakError.getErrorDescription());
+        log.warn("Keycloak token endpoint error for user {}: status={}, error={}",
+                username, status, keycloakError.getError());
+        log.debug("Keycloak error response: error={}, errorDescription={}",
+                keycloakError.getError(), keycloakError.getErrorDescription());
 
         if (isInvalidCredentialsError(status, keycloakError)) {
             log.warn("Identified as invalid credentials error. Throwing InvalidCredentialsException for user {}", username);
@@ -473,7 +465,7 @@ public class KeycloakAuthProvider {
         try {
             return objectMapper.readValue(body, KeycloakErrorResponse.class);
         } catch (JsonProcessingException ex) {
-            log.debug("Could not parse Keycloak error body as JSON: {}", body);
+            log.debug("Could not parse Keycloak error body as JSON");
             return new KeycloakErrorResponse();
         }
     }
@@ -550,7 +542,7 @@ public class KeycloakAuthProvider {
         String adminUser   = keycloakProperties.adminUsername();
         String grantType   = keycloakProperties.grantType();
 
-        log.info("Requesting admin token: realm={}, client_id={}, grant_type={}, username={}", adminRealm, adminClient, grantType, adminUser);
+        log.debug("Requesting admin token for realm={}", adminRealm);
 
         try {
             ResponseEntity<Object> tokenRes = keycloakTokenClient.postTokenForm(
@@ -569,9 +561,8 @@ public class KeycloakAuthProvider {
             log.info("Admin token obtained successfully for realm={}", adminRealm);
             return "Bearer " + token.accessToken();
         } catch (HttpClientErrorException ex) {
-            log.error("Admin token request failed: status={}, realm={}, client_id={}, username={}, body={}",
-                    ex.getStatusCode(), adminRealm, adminClient, adminUser,
-                    ex.getResponseBodyAsString());
+            log.error("Admin token request failed: status={}, realm={}",
+                    ex.getStatusCode(), adminRealm);
             throw new ResponseStatusException(ex.getStatusCode(),
                     "fetchAdminBearerToken(): " + ex.getMessage(), ex);
         }

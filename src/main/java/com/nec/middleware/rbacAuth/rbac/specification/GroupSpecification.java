@@ -104,7 +104,7 @@ public final class GroupSpecification {
             if (request.getFromDate() != null) {
                 predicates.add(
                         criteriaBuilder.greaterThanOrEqualTo(
-                                root.get("createdDate"),
+                                root.get("createdAt"),
                                 request.getFromDate().atStartOfDay()
                         )
                 );
@@ -113,7 +113,7 @@ public final class GroupSpecification {
             if (request.getToDate() != null) {
                 predicates.add(
                         criteriaBuilder.lessThan(
-                                root.get("createdDate"),
+                                root.get("createdAt"),
                                 request.getToDate().plusDays(1).atStartOfDay()
                         )
                 );

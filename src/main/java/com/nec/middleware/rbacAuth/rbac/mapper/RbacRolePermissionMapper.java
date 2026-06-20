@@ -55,39 +55,18 @@ public class RbacRolePermissionMapper {
             Long roleId,
             Long moduleId,
             Long groupId,
-            Long permissionId,
-            String createdByUserId) {
-        Long numericId = 1L; // Default system user ID when Keycloak UUID cannot be converted
-        // Try to parse String userId if it's numeric
-        if (createdByUserId != null) {
-            try {
-                numericId = Long.parseLong(createdByUserId);
-            } catch (NumberFormatException e) {
-                // If not numeric (Keycloak UUID), use default system user ID
-                numericId = 1L;
-            }
-        }
+            Long permissionId) {
         return RbacRolePermission.builder()
                 .roleId(roleId)
                 .moduleId(moduleId)
                 .groupId(groupId)
                 .permissionId(permissionId)
                 .status("ACTIVE")
-                .createdByUserId(numericId)
                 .build();
     }
 
-    public void updateStatus(RbacRolePermission entity, String status, String modifiedByUserId) {
+    public void updateStatus(RbacRolePermission entity, String status) {
         entity.setStatus(status);
-        // Convert String userId to Long if possible (default to system user 1 if it's a Keycloak UUID)
-        if (modifiedByUserId != null) {
-            try {
-                entity.setModifiedByUserId(Long.parseLong(modifiedByUserId));
-            } catch (NumberFormatException e) {
-                // If not a valid Long (Keycloak UUID), use system user ID
-                entity.setModifiedByUserId(1L);
-            }
-        }
     }
 
     public List<RbacRolePermissionResponse> toHierarchicalList(

@@ -12,12 +12,14 @@ import com.nec.middleware.rbacAuth.rbac.service.RolePermissionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/rbac/role-permission")
 @AllArgsConstructor
@@ -33,8 +35,14 @@ public class RbacRolePermissionController {
     @PostMapping
     public ResponseEntity<ApiResponse<RbacRolePermissionResponse>> createRolePermission(
             @Valid @RequestBody RbacRolePermissionRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(rolePermissionService.createRolePermission(request));
+        int moduleCount = request.getModules() != null ? request.getModules().size() : 0;
+        log.info("Create role-permission request received: roleId={}, moduleCount={}",
+                request.getRoleId(), moduleCount);
+        ResponseEntity<ApiResponse<RbacRolePermissionResponse>> response =
+                ResponseEntity.status(HttpStatus.CREATED)
+                        .body(rolePermissionService.createRolePermission(request));
+        log.info("Role-permission mappings created successfully: roleId={}", request.getRoleId());
+        return response;
     }
 
     /**
@@ -45,7 +53,13 @@ public class RbacRolePermissionController {
     @PutMapping
     public ResponseEntity<ApiResponse<RbacRolePermissionResponse>> updateRolePermission(
             @Valid @RequestBody RbacRolePermissionRequest request) {
-        return ResponseEntity.ok(rolePermissionService.updateRolePermission(request));
+        int moduleCount = request.getModules() != null ? request.getModules().size() : 0;
+        log.info("Update role-permission request received: roleId={}, moduleCount={}",
+                request.getRoleId(), moduleCount);
+        ResponseEntity<ApiResponse<RbacRolePermissionResponse>> response =
+                ResponseEntity.ok(rolePermissionService.updateRolePermission(request));
+        log.info("Role-permission mappings updated successfully: roleId={}", request.getRoleId());
+        return response;
     }
 
     /**
@@ -57,7 +71,9 @@ public class RbacRolePermissionController {
     @GetMapping("/{roleId}")
     public ResponseEntity<ApiResponse<RbacRolePermissionResponse>> getRolePermissionsByRoleId(
             @PathVariable @Min(value = 1, message = "roleId must be a positive number") Long roleId) {
+        log.info("Fetch role-permission request received: roleId={}", roleId);
         RbacRolePermissionResponse response = rolePermissionService.getRolePermissionsByRoleId(roleId);
+        log.debug("Role-permission hierarchy fetched successfully: roleId={}", roleId);
         return ResponseEntity.ok(ApiResponse.ok(RbacRolePermissionConstants.ROLE_PERMISSIONS_FETCHED, response));
     }
 
@@ -67,7 +83,9 @@ public class RbacRolePermissionController {
      */
     @GetMapping("/get-all")
     public ResponseEntity<ApiResponse<List<RbacRolePermissionResponse>>> getAllRolePermissions() {
+        log.info("Fetching all role-permission mappings");
         List<RbacRolePermissionResponse> response = rolePermissionService.getAllRolePermissions();
+        log.debug("Fetched {} role-permission hierarchies", response.size());
         return ResponseEntity.ok(ApiResponse.ok(RbacRolePermissionConstants.ROLE_PERMISSIONS_FETCHED, response));
     }
 
@@ -77,9 +95,14 @@ public class RbacRolePermissionController {
     @PostMapping("/list")
     public ResponseEntity<ApiResponse<PaginatedResponse<RbacRolePermissionResponseDto>>> listRolePermissions(
             @Valid @RequestBody(required = false) RolePermissionListRequestDto request) {
+        RolePermissionListRequestDto listRequest = request != null ? request : new RolePermissionListRequestDto();
+        log.info("Fetching role-permissions with filters: page={}, size={}, search={}",
+                listRequest.getPage(), listRequest.getSize(), listRequest.getSearch());
+        PaginatedResponse<RbacRolePermissionResponseDto> response =
+                rolePermissionService.listRolePermissions(request);
         return ResponseEntity.ok(ApiResponse.ok(
                 ApiMessageConstants.DATA_FETCHED,
-                rolePermissionService.listRolePermissions(request)));
+                response));
     }
 
     /**
@@ -91,7 +114,9 @@ public class RbacRolePermissionController {
     @DeleteMapping("/{rolePermissionId}")
     public ResponseEntity<ApiResponse<RbacRolePermissionResponse>> deleteRolePermission(
             @PathVariable @Min(value = 1, message = "rolePermissionId must be a positive number") Long rolePermissionId) {
+        log.info("Soft deleting role-permission mapping: rolePermissionId={}", rolePermissionId);
         RbacRolePermissionResponse response = rolePermissionService.deleteRolePermission(rolePermissionId);
+        log.info("Role-permission mapping soft-deleted successfully: rolePermissionId={}", rolePermissionId);
         return ResponseEntity.ok(ApiResponse.ok(RbacRolePermissionConstants.ROLE_PERMISSION_DELETED, response));
     }
 

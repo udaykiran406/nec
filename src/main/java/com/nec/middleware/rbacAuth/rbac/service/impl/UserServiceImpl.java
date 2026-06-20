@@ -17,7 +17,6 @@ import com.nec.middleware.rbacAuth.rbac.service.UserService;
 import com.nec.middleware.rbacAuth.rbac.specification.UserSpecification;
 import com.nec.middleware.rbacAuth.rbac.util.RbacPaginationUtil;
 import com.nec.middleware.rbacAuth.rbac.util.RbacUtil;
-import com.nec.middleware.rbacAuth.auth.utils.NecSecurityUtils;
 import com.nec.middleware.rbacAuth.keycloak.client.request.KeycloakCredentialRequest;
 import com.nec.middleware.rbacAuth.keycloak.client.request.KeycloakUserCreateRequest;
 import com.nec.middleware.rbacAuth.keycloak.provider.KeycloakAuthProvider;
@@ -75,6 +74,7 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Email is required and cannot be blank");
         }
         String email = request.getEmail().trim();
+        log.info("Starting RBAC user creation: email={}", email);
 
         if (userRepository.existsByEmailIgnoreCaseAndIsDeleted(email, RbacConstants.IS_DELETED_FALSE)) {
             throw ExceptionUtil.duplicateConstraint("uq_nec_rbac_users_email", email);
@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
             entity.setStatus(RbacConstants.IS_ACTIVE_TRUE.equals(request.getIsActive()) ? "ACTIVE" : "INACTIVE");
 
             RbacUser saved = userRepository.saveAndFlush(entity);
+            log.info("RBAC user saved: userId={}, keycloakUserId={}", saved.getUserId(), saved.getKeycloakUserId());
             return mapUserWithAssociations(saved);
         } catch (DataIntegrityViolationException e) {
             log.warn("Data integrity violation during user creation. Phone: {}, Email: {}", phone, email, e);
@@ -123,6 +124,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RbacUserResponse updateUser(String id, RbacUserRequest request) {
+        log.info("Starting RBAC user update: userId={}", id);
         if (request == null || id == null) {
             throw new ValidationException(RbacConstants.REQUEST_NULL);
         }
@@ -168,6 +170,7 @@ public class UserServiceImpl implements UserService {
                         saved.getKeycloakUserId(), ex);
             }
 
+            log.info("RBAC user updated: userId={}", saved.getUserId());
             return mapUserWithAssociations(saved);
         } catch (DataIntegrityViolationException e) {
             log.warn("Data integrity violation during user update. UserId: {}", id, e);
@@ -201,6 +204,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public PaginatedResponse<RbacUserResponse> listUsers(UserListRequestDto request) {
         UserListRequestDto listRequest = request != null ? request : new UserListRequestDto();
+        log.debug("Listing RBAC users: page={}, size={}", listRequest.getPage(), listRequest.getSize());
         Sort sort = RbacPaginationUtil.buildSort(
                 listRequest.getSortBy(), listRequest.getSortDirection(), "createdAt");
         return fetchList(
@@ -226,6 +230,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RbacUserResponse changeUserActiveStatus(String id, Integer isActive) {
+        log.info("Changing RBAC user status: userId={}, isActive={}", id, isActive);
         if (isActive == null) {
             throw new ValidationException(RbacConstants.USER_ACTIVE_STATUS_REQUIRED);
         }
@@ -234,10 +239,6 @@ public class UserServiceImpl implements UserService {
                         RbacUtil.buildMessage(RbacConstants.USER_NOT_FOUND, id)));
         user.setIsActive(isActive);
         user.setStatus(isActive.equals(1) ? "ACTIVE" : "INACTIVE");
-        String actingUserId = resolveActingUserId();
-        if (org.springframework.util.StringUtils.hasText(actingUserId)) {
-            user.setUpdatedBy(actingUserId);
-        }
         RbacUser saved = userRepository.saveAndFlush(user);
 
         // Sync to Keycloak; DB change is already committed — a Keycloak failure must not roll it back.
@@ -254,14 +255,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String id) {
+        log.info("Soft deleting RBAC user: userId={}", id);
         RbacUser user = userRepository.findByUserIdAndIsDeleted(id, RbacConstants.IS_DELETED_FALSE)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         RbacUtil.buildMessage(RbacConstants.USER_NOT_FOUND, id)));
         user.setIsDeleted(RbacConstants.IS_DELETED_TRUE);
-        String actingUserId = resolveActingUserId();
-        if (org.springframework.util.StringUtils.hasText(actingUserId)) {
-            user.setUpdatedBy(actingUserId);
-        }
         userRepository.save(user);
 
         // Soft-delete in Keycloak by disabling the user (keep user in Keycloak for audit/restore purposes)
@@ -272,10 +270,12 @@ public class UserServiceImpl implements UserService {
             log.warn("User {} soft-deleted locally but Keycloak disable failed (will retry on next login)",
                     user.getKeycloakUserId(), ex);
         }
+        log.info("RBAC user soft-deleted: userId={}", id);
     }
 
     @Override
     public RbacUserResponse restoreUser(String id) {
+        log.info("Restoring RBAC user: userId={}", id);
         // Find the soft-deleted user
         RbacUser user = userRepository.findByUserIdAndIsDeleted(id, RbacConstants.IS_DELETED_TRUE)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -283,10 +283,6 @@ public class UserServiceImpl implements UserService {
 
         // Restore in database
         user.setIsDeleted(RbacConstants.IS_DELETED_FALSE);
-        String actingUserId = resolveActingUserId();
-        if (org.springframework.util.StringUtils.hasText(actingUserId)) {
-            user.setUpdatedBy(actingUserId);
-        }
         RbacUser saved = userRepository.saveAndFlush(user);
 
         // Re-enable in Keycloak to sync with database restoration
@@ -298,6 +294,7 @@ public class UserServiceImpl implements UserService {
                     saved.getKeycloakUserId(), ex);
         }
 
+        log.info("RBAC user restored: userId={}", saved.getUserId());
         return mapUserWithAssociations(saved);
     }
 
@@ -356,11 +353,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return "User creation failed due to an invalid foreign key reference. Please ensure all referenced entities exist.";
-    }
-
-    private String resolveActingUserId() {
-        var user = NecSecurityUtils.getCurrentUserOrNull();
-        return user != null ? user.getUserId() : null;
     }
 
     private RbacUserResponse mapUserWithAssociations(RbacUser user) {

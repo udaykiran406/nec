@@ -14,10 +14,12 @@ import com.nec.middleware.rbacAuth.rbac.dto.response.RbacPermissionGroupModuleRe
 import com.nec.middleware.rbacAuth.rbac.service.PermissionGroupService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/rbac")
 @AllArgsConstructor
@@ -36,8 +38,13 @@ public class RbacPermissionGroupController {
     @PostMapping("/permission-groups")
     public ResponseEntity<ApiResponse<RbacPermissionGroupResponse>> createPermissionGroup(
             @Valid @RequestBody RbacPermissionGroupRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(permissionGroupService.createPermissionGroup(request));
+        int moduleCount = request.getModules() != null ? request.getModules().size() : 0;
+        log.info("Create permission group request received: moduleCount={}", moduleCount);
+        ResponseEntity<ApiResponse<RbacPermissionGroupResponse>> response =
+                ResponseEntity.status(HttpStatus.CREATED)
+                        .body(permissionGroupService.createPermissionGroup(request));
+        log.info("Permission group created successfully: moduleCount={}", moduleCount);
+        return response;
     }
 
     /**
@@ -47,7 +54,12 @@ public class RbacPermissionGroupController {
     @PutMapping("/permission-groups")
     public ResponseEntity<ApiResponse<RbacPermissionGroupResponse>> updatePermissionGroup(
             @Valid @RequestBody RbacPermissionGroupRequest request) {
-        return ResponseEntity.ok(permissionGroupService.updatePermissionGroup(request));
+        int moduleCount = request.getModules() != null ? request.getModules().size() : 0;
+        log.info("Update permission group request received: moduleCount={}", moduleCount);
+        ResponseEntity<ApiResponse<RbacPermissionGroupResponse>> response =
+                ResponseEntity.ok(permissionGroupService.updatePermissionGroup(request));
+        log.info("Permission group updated successfully: moduleCount={}", moduleCount);
+        return response;
     }
 
     /**
@@ -56,6 +68,7 @@ public class RbacPermissionGroupController {
      */
     @GetMapping("/permission-group/all")
     public ResponseEntity<ApiResponse<RbacPermissionGroupResponse>> getAllPermissionGroups() {
+        log.info("Fetching all permission groups");
         RbacPermissionGroupResponse response = permissionGroupService.getAllPermissionGroups();
         return ResponseEntity.ok(ApiResponse.ok(RbacConstants.PERMISSION_GROUP_FETCHED, response));
     }
@@ -66,9 +79,14 @@ public class RbacPermissionGroupController {
     @PostMapping("/permission-group/list")
     public ResponseEntity<ApiResponse<PaginatedResponse<RbacPermissionGroupModuleResponse>>> listPermissionGroups(
             @Valid @RequestBody(required = false) ModuleListRequestDto request) {
+        ModuleListRequestDto listRequest = request != null ? request : new ModuleListRequestDto();
+        log.info("Fetching permission groups with filters: page={}, size={}, search={}",
+                listRequest.getPage(), listRequest.getSize(), listRequest.getSearch());
+        PaginatedResponse<RbacPermissionGroupModuleResponse> response =
+                permissionGroupService.listPermissionGroups(request);
         return ResponseEntity.ok(ApiResponse.ok(
                 ApiMessageConstants.DATA_FETCHED,
-                permissionGroupService.listPermissionGroups(request)));
+                response));
     }
 
     /**
@@ -79,7 +97,9 @@ public class RbacPermissionGroupController {
     @GetMapping("/permission-group/{moduleId}")
     public ResponseEntity<ApiResponse<RbacPermissionGroupResponse>> getPermissionGroupByModuleId(
             @PathVariable Long moduleId) {
+        log.info("Fetch permission group request received: moduleId={}", moduleId);
         RbacPermissionGroupResponse response = permissionGroupService.getPermissionGroupByModuleId(moduleId);
+        log.debug("Permission group fetched successfully: moduleId={}", moduleId);
         return ResponseEntity.ok(ApiResponse.ok(RbacConstants.PERMISSION_GROUP_FETCHED, response));
     }
 
@@ -93,9 +113,13 @@ public class RbacPermissionGroupController {
     @PostMapping("/module/list")
     public ResponseEntity<ApiResponse<PaginatedResponse<RbacModuleResponse>>> listModules(
             @Valid @RequestBody(required = false) ModuleListRequestDto request) {
+        ModuleListRequestDto listRequest = request != null ? request : new ModuleListRequestDto();
+        log.info("Fetching RBAC modules with filters: page={}, size={}, search={}",
+                listRequest.getPage(), listRequest.getSize(), listRequest.getSearch());
+        PaginatedResponse<RbacModuleResponse> response = permissionGroupService.listModules(request);
         return ResponseEntity.ok(ApiResponse.ok(
                 ApiMessageConstants.DATA_FETCHED,
-                permissionGroupService.listModules(request)));
+                response));
     }
 
     // =========================================================================
@@ -108,9 +132,13 @@ public class RbacPermissionGroupController {
     @PostMapping("/group/list")
     public ResponseEntity<ApiResponse<PaginatedResponse<RbacGroupResponse>>> listGroups(
             @Valid @RequestBody(required = false) GroupListRequestDto request) {
+        GroupListRequestDto listRequest = request != null ? request : new GroupListRequestDto();
+        log.info("Fetching RBAC groups with filters: page={}, size={}, search={}",
+                listRequest.getPage(), listRequest.getSize(), listRequest.getSearch());
+        PaginatedResponse<RbacGroupResponse> response = permissionGroupService.listGroups(request);
         return ResponseEntity.ok(ApiResponse.ok(
                 ApiMessageConstants.DATA_FETCHED,
-                permissionGroupService.listGroups(request)));
+                response));
     }
 
 }

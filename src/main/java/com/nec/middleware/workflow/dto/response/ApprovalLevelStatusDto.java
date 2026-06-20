@@ -1,16 +1,13 @@
 package com.nec.middleware.workflow.dto.response;
 
 import lombok.*;
-
 import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApprovalLevelStatusDto {
-
     private Integer approvalLevel;
 
     private String approvalRole;

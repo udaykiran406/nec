@@ -1,4 +1,4 @@
-package com.nec.middleware.hr.entity;
+package com.nec.middleware.rbacAuth.rbac.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -14,21 +14,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 /**
- * Base entity that carries audit fields shared across all modules.
- * Every entity that needs created_by / updated_by / timestamps
- * should extend this class instead of repeating the fields.
+ * Base audit fields for RBAC entities — mirrors HR {@code AuditableEntity}.
+ * Populated automatically via {@code JpaAuditConfig} and {@code AuditingEntityListener}.
  */
 @Getter
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AuditableEntity {
-
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = Boolean.TRUE;
+public abstract class BaseAuditEntity {
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false)
+    @Column(name = "created_by", nullable = false, updatable = false, length = 150)
     private String createdBy;
 
     @CreatedDate
@@ -36,7 +32,7 @@ public abstract class AuditableEntity {
     private LocalDateTime createdAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", length = 150)
     private String updatedBy;
 
     @LastModifiedDate

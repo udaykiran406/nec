@@ -21,7 +21,6 @@ import java.util.List;
  *       "description": "HR Module",
  *       "displayOrder": 1,
  *       "status": "ACTIVE",
- *       "createdByUserId": 1,
  *       "groups": [
  *         {
  *           "groupId": 101,
@@ -30,7 +29,6 @@ import java.util.List;
  *           "description": "TPP Group",
  *           "displayOrder": 1,
  *           "status": "ACTIVE",
- *           "createdByUserId": 1,
  *           "permissions": [
  *             {
  *               "permissionId": 10001,
@@ -38,8 +36,7 @@ import java.util.List;
  *               "permissionName": "Create User",
  *               "description": "Create new user",
  *               "displayOrder": 1,
- *               "status": "ACTIVE",
- *               "createdByUserId": 1
+ *               "status": "ACTIVE"
  *             }
  *           ]
  *         }
@@ -114,19 +111,6 @@ public class RbacPermissionGroupRequest {
         private String status;
 
         /**
-         * User ID who created this module.
-         */
-        @NotNull(message = "Created By User ID is required.")
-        @Positive(message = "Created By User ID must be positive.")
-        private Long createdByUserId;
-
-        /**
-         * Optional user ID who modified this module.
-         */
-        @Positive(message = "Modified By User ID must be positive.")
-        private Long modifiedByUserId;
-
-        /**
          * Permission groups within this module.
          */
         @NotNull(message = "Permission Groups list is required.")
@@ -183,19 +167,6 @@ public class RbacPermissionGroupRequest {
         @NotBlank(message = "Status is required.")
         @Pattern(regexp = "^(ACTIVE|INACTIVE)$", message = "Status must be 'ACTIVE' or 'INACTIVE'.")
         private String status;
-
-        /**
-         * User ID who created this group.
-         */
-        @NotNull(message = "Created By User ID is required.")
-        @Positive(message = "Created By User ID must be positive.")
-        private Long createdByUserId;
-
-        /**
-         * Optional user ID who modified this group.
-         */
-        @Positive(message = "Modified By User ID must be positive.")
-        private Long modifiedByUserId;
 
         /**
          * Permissions within this group.
@@ -259,19 +230,6 @@ public class RbacPermissionGroupRequest {
          * Flag to indicate if permission appears in side menu (default: false).
          */
         private Boolean isSideMenu;
-
-        /**
-         * User ID who created this permission.
-         */
-        @NotNull(message = "Created By User ID is required.")
-        @Positive(message = "Created By User ID must be positive.")
-        private Long createdByUserId;
-
-        /**
-         * Optional user ID who modified this permission.
-         */
-        @Positive(message = "Modified By User ID must be positive.")
-        private Long modifiedByUserId;
     }
 }
 

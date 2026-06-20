@@ -23,16 +23,7 @@ public class KeycloakConfig {
     ApplicationRunner keycloakPropertiesValidator(KeycloakProperties keycloakProperties) {
         return args -> {
             keycloakProperties.validate();
-            log.info("Keycloak configured: baseUrl={}, realm={}, adminRealm={}, " +
-                            "adminClientId={}, adminUsername={}, grantType={}, " +
-                            "webClientId={} — adminPassword=[REDACTED]",
-                    keycloakProperties.requireBaseUrl(),
-                    keycloakProperties.realmName(),
-                    keycloakProperties.requireAdminRealm(),
-                    keycloakProperties.adminClientId(),
-                    keycloakProperties.adminUsername(),
-                    keycloakProperties.grantType(),
-                    keycloakProperties.webClientId());
+            log.info("Keycloak configured successfully for realm={}", keycloakProperties.realmName());
         };
     }
 

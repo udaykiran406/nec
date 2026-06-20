@@ -43,7 +43,7 @@ public class NecUserContextDTO {
     // Audit Fields
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long createdBy;
+    private String createdBy;
     private String updatedBy;
 
     // Token Context (optional)

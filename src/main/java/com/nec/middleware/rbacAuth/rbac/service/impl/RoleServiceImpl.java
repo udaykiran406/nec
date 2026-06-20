@@ -4,7 +4,6 @@ import com.nec.middleware.exception.DuplicateException;
 import com.nec.middleware.exception.ExceptionUtil;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.exception.ValidationException;
-import com.nec.middleware.rbacAuth.auth.utils.NecSecurityUtils;
 import com.nec.middleware.rbacAuth.rbac.constant.RbacConstants;
 import com.nec.middleware.rbacAuth.rbac.dto.request.RbacRoleRequest;
 import com.nec.middleware.rbacAuth.rbac.dto.request.RoleListRequestDto;
@@ -50,11 +49,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RbacRoleResponse createRole(RbacRoleRequest request) {
+        log.info("Starting role creation: roleName={}", request.getRoleName());
         // Business-level validation (roleCode is excluded – it is auto-generated)
         validationUtil.validateCreateRequest(request);
 
         // Auto-generate a unique role code from the role name
         String generatedCode = generateRoleCode(request.getRoleName());
+        log.debug("Generated role code: {}", generatedCode);
         request.setRoleCode(generatedCode);
 
         // Check for duplicate role name
@@ -75,15 +76,20 @@ public class RoleServiceImpl implements RoleService {
         try {
             // Map request to entity and save
             RbacRole entity = mapper.toEntity(request);
+            log.info("Saving role: roleName={}, roleCode={}", request.getRoleName(), generatedCode);
             RbacRole savedEntity = roleRepository.save(entity);
+            log.info("Role saved successfully: roleId={}, roleCode={}",
+                    savedEntity.getRoleId(), savedEntity.getRoleCode());
             return mapRoleWithAssociations(savedEntity);
         } catch (DataIntegrityViolationException e) {
+            log.warn("Data integrity violation during role creation: roleName={}", request.getRoleName(), e);
             throw ExceptionUtil.fromDataIntegrityViolation(e);
         }
     }
 
     @Override
     public RbacRoleResponse updateRole(Long id, RbacRoleRequest request) {
+        log.info("Starting role update: roleId={}", id);
         request.setRoleId(id);
         // Business-level validation
         validationUtil.validateUpdateRequest(request);
@@ -127,8 +133,11 @@ public class RoleServiceImpl implements RoleService {
             // Apply updates to the entity
             mapper.updateEntity(existingRole, request);
             RbacRole savedEntity = roleRepository.save(existingRole);
+            log.info("Role updated successfully: roleId={}, roleCode={}",
+                    savedEntity.getRoleId(), savedEntity.getRoleCode());
             return mapRoleWithAssociations(savedEntity);
         } catch (DataIntegrityViolationException e) {
+            log.warn("Data integrity violation during role update: roleId={}", id, e);
             throw ExceptionUtil.fromDataIntegrityViolation(e);
         }
     }
@@ -136,6 +145,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     public RbacRoleResponse getRoleById(Long roleId) {
+        log.debug("Fetching role: roleId={}", roleId);
         RbacRole role = roleRepository.findByRoleIdAndIsDeletedWithAssociations(roleId, RbacConstants.IS_DELETED_FALSE)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         RbacUtil.buildMessage(RbacConstants.ROLE_NOT_FOUND, roleId)));
@@ -155,8 +165,9 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public PaginatedResponse<RbacRoleResponse> listRoles(RoleListRequestDto request) {
         RoleListRequestDto listRequest = request != null ? request : new RoleListRequestDto();
+        log.debug("Listing roles: page={}, size={}", listRequest.getPage(), listRequest.getSize());
         Sort sort = RbacPaginationUtil.buildSort(
-                listRequest.getSortBy(), listRequest.getSortDirection(), "createdDate");
+                listRequest.getSortBy(), listRequest.getSortDirection(), "createdAt");
         return fetchList(
                 RoleSpecification.build(listRequest),
                 roleRepository,
@@ -196,15 +207,18 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void deleteRole(Long roleId) {
+        log.info("Soft deleting role: roleId={}", roleId);
         RbacRole role = roleRepository.findByRoleIdAndIsDeleted(roleId, RbacConstants.IS_DELETED_FALSE)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         RbacUtil.buildMessage(RbacConstants.ROLE_NOT_FOUND, roleId)));
         role.setIsDeleted(RbacConstants.IS_DELETED_TRUE);
         roleRepository.save(role);
+        log.info("Role soft-deleted successfully: roleId={}", roleId);
     }
 
     @Override
     public RbacRoleResponse changeRoleStatus(Long roleId, String status) {
+        log.info("Changing role status: roleId={}, status={}", roleId, status);
         // Validate the new status value
         if (!RbacUtil.isValidStatus(status)) {
             throw new ValidationException(RbacConstants.INVALID_STATUS);
@@ -217,18 +231,10 @@ public class RoleServiceImpl implements RoleService {
 
         // Apply status change
         role.setStatus(status.toUpperCase());
-        String actingUserId = resolveActingUserId();
-        if (org.springframework.util.StringUtils.hasText(actingUserId)) {
-            role.setModifiedByUserId(actingUserId);
-        }
 
         RbacRole savedEntity = roleRepository.saveAndFlush(role);
+        log.info("Role status changed successfully: roleId={}, status={}", roleId, savedEntity.getStatus());
         return mapRoleWithAssociations(savedEntity);
-    }
-
-    private String resolveActingUserId() {
-        var user = NecSecurityUtils.getCurrentUserOrNull();
-        return user != null ? user.getUserId() : null;
     }
 
     // Helper methods

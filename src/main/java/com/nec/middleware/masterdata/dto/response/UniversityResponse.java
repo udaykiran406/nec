@@ -1,16 +1,13 @@
 package com.nec.middleware.masterdata.dto.response;
 
 import lombok.*;
-
 import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UniversityResponse {
-
     private Long id;
 
     private String universityName;
