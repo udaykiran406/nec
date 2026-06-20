@@ -13,9 +13,13 @@ public class TrainingTraineeAllocationFilterRequestDto {
 
     private Long traineeId;
 
-    private Long universityId;
-
     private Long regionId;
+
+    private Long districtId;
+
+    private Long cityId;
+
+    private Long universityId;
 
     private Long trainingClassId;
 

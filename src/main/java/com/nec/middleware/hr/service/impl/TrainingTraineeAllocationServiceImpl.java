@@ -1,6 +1,7 @@
 package com.nec.middleware.hr.service.impl;
 
 import com.nec.middleware.Lookups.repository.TrainingManagementStatusRepository;
+import com.nec.middleware.Lookups.repository.TrainingTypeRepository;
 import com.nec.middleware.exception.ResourceNotFoundException;
 import com.nec.middleware.exception.ValidationException;
 import com.nec.middleware.hr.constant.TrainingTraineeAllocationConstants;
@@ -16,6 +17,10 @@ import com.nec.middleware.hr.service.TrainingTraineeAllocationService;
 import com.nec.middleware.hr.specification.TrainingTraineeAllocationSearchSpecification;
 import com.nec.middleware.idGenerator.Enum.ModuleCode;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
+import com.nec.middleware.masterdata.repository.CityRepository;
+import com.nec.middleware.masterdata.repository.DistrictRepository;
+import com.nec.middleware.masterdata.repository.RegionRepository;
+import com.nec.middleware.masterdata.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -38,9 +43,19 @@ public class TrainingTraineeAllocationServiceImpl
     private final TrainingManagementStatusRepository statusRepository;
     private final UniqueIdGeneratorService uniqueIdGeneratorService;
 
+    private final RegionRepository regionRepository;
+
+    private final DistrictRepository districtRepository;
+
+    private final CityRepository cityRepository;
+
+    private final UniversityRepository universityRepository;
+
+    private final TrainingTypeRepository trainingTypeRepository;
+
     @Override
     @Transactional
-    public TrainingTraineeAllocationResponseDto createAllocation(
+    public TrainingTraineeAllocationResponseDto createTraineeAllocation(
             TrainingTraineeAllocationRequestDto requestDto) {
 
         log.info("Creating trainee allocation");
@@ -68,7 +83,7 @@ public class TrainingTraineeAllocationServiceImpl
 
     @Override
     @Transactional
-    public TrainingTraineeAllocationResponseDto updateAllocation(
+    public TrainingTraineeAllocationResponseDto updateTraineeAllocation(
             String allocationCode,
             TrainingTraineeAllocationRequestDto requestDto) {
 
@@ -105,27 +120,18 @@ public class TrainingTraineeAllocationServiceImpl
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TrainingTraineeAllocationResponseDto> getAllAllocations(
-            TrainingTraineeAllocationFilterRequestDto filterDto,
-            int pageNumber,
-            int pageSize) {
+    public Page<TrainingTraineeAllocationResponseDto> getAllTraineeAllocations(
+            TrainingTraineeAllocationFilterRequestDto request,
+            int page,
+            int size) {
 
-        if (filterDto == null) {
-            filterDto = new TrainingTraineeAllocationFilterRequestDto();
-        }
-
-        Pageable pageable = PageRequest.of(
-                pageNumber,
-                pageSize,
-                Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+        if(request==null)
+            request=new TrainingTraineeAllocationFilterRequestDto();
+        Pageable pageable = PageRequest.of(page, size);
 
         return allocationRepository.findAll(
-                        TrainingTraineeAllocationSearchSpecification
-                                .buildSpecification(filterDto),
-                        pageable
-                )
-                .map(allocationMapper::toTrainingTraineeAllocationResponse);
+                TrainingTraineeAllocationSearchSpecification.buildSpecification(request),pageable)
+        .map(allocationMapper::toTrainingTraineeAllocationResponse);
     }
 
     @Override
@@ -152,25 +158,75 @@ public class TrainingTraineeAllocationServiceImpl
             TrainingTraineeAllocation entity,
             TrainingTraineeAllocationRequestDto requestDto) {
 
-        entity.setAllocationDate(requestDto.getAllocationDate());
-        entity.setNotes(requestDto.getNotes());
+        entity.setRegion(
+                regionRepository.findById(requestDto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Region not found"))
+        );
+
+        entity.setDistrict(
+                districtRepository.findById(requestDto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "District not found"))
+        );
+
+        entity.setCity(
+                cityRepository.findById(requestDto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "City not found"))
+        );
+
+        entity.setUniversity(
+                universityRepository.findById(requestDto.getUniversityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "University not found"))
+        );
 
         entity.setTrainee(
                 universityTraineeRepository.findById(requestDto.getTraineeId())
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Trainee not found"))
+                                new ResourceNotFoundException(
+                                        "Trainee not found"))
+        );
+
+        entity.setFaculty(
+                requestDto.getFaculty()
         );
 
         entity.setTrainingClass(
-                trainingClassRepository.findById(requestDto.getTrainingClassId())
+                trainingClassRepository.findById(
+                                requestDto.getTrainingClassId())
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Training class not found"))
+                                new ResourceNotFoundException(
+                                        "Training class not found"))
+        );
+
+        // Add this here
+        entity.setTrainingType(
+                trainingTypeRepository.findById(
+                                requestDto.getTrainingTypeId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Training type not found"))
         );
 
         entity.setStatus(
                 statusRepository.findById(requestDto.getStatusId())
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Status not found"))
+                                new ResourceNotFoundException(
+                                        "Status not found"))
+        );
+
+        entity.setAllocationDate(
+                requestDto.getAllocationDate()
+        );
+
+        entity.setNotes(
+                requestDto.getNotes()
         );
     }
 

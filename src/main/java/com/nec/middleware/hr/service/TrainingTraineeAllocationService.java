@@ -7,13 +7,15 @@ import org.springframework.data.domain.Page;
 
 public interface TrainingTraineeAllocationService {
 
-    TrainingTraineeAllocationResponseDto createAllocation(
+
+
+    TrainingTraineeAllocationResponseDto createTraineeAllocation(
             TrainingTraineeAllocationRequestDto requestDto);
 
     TrainingTraineeAllocationResponseDto getAllocationByAllocationCode(
             String allocationCode);
 
-    Page<TrainingTraineeAllocationResponseDto> getAllAllocations(
+    Page<TrainingTraineeAllocationResponseDto> getAllTraineeAllocations(
             TrainingTraineeAllocationFilterRequestDto filterDto,
             int pageNumber,
             int pageSize);
@@ -22,7 +24,7 @@ public interface TrainingTraineeAllocationService {
             String allocationCode,
             Boolean isActive);
 
-    TrainingTraineeAllocationResponseDto updateAllocation(
+    TrainingTraineeAllocationResponseDto updateTraineeAllocation(
             String allocationCode,
             TrainingTraineeAllocationRequestDto requestDto);
 }

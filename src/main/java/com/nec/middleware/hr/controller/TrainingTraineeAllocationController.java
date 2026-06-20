@@ -32,11 +32,11 @@ public class TrainingTraineeAllocationController {
 
     @Operation(summary = "Create Training Trainee Allocation")
     @PostMapping
-    public ResponseEntity<ApiResponse<TrainingTraineeAllocationResponseDto>> createAllocation(
+    public ResponseEntity<ApiResponse<TrainingTraineeAllocationResponseDto>> createTraineeAllocation(
             @Valid @RequestBody TrainingTraineeAllocationRequestDto requestDto) {
 
         TrainingTraineeAllocationResponseDto response =
-                trainingTraineeAllocationService.createAllocation(requestDto);
+                trainingTraineeAllocationService.createTraineeAllocation(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
@@ -48,13 +48,13 @@ public class TrainingTraineeAllocationController {
     // ------------------------------------------------------------------ UPDATE
 
     @Operation(summary = "Update Training Trainee Allocation")
-    @PatchMapping("/{allocationCode}")
-    public ResponseEntity<ApiResponse<TrainingTraineeAllocationResponseDto>> updateAllocation(
+    @PutMapping("/{allocationCode}")
+    public ResponseEntity<ApiResponse<TrainingTraineeAllocationResponseDto>> updateTraineeAllocation(
             @PathVariable String allocationCode,
             @Valid @RequestBody TrainingTraineeAllocationRequestDto requestDto) {
 
         TrainingTraineeAllocationResponseDto response =
-                trainingTraineeAllocationService.updateAllocation(
+                trainingTraineeAllocationService.updateTraineeAllocation(
                         allocationCode,
                         requestDto
                 );
@@ -67,37 +67,17 @@ public class TrainingTraineeAllocationController {
         );
     }
 
-    // ------------------------------------------------------------------ GET BY BUSINESS CODE
-
-    @Operation(summary = "Get Training Trainee Allocation by Allocation Code")
-    @GetMapping("/{allocationCode}")
-    public ResponseEntity<ApiResponse<TrainingTraineeAllocationResponseDto>> getByAllocationCode(
-            @PathVariable String allocationCode) {
-
-        TrainingTraineeAllocationResponseDto response =
-                trainingTraineeAllocationService.getAllocationByAllocationCode(
-                        allocationCode
-                );
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        TrainingTraineeAllocationConstants.ALLOCATION_FETCHED,
-                        response
-                )
-        );
-    }
-
     // ------------------------------------------------------------------ GET ALL
 
     @Operation(summary = "Get All Training Trainee Allocations")
-    @PostMapping("/getAllTrainingTraineeAllocations")
-    public ResponseEntity<ApiResponse<Page<TrainingTraineeAllocationResponseDto>>> getAllAllocations(
+    @GetMapping("/getAllTrainingTraineeAllocations")
+    public ResponseEntity<ApiResponse<Page<TrainingTraineeAllocationResponseDto>>> getAllTraineeAllocations(
             @RequestBody(required = false) TrainingTraineeAllocationFilterRequestDto request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Page<TrainingTraineeAllocationResponseDto> response =
-                trainingTraineeAllocationService.getAllAllocations(
+                trainingTraineeAllocationService.getAllTraineeAllocations(
                         request,
                         page,
                         size

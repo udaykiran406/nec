@@ -5,45 +5,37 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class TrainingTraineeAllocationResponseDto {
 
     private Long id;
-
     private String allocationCode;
 
-    private LocalDate allocationDate;
-
-    private String notes;
-
-    // Trainee
     private IdValueDto trainee;
-
-    // Derived from trainee
     private IdValueDto university;
+
     private IdValueDto region;
+    private IdValueDto district;
+    private IdValueDto city;
+
     private String faculty;
 
-    // Training class
     private IdValueDto trainingClass;
-
-    // Derived from training class
     private IdValueDto trainingType;
 
-    // Status
     private IdValueDto status;
 
-    // Audit
+    private LocalDate allocationDate;
+    private String notes;
+
     private Boolean isActive;
 
     private String createdBy;
     private LocalDateTime createdAt;
-
     private String updatedBy;
     private LocalDateTime updatedAt;
 }

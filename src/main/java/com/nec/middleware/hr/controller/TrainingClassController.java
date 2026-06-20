@@ -70,7 +70,7 @@ public class TrainingClassController {
     }
 
     @Operation(summary = "Get Paginated & Filtered Training Class List")
-    @PostMapping("/getAllTrainingClasses")
+    @GetMapping("/getAllTrainingClasses")
     public ResponseEntity<ApiResponse<Page<TrainingClassResponse>>> getAllTrainingClasses(
             @RequestBody(required = false) TrainingClassListRequestDto filterDto,
             @RequestParam(defaultValue = "0") int page,

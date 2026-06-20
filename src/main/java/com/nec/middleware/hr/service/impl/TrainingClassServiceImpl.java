@@ -63,7 +63,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     @Override
     public TrainingClassResponse updateTrainingClass(String classCode, TrainingClassRequest request) {
 
-        TrainingClass entity = trainingClassRepository.findByClassCode(classCode)
+        TrainingClass trainingClass = trainingClassRepository.findByClassCode(classCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Training class not found"));
 
         //this check is to ensure that when updating,
@@ -75,9 +75,9 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             throw new ResourceAlreadyExistsException("Training class name already exists");
         }
 
-        populateTrainingClass(entity, request);
+        populateTrainingClass(trainingClass, request);
 
-        TrainingClass updatedEntity = trainingClassRepository.save(entity);
+        TrainingClass updatedEntity = trainingClassRepository.save(trainingClass);
 
         return trainingClassMapper.toTrainingClassResponse(updatedEntity);
     }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,7 +18,9 @@ public interface TrainingAttendanceRecordRepository
     findByTrainingClassIdAndTraineeIdAndAttendanceDate(
             Long trainingClassId,
             Long traineeId,
-            LocalDate attendanceDate
-    );
+            LocalDate attendanceDate);
 
+    List<TrainingAttendanceRecord> findByTrainingClassIdAndTraineeIdIn(
+            Long trainingClassId,
+            List<Long> traineeIds);
 }
