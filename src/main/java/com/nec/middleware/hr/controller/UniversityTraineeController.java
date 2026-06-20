@@ -12,7 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +30,6 @@ public class UniversityTraineeController {
 
     private final UniversityTraineeService universityTraineeService;
 
-
-
     // ------------------------------------------------------------------ CREATE
 
     @Operation(summary = "Create University Trainee",
@@ -39,11 +39,10 @@ public class UniversityTraineeController {
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> createUniversityTrainee(
             @Valid @ModelAttribute UniversityTraineeRequestDto requestDto,
             @RequestParam("photo")MultipartFile photo) {
-        log.info("Create university trainee request received, photo='{}'",
-                photo != null ? photo.getOriginalFilename() : "none");
+
         UniversityTraineeResponseDto universityTraineeResponse =
                 universityTraineeService.createTrainee(requestDto, photo);
-        log.info("University trainee created: universityTraineeId='{}'", universityTraineeResponse.getUniversityTraineeId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
                         UniversityTraineeConstants.TRAINEE_CREATED,
@@ -55,20 +54,19 @@ public class UniversityTraineeController {
 
     @Operation(summary = "Update University Trainee",
             description = "multipart/form-data: flat fields + optional photo")
-    @PutMapping(value = "/{universityTraineeId}",
+    @PatchMapping(value = "/{universityTraineeId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> updateUniversityTrainee(
             @PathVariable String universityTraineeId,
             @Valid @ModelAttribute UniversityTraineeRequestDto requestDto,
             @RequestParam(value="photo", required = false) MultipartFile photo) {
-        log.info("Update university trainee request, universityTraineeId='{}'", universityTraineeId);
+
         UniversityTraineeResponseDto response =
                 universityTraineeService.updateTrainee(
                         universityTraineeId,
                         requestDto,
                         photo
                 );
-        log.info("University trainee updated: universityTraineeId='{}'", universityTraineeId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -84,12 +82,11 @@ public class UniversityTraineeController {
     @GetMapping("/{universityTraineeId}")
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> getByUniversityTraineeId(
             @PathVariable String universityTraineeId) {
-        log.info("GEt university trainee request, universityTraineeId='{}'", universityTraineeId);
+
         UniversityTraineeResponseDto response =
                 universityTraineeService.getTraineeByUniversityTraineeId(
                         universityTraineeId
                 );
-        log.info("University trainee fetched sucessfully: universityTraineeId='{}'", universityTraineeId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -130,14 +127,13 @@ public class UniversityTraineeController {
     public ResponseEntity<ApiResponse<UniversityTraineeResponseDto>> changeUniversityTraineeStatus(
             @PathVariable String universityTraineeId,
             @RequestParam Boolean isActive) {
-        log.info("Change status request: universityTraineeId='{}', isActive={}", universityTraineeId, isActive);
 
         UniversityTraineeResponseDto response =
                 universityTraineeService.changeStatus(
                         universityTraineeId,
                         isActive
                 );
-        log.info("University trainee status changed: universityTraineeId='{}', isActive={}", universityTraineeId, isActive);
+
         return ResponseEntity.ok(
                 ApiResponse.success(
                         UniversityTraineeConstants.TRAINEE_STATUS_CHANGED,

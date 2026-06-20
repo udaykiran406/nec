@@ -1,6 +1,7 @@
 package com.nec.middleware.template.controller;
 
 import com.nec.middleware.hr.dto.request.*;
+import com.nec.middleware.rbacAuth.rbac.dto.request.RbacUserBulkUploadDto;
 import com.nec.middleware.template.service.ExcelTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,6 +86,18 @@ public class ExcelTemplateController {
                 "temporary_contract_template.xlsx"
         );
     }
+
+    @GetMapping("/RbacUsers")
+    @Operation(
+            summary = "Download RBAC Users Excel import template"
+    )
+    public ResponseEntity<byte[]> RbacUsers() throws Exception {
+        return buildResponse(
+                RbacUserBulkUploadDto.class,
+                "RbacUsers_template.xlsx"
+        );
+    }
+
 
     private ResponseEntity<byte[]> buildResponse(Class<?> dtoClass, String fileName) throws Exception {
         byte[] excelBytes = excelTemplateService.createTemplate(dtoClass);

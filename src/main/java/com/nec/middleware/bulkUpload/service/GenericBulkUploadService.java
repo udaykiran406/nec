@@ -18,48 +18,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * CORE bulk-upload pipeline. Every module's upload — UniversityTrainee,
- * Employee, Student, Vendor, Contractor, anything added later — runs
- * through this exact same class. The only thing that varies per module is
- * which {@link BulkUploadHandler} gets passed in.
- *
- * <p>Per-row flow:
- * <ol>
- *   <li>{@code handler.map(row)} — raw columns → DTO</li>
- *   <li>{@code handler.validate(dto)} — bean validation + business rules + FK checks</li>
- *   <li>{@code handler.persist(dto)} — save and return the response DTO</li>
- * </ol>
- *
- * <p>Each row is isolated: a failure at any step is caught, turned into a
- * {@link RowErrorDto} carrying that row's original raw data, and processing
- * continues with the next row. Rows already persisted earlier in the batch
- * are never rolled back because of a later row's failure — that guarantee
- * is enforced by each handler's {@code persist} method owning its own
- * {@code REQUIRES_NEW} transaction (see module README), not by this engine.
- *
- * <p>This class has NO knowledge of UniversityTrainee, Employee, or any
- * other concrete module — it only ever calls the five
- * {@link BulkUploadHandler} methods and the generic {@link GenericExcelParser}.
- */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GenericBulkUploadService {
 
     private final GenericExcelParser excelParser;
-
-    /**
-     * Parse {@code file} with the generic Excel parser, then map/validate/
-     * persist every row through {@code handler}, collecting successes and
-     * failures independently.
-     *
-     * @param file    the uploaded {@code .xlsx} file
-     * @param handler the module-specific strategy implementation
-     * @param <T>     the module's request DTO type
-     * @param <R>     the module's response DTO type
-     * @return aggregate result with success records and per-row errors
-     */
     public <T, R> BulkUploadResultDto<R> process(MultipartFile file, BulkUploadHandler<T, R> handler) {
 
         log.info("Starting bulk upload for module '{}', file='{}'",
@@ -82,7 +47,6 @@ public class GenericBulkUploadService {
         validateHeaderRow(rows, handler, errors);
 
        int sucessCount=0;
-
         for (ParsedExcelRow parsedRow : rows) {
             int rowNumber = parsedRow.getRowNumber();
             try {
@@ -142,6 +106,15 @@ public class GenericBulkUploadService {
     /**
      * Fail fast with one clear error if the uploaded file's header row is
      * missing columns the handler expects — rather than letting every
+<<<<<<< HEAD
+=======
+     <<<<<<< HEAD
+     =======
+     * single data row fail individually with a confusing "field is
+     * required" message. Does not block processing; rows are still
+     * attempted, since {@code map()} degrades missing columns to
+     >>>>>>> rbac
+>>>>>>> rbac
      * {@code null} and {@code validate()} will report them per-row too if
      * this check is skipped or partially wrong.
      */
@@ -163,14 +136,6 @@ public class GenericBulkUploadService {
         }
     }
 
-    /**
-     * Counts structural parse errors that have no associated data row at
-     * all (e.g. "missing header column") so they're included in
-     * {@code totalRows} alongside the rows the parser did manage to read.
-     * Per-row failures (which DO have a row already counted in
-     * {@code rows.size()}) are intentionally excluded here to avoid
-     * double-counting.
-     */
     private int countRowlessStructuralErrors(List<RowErrorDto> errors) {
         return (int) errors.stream()
                 .filter(e -> e.getRowNumber() <= 1)
@@ -178,10 +143,6 @@ public class GenericBulkUploadService {
                 .count();
     }
 
-    /**
-     * Never expose a raw exception message (SQL state, constraint name,
-     * stack-trace fragments) to the end user's downloaded error report.
-     */
     private String resolveErrorMessage(Exception e) {
 
         if (e.getCause() != null) {

@@ -1,0 +1,1710 @@
+{
+  "info": {
+    "name": "NEC Middleware API",
+    "_postman_id": "nec-middleware-collection-v2",
+    "description": "Full API collection for NEC Middleware — Auth, Roles, Users, Permission Groups, Role-Permissions, Modules, Groups, and Permissions.\n\nBase URL is stored in {{baseUrl}} (default: http://localhost:8082/nec). HTTP status codes indicate success/failure. Success: { success, message, data }. Error: { success, errorCode, message }. isActive: 1=active, 0=inactive. isDeleted: 0=not deleted, 1=deleted.\n\nAfter login, the test script auto-saves accessToken and refreshToken to collection variables.\n\nAuth endpoints include:\n- Login (POST /api/v1/auth/login)\n- Refresh token (POST /api/v1/auth/refresh)\n- Logout (POST /api/v1/auth/logout)\n- Forgot password (POST /api/v1/auth/forgot-password)\n- Reset password (POST /api/v1/auth/reset-password)\n- Update password (PUT /api/v1/auth/update-password)\n- Get user context (POST /api/v1/auth/user-context) - Returns current user's profile, role, and permissions\n\n--- ROLE CODE AUTO-GENERATION ---\nDo NOT include roleCode in Create Role requests. The service generates it automatically:\n  Format : <PREFIX><3-digit-sequence>  e.g. ADMIN001\n  Prefix : derived from the first word of roleName (vowel-boundary algorithm)\n  Examples:\n    Administrator  →  ADMIN001, ADMIN002 …\n    Finance        →  FIN001,   FIN002   …\n    HR Officer     →  HR001\n    Procurement    →  PROC001\n    Logistics      →  LOG001\n    Communication  →  COMM001\n    Director       →  DIR001\n    Deputy         →  DEP001",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082/nec",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "moduleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "rolePermissionId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', res.data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', res.data.refreshToken);",
+                  "    console.log('Tokens saved to collection variables');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"admin@nec.gov\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates via Keycloak. On success, the test script auto-saves accessToken and refreshToken to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', res.data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', res.data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "refresh-token",
+                "value": "{{refreshToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Exchanges the current refresh token for a new access + refresh token pair."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "refresh-token",
+                "value": "{{refreshToken}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Revokes the Keycloak session."
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"admin@nec.gov\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Generates a reset token. Copy the returned token into {{resetToken}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resetToken\": \"{{resetToken}}\",\n  \"newPassword\": \"NewPass@123\",\n  \"confirmPassword\": \"NewPass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Resets the password using the token from the forgot-password flow."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin@123\",\n  \"newPassword\": \"NewPass@456\",\n  \"confirmNewPassword\": \"NewPass@456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/update-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "update-password"
+              ]
+            },
+            "description": "Authenticated endpoint — requires a valid Bearer token."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Context",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/user-context",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "user-context"
+              ]
+            },
+            "description": "Retrieve the current authenticated user's context including profile, role, and permissions. Requires a valid Bearer token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC — Roles",
+      "item": [
+        {
+          "name": "Create Role — Administrator (→ ADMIN001)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.roleId) {",
+                  "    pm.collectionVariables.set('roleId', res.data.roleId);",
+                  "    console.log('roleId saved:', res.data.roleId, '| roleCode:', res.data.roleCode);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Full system access\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": true,\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Creates a new role. roleCode is AUTO-GENERATED — do NOT include it in the request.\n\nExpected roleCode: ADMIN001 (first call), ADMIN002 (second call), …\n\nOn success (HTTP 201) the test script saves the returned roleId to {{roleId}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role — Finance (→ FIN001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Finance\",\n  \"description\": \"Finance department role\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Expected roleCode: FIN001 (auto-generated). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role — HR Officer (→ HR001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"HR Officer\",\n  \"description\": \"Human resources officer\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Expected roleCode: HR001 (auto-generated). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role — Procurement Manager (→ PROC001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Procurement Manager\",\n  \"description\": \"Oversees procurement operations\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Expected roleCode: PROC001 (auto-generated). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role — Communication Officer (→ COMM001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Communication Officer\",\n  \"description\": \"Manages internal and external communications\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Expected roleCode: COMM001 (auto-generated). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleId\": {{roleId}},\n  \"roleName\": \"Administrator Updated\",\n  \"description\": \"Updated description\",\n  \"parentRoleId\": null,\n  \"status\": \"ACTIVE\",\n  \"modifiedByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Updates an existing role (roleId present). Do NOT send roleCode — the auto-generated code is immutable and will be ignored if sent. Returns HTTP 200."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "{{roleId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Roles by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/status/ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "status",
+                "ACTIVE"
+              ]
+            },
+            "description": "Replace ACTIVE with INACTIVE as needed."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Child Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/parent/{{roleId}}/children",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "parent",
+                "{{roleId}}",
+                "children"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Role Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INACTIVE\",\n  \"modifiedByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "{{roleId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "{{roleId}}"
+              ]
+            },
+            "description": "Soft-deletes the role."
+          },
+          "response": []
+        },
+        {
+          "name": "List Roles (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"roleName\",\n  \"sortDir\": \"asc\",\n  \"search\": \"\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role",
+                "list"
+              ]
+            },
+            "description": "Paginated / filtered role list. Body is optional — send an empty body {} for defaults."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC — Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@nec.gov\",\n  \"username\": \"john.doe\",\n  \"password\": \"Pass@1234\",\n  \"roleId\": {{roleId}},\n  \"isActive\": 1,\n  \"createdBy\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "save"
+              ]
+            },
+            "description": "Creates a new user (id absent). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{userId}},\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe Updated\",\n  \"email\": \"john.doe@nec.gov\",\n  \"username\": \"john.doe\",\n  \"roleId\": {{roleId}},\n  \"isActive\": 1,\n  \"modifiedBy\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "save"
+              ]
+            },
+            "description": "Updates an existing user (id present). Returns HTTP 200."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Users by Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/role/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "role",
+                "{{roleId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change User Active Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}/status?isActive=1&updatedBy=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "isActive",
+                  "value": "1"
+                },
+                {
+                  "key": "updatedBy",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/{{userId}}?updatedBy=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "users",
+                "{{userId}}"
+              ],
+              "query": [
+                {
+                  "key": "updatedBy",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Soft-deletes the user."
+          },
+          "response": []
+        },
+        {
+          "name": "List Users (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"firstName\",\n  \"sortDir\": \"asc\",\n  \"search\": \"\",\n  \"roleId\": null,\n  \"isActive\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/user/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "user",
+                "list"
+              ]
+            },
+            "description": "Paginated / filtered user list. Body is optional."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC — Permission Groups",
+      "item": [
+        {
+          "name": "Save Permission Group (Create)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modules\": [\n    {\n      \"moduleId\": null,\n      \"moduleCode\": \"HR\",\n      \"moduleName\": \"Human Resource\",\n      \"displayOrder\": 1,\n      \"groups\": [\n        {\n          \"groupId\": null,\n          \"groupCode\": \"EMP\",\n          \"groupName\": \"Employee Management\",\n          \"permissions\": [\n            {\n              \"permissionId\": null,\n              \"permissionCode\": \"CREATE_USER\",\n              \"permissionName\": \"Create User\"\n            },\n            {\n              \"permissionId\": null,\n              \"permissionCode\": \"VIEW_USER\",\n              \"permissionName\": \"View User\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "save"
+              ]
+            },
+            "description": "Creates a new module/group/permission hierarchy (moduleId null). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Save Permission Group (Update)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modules\": [\n    {\n      \"moduleId\": {{moduleId}},\n      \"moduleCode\": \"HR\",\n      \"moduleName\": \"Human Resource Updated\",\n      \"displayOrder\": 1,\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupCode\": \"EMP\",\n          \"groupName\": \"Employee Management\",\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionCode\": \"CREATE_USER\",\n              \"permissionName\": \"Create User\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "save"
+              ]
+            },
+            "description": "Updates an existing hierarchy (all moduleIds present). Returns HTTP 200."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Permission Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "all"
+              ]
+            },
+            "description": "Returns full module → group → permission hierarchy."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Permission Group by Module ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/{{moduleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "{{moduleId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Permission Groups (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"moduleName\",\n  \"sortDir\": \"asc\",\n  \"search\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission-group/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission-group",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Modules (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"moduleName\",\n  \"sortDir\": \"asc\",\n  \"search\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/module/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "module",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Groups (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"groupName\",\n  \"sortDir\": \"asc\",\n  \"search\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/group/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "group",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC — Role Permissions",
+      "item": [
+        {
+          "name": "Save Role Permission (Create)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rolePermissionId\": null,\n  \"roleName\": \"HR Manager\",\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleName\": \"Human Resource\",\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupName\": \"Employee Management\",\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionName\": \"Create User\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "save"
+              ]
+            },
+            "description": "Creates new role-permission mappings (rolePermissionId null). Returns HTTP 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Save Role Permission (Update)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rolePermissionId\": {{rolePermissionId}},\n  \"roleName\": \"HR Manager\",\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleName\": \"Human Resource\",\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupName\": \"Employee Management\",\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionName\": \"Create User\"\n            },\n            {\n              \"permissionId\": 2,\n              \"permissionName\": \"Edit User\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "save"
+              ]
+            },
+            "description": "Updates existing role-permission mappings (rolePermissionId present). Returns HTTP 200."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Role Permissions by Role ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/{{roleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "{{roleId}}"
+              ]
+            },
+            "description": "Returns hierarchical permissions (Module → Group → Permissions) for a specific role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Role Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/get-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "get-all"
+              ]
+            },
+            "description": "Returns all active role-permission mappings grouped by Role → Module → Group → Permissions."
+          },
+          "response": []
+        },
+        {
+          "name": "List Role Permissions (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"roleName\",\n  \"sortDir\": \"asc\",\n  \"roleId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Role Permission",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/role-permission/{{rolePermissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "role-permission",
+                "{{rolePermissionId}}"
+              ]
+            },
+            "description": "Soft-deletes the mapping. Returns remaining active permissions for the role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC — Permissions",
+      "item": [
+        {
+          "name": "List Permissions (paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"permissionName\",\n  \"sortDir\": \"asc\",\n  \"search\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/permission/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "permission",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "— Error Cases —",
+      "item": [
+        {
+          "name": "Create Role — duplicate role name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Attempt to create a duplicate\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Expects HTTP 409 — DUPLICATE_ROLE_NAME.\n\nroleCode is still auto-generated (would be ADMIN002) but the duplicate-name check fires first."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role — missing roleName",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Missing roleName field\",\n  \"status\": \"ACTIVE\",\n  \"createdByUserId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/roles/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "rbac",
+                "roles",
+                "save"
+              ]
+            },
+            "description": "Expects HTTP 400 — @NotBlank validation failure on roleName."
+          },
+          "response": []
+        },
+        {
+          "name": "Login — wrong password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"admin@nec.gov\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Expects HTTP 401 — INVALID_CREDENTIALS"
+          },
+          "response": []
+        },
+        {
+          "name": "Login — unknown email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"nobody@nec.gov\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Expects HTTP 401 — INVALID_CREDENTIALS (user not found)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login — missing fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"\",\n  \"password\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Expects HTTP 400 — @NotBlank validation failure"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh — invalid token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "refresh-token",
+                "value": "invalid.token.here"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Expects HTTP 401 — KeycloakException (invalid_grant)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password — no token",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin@123\",\n  \"newPassword\": \"NewPass@456\",\n  \"confirmNewPassword\": \"NewPass@456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/update-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "update-password"
+              ]
+            },
+            "description": "No Authorization header — expects HTTP 401 from @Authorize aspect"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password — mismatched passwords",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resetToken\": \"some-valid-token\",\n  \"newPassword\": \"Pass@123\",\n  \"confirmPassword\": \"DifferentPass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Expects HTTP 400 — passwords do not match"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

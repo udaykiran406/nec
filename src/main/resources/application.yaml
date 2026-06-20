@@ -7,9 +7,9 @@ spring:
   application:
     name: nec-middleware-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/nec_hr
+    url: jdbc:postgresql://localhost:5432/nec
     username: postgres
-    password: root
+    password: admin
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -17,12 +17,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 7
 
   main:
     allow-bean-definition-overriding: true
@@ -35,9 +40,9 @@ spring:
 
     # Flowable Engine Configuration
   flowable:
-      database-schema-update: true
-      history-level: full
-      db-history-used: true
+    database-schema-update: true
+    history-level: full
+    db-history-used: true
 
   jackson:
     default-property-inclusion: NON_NULL
@@ -47,16 +52,44 @@ spring:
       fail-on-unknown-properties: false
       accept-empty-string-as-null-object: false
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak's issuer URI for token validation
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/NEC-DEV}
+          # Keycloak's JWK Set endpoint for public key retrieval
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/NEC-DEV/protocol/openid-connect/certs}
+
+  # ── Mail Configuration (for bulk upload email notifications) ──────────────
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 logging:
   level:
-    com.emis.ams: INFO
-    com.emis.ams.controller: INFO
-    com.emis.ams.service: INFO
-    com.emis.ams.repository: DEBUG
+    com.nec.middleware: INFO
+    com.nec.middleware.rbacAuth.rbac.handler.RbacUserBulkRowPersister: DEBUG
+    com.nec.middleware.rbacAuth.rbac.service.BulkUploadEmailService: DEBUG
+    com.nec.middleware.rbacAuth.keycloak: DEBUG
     org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
@@ -89,15 +122,64 @@ admin:
 
 # File Storage Configuration
 file:
-  # Upload directory used by the Document Upload API (com.emis.sms.uploads)
+  # Upload directory used by the Document Upload API (com.nec.sms.uploads)
   # Windows local path – sub-folders are created automatically on first upload
-  upload:
-    base-dir: C:/nec-uploads
+  upload-dir: C:/Users/hp/Downloads/nec-middleware-uploads
 
-# ── OFBiz connection ──────────────────────────────────────────────────────────
+  # ── OFBiz connection ──────────────────────────────────────────────────────────
   ofbiz:
     base-url: https://localhost:8443
     username: admin
     password: ofbiz
     # Set to false in production (use a real TLS cert on OFBiz)
     trust-self-signed: true
+
+# ── Keycloak configuration ────────────────────────────────────────────────────
+# Keycloak 26.x: base-url is the server root WITHOUT /auth (e.g. http://localhost:8080)
+keycloak:
+  base-url: http://localhost:8080
+  realm-name: NEC-DEV
+  admin-realm: master
+  grant-type: password
+  admin-client-id: admin-cli
+  admin-client-secret: mbD3hQJFr39bm8bkWE6ZSBubpOmqgKsc
+  admin-username: admin
+  admin-password: admin123
+  web-client-id: nec-web
+  web-client-secret: 1abefLKB9ezHPGieYGZXtH6ZmCCphEZS
+# ── JWT Authentication ────────────────────────────────────────────────────────
+jwt:
+  secret: ${JWT_SECRET:NEC-Middleware-JWT-Secret-Key-Must-Be-At-Least-256-Bits-Long-For-HS256}
+  access-token-expiration: ${JWT_ACCESS_EXPIRY:900000}       # 15 minutes in ms
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRY:604800000}  # 7 days in ms
+  issuer: nec-middleware
+
+# ── Application settings ──────────────────────────────────────────────────
+app:
+  password-reset:
+    url: http://localhost:3000/reset-password
+    token-validity-minutes: 30
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - https://your-frontend.example.com
+  security:
+    max-failed-attempts: ${MAX_FAILED_ATTEMPTS:5}
+    lock-duration-minutes: ${LOCK_DURATION_MINUTES:30}
+    password-expiry-days: ${PASSWORD_EXPIRY_DAYS:90}
+  # ── Email/Notification settings ────────────────────────────────────────────
+  mail:
+    from-email: ${MAIL_FROM_EMAIL:techlead@aakrutisolutions.com}
+    from-name: ${MAIL_FROM_NAME:NEC Authentication System}
+  auth-url: ${AUTH_URL:http://localhost:3000/login}
+  support-email: ${SUPPORT_EMAIL:support@nec.go.tz}
+
+
+# ── Mailjet email provider ────────────────────────────────────────────────────
+mailjet:
+  api:
+    key: ${MAILJET_API_KEY:1991683a505cb9f5ad27ebd107e77686}
+    secret: ${MAILJET_API_SECRET:30fc0bf9c24081e67c9d2967923dd968}
+  from:
+    email: ${MAILJET_FROM_EMAIL:techlead@aakrutisolutions.com}
+    name: ${MAILJET_FROM_NAME:NEC Support}

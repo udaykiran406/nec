@@ -17,37 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * CORE bulk-upload component. Reads an {@code .xlsx} file and turns it into
- * plain {@code Map<String, String>} rows, keyed by header label, in column
- * order.
- *
- * <p>This class is the single Excel-reading entry point for every module in
- * the bulk upload framework
- *
- * <ul>
- *   <li>NO knowledge of any DTO class.</li>
- *   <li>NO validation beyond "is this a readable .xlsx with a header row".</li>
- *   <li>NO database access.</li>
- *   <li>NO business rules of any kind.</li>
- * </ul>
- *
- * <p>Everything module-specific (which headers are expected, how a row maps
- * to a DTO, what counts as valid) lives in that module's
- * {@link com.nec.middleware.bulkUpload.handler.BulkUploadHandler} — never
- * here. This is what lets a new module be added with zero changes to this
- * class.
- *
- * <h3>Header normalization</h3>
- * Uploaded files routinely have header text that differs from the expected
- * header only in casing or whitespace — {@code "full name"} vs
- * {@code "Full Name"} vs {@code "Full  Name "}. Treating these as different
- * columns would silently drop the column's data (it just wouldn't match any
- * key the handler looks up), so headers are normalized
- * <p>Reuses the same low-level cell-reading conventions as the legacy
- * {@code ExcelParserUtil} (numeric whole numbers rendered without a
- * trailing ".0", dates as {@code yyyy-MM-dd}, blank cells as {@code null}).
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -151,13 +120,6 @@ public class GenericExcelParser {
     // Header / row reading
     // ------------------------------------------------------------------
 
-    /**
-     * Reads the header row and resolves each cell's label to its canonical
-     * form via {@code normalizedToCanonical}. A header that doesn't match
-     * any expected header (e.g. an extra column the handler doesn't declare)
-     * is kept under its own trimmed text rather than dropped, so it still
-     * shows up in {@code rawData} for handlers that want to read it anyway.
-     */
     private List<String> readHeaderRow(Row headerRow, Map<String, String> normalizedToCanonical) {
         List<String> headers = new ArrayList<>();
         for (int c = 0; c < headerRow.getLastCellNum(); c++) {
@@ -174,6 +136,7 @@ public class GenericExcelParser {
 
             String canonical = normalizedToCanonical.get(normalize(rawLabel));
            headers.add(canonical != null ? canonical : rawLabel.trim());
+
         }
         return headers;
     }
@@ -199,12 +162,6 @@ public class GenericExcelParser {
         return true;
     }
 
-    /**
-     * Read any cell type as a trimmed String. Whole-number numeric cells
-     * render without a trailing ".0" (so an ID column reads "5" not "5.0").
-     * Date-formatted numeric cells render as {@code yyyy-MM-dd}. Blank
-     * cells return {@code null}.
-     */
     private String cellString(Cell cell) {
         if (cell == null) return null;
         switch (cell.getCellType()) {
