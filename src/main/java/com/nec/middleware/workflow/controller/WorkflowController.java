@@ -26,6 +26,7 @@ public class WorkflowController {
 
     private final WorkflowService workflowService;
 
+
     @Operation(summary = "Get Active Tasks",
             description = "Retrieves a list of active tasks in the workflow engine. Each task includes its ID and name.")
     @GetMapping("/activeTasks")
@@ -44,6 +45,7 @@ public class WorkflowController {
                 .toList();
     }
 
+
     @Operation(summary = "Get Workflow Inbox",
             description = "Retrieves a paginated list of workflow inbox items for a specific user role. " +
                     "Each inbox item includes details about the workflow task assigned to that role.")
@@ -56,16 +58,16 @@ public class WorkflowController {
             int size) {
 
         return ResponseEntity.ok(
-                workflowService.getInbox(role,page,size));
+                workflowService.getInbox(role, page, size));
     }
 
     @Operation(summary = "View Workflow Details",
             description = "Retrieves detailed information about a specific workflow instance based on the provided module name and entity ID. " +
                     "This API is used to view the current state and history of a workflow related to a particular business entity.")
     @GetMapping("/view/{moduleName}/{entityId}")
-    public ResponseEntity<Object> viewWorkflow(@PathVariable String moduleName,@PathVariable String entityId) {
+    public ResponseEntity<Object> viewWorkflow(@PathVariable String moduleName, @PathVariable String entityId) {
 
-        return ResponseEntity.ok(workflowService.getWorkflowDetails(moduleName,entityId));
+        return ResponseEntity.ok(workflowService.getWorkflowDetails(moduleName, entityId));
     }
 
     @Operation(summary = "Perform Workflow Action",
@@ -81,7 +83,14 @@ public class WorkflowController {
                 "Action completed successfully");
     }
 
-    @Operation(summary = "Get Active Tasks by Role",
+    @GetMapping("/rejectedItems")
+    public ResponseEntity<Page<WorkflowInboxDto>> getRejectedByRole(@RequestParam String role, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                workflowService.getRejectedWorkflowsByRequesterRole(role, page, size));
+    }
+
+   @Operation(summary = "Get Active Tasks by Role",
             description = "Retrieves a list of active tasks assigned to a specific user role in the workflow engine. " +
                     "Each task includes its ID and name, allowing users to see tasks relevant to their role.")
     @GetMapping("/activeTasks/{role}")
@@ -95,8 +104,7 @@ public class WorkflowController {
                 .stream()
                 .map(task -> {
 
-                    Map<String, Object> response =
-                            new HashMap<>();
+                    Map<String, Object> response = new HashMap<>();
 
                     response.put(
                             "taskId",
@@ -110,6 +118,5 @@ public class WorkflowController {
                 })
                 .toList();
     }
-
 
 }

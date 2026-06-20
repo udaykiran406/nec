@@ -10,11 +10,11 @@ import com.nec.middleware.hr.entity.TemporaryContract;
 import com.nec.middleware.hr.mapper.TemporaryContractMapStruct;
 import com.nec.middleware.hr.repository.TemporaryContractRepository;
 import com.nec.middleware.hr.service.TemporaryContractService;
-import com.nec.middleware.workflow.mapper.WorkflowInboxMapper;
-import com.nec.middleware.workflow.service.WorkflowService;
 import com.nec.middleware.idGenerator.service.UniqueIdGeneratorService;
 import com.nec.middleware.masterdata.entity.ApprovalWorkflowLevel;
 import com.nec.middleware.masterdata.repository.ApprovalWorkflowLevelRepository;
+import com.nec.middleware.workflow.mapper.WorkflowInboxMapper;
+import com.nec.middleware.workflow.service.WorkflowService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +43,10 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
     private final WorkflowService workflowService;
 
     private final WorkflowInboxMapper workflowSubmissionResponseDtoMapper;
+    private static final String DRAFT = "DRAFT";
+    private static final String REQUESTER_ROLE = "HR_OFFICER";
 
-
-    private static final String DRAFT="DRAFT";
+    // for testing requester role and name is hardcoded at line 138
     @Override
     @Transactional
     public TemporaryContractResponseDto createOrUpdateContract(TemporaryContractRequestDto temporaryContractRequestDto) {
@@ -113,14 +114,6 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
     }
 
     private TemporaryContractResponseDto saveAsDraft(TemporaryContract savedContract) {
-
-//        return workflowSubmissionResponseDtoMapper
-//                .workflowSubmissionResponseDto(
-//                        contract.getContractId(),
-//                        Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
-//                        null,
-//                        null,
-//                        contract.getStatus());
         return temporaryContractMapStruct.temporaryContractResponseDto(savedContract);
     }
 
@@ -142,19 +135,17 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
                         firstLevel,
                         contract.getContractId(),
                         Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
-                        contract.getCreatedBy());
+                        contract.getCreatedBy(), REQUESTER_ROLE);
 
-        contract.setProcessInstanceId(
-                processInstanceId);
-        log.info("Process instance Id generated Successfully {}",processInstanceId);
-        contract =
-                temporaryContractRepository.save(
-                        contract);
+        contract.setProcessInstanceId(processInstanceId);
+        log.info("Process instance Id generated Successfully {}", processInstanceId);
+        contract.setRevisionNo(1);
+        contract = temporaryContractRepository.save(contract);
 
         workflowService.createWorkflowAuditRecords(
                 contract.getContractId(),
                 Constants.TEMPORARY_CONTRACT_WORKFLOW_MODULE_NAME,
-                processInstanceId,contract.getCreatedBy());
+                processInstanceId, contract.getCreatedBy(), REQUESTER_ROLE);
 
 //        WorkflowInboxDto response =
 //                workflowSubmissionResponseDtoMapper
@@ -198,7 +189,7 @@ public class TemporaryContractServiceImpl implements TemporaryContractService {
         String prefix = "TC-" + Year.now().getValue() + "-";
 
         return uniqueIdGeneratorService.generateId(
-                        TEMPORARY_CONTRACT,
-                        prefix);
+                TEMPORARY_CONTRACT,
+                prefix);
     }
 }

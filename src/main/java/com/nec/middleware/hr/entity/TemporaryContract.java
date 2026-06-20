@@ -1,8 +1,6 @@
 package com.nec.middleware.hr.entity;
 
-import com.nec.middleware.Lookups.entity.ContractCompletionTrigger;
 import com.nec.middleware.Lookups.entity.ContractTypes;
-import com.nec.middleware.Lookups.entity.TemporaryContractStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -87,7 +85,7 @@ public class TemporaryContract extends AuditableEntity {
     @Column(name = "current_approval")
     private String currentApproval;
 
-//    Manual Completion
+    //    Manual Completion
 //    Deployment Completion
 //    Finance Confirmation
 //    @ManyToOne(fetch = FetchType.LAZY)
@@ -109,12 +107,15 @@ public class TemporaryContract extends AuditableEntity {
 
     //Contract Lifecycle
 
-//    @Column(name = "completed_date")
+    //    @Column(name = "completed_date")
 //    private LocalDate completedDate;
 //
 //    @Column(name = "closed_date")
 //    private LocalDate closedDate;
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @Column(name = "revision_no")
+    private Integer revisionNo;
 
 }

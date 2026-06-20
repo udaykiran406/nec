@@ -17,7 +17,6 @@ public class TemporaryContractResponseDto {
 
     private String taskId;
     private String taskName;
-
     private String contractId;
     private String employerName;
 
