@@ -57,6 +57,7 @@ public class PoliticalPartyAgent extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private MasterDataCity city;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", nullable = false)
     private ThirdPartyStatus status;

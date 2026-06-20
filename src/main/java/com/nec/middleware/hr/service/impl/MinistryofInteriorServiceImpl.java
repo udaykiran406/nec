@@ -1,5 +1,6 @@
 package com.nec.middleware.hr.service.impl;
 
+import com.nec.middleware.Lookups.entity.ThirdPartyStatus;
 import com.nec.middleware.Lookups.repository.LookupGenderRepository;
 import com.nec.middleware.Lookups.repository.LookupMOITitlesRepository;
 import com.nec.middleware.Lookups.repository.ThirdPartyStatusRepository;
@@ -57,67 +58,24 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
 
         validateMinistryOfInterior(ministryofInteriorRequestDto);
 
-        log.info("Creating moi. Name: {}", ministryofInteriorRequestDto.getName());
+        MinistryofInterior ministryofInteriorEntity = ministryMapper.toEntity(ministryofInteriorRequestDto);
 
-        MinistryofInterior moiEntity = ministryMapper.toEntity(ministryofInteriorRequestDto);
-
-
-        moiEntity.setMoiTitle(
-                moiTitlesRepository.findById(ministryofInteriorRequestDto.getMoiTitleId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Ministry of Interior Title Not Found"))
-        );
-
-        moiEntity.setGender(
-                genderRepository.findById(ministryofInteriorRequestDto.getGenderId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Gender Not Found"))
-        );
-
-        moiEntity.setStatus(
-                statusRepository.findById(ministryofInteriorRequestDto.getStatusId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Status Not Found"))
-        );
-
-        moiEntity.setRegion(
-                regionRepository.findById(ministryofInteriorRequestDto.getRegionId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Region Not Found"))
-        );
-
-        moiEntity.setDistrict(
-                districtRepository.findById(ministryofInteriorRequestDto.getDistrictId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("District Not Found"))
-        );
-
-        moiEntity.setCity(
-                cityRepository.findById(ministryofInteriorRequestDto.getCityId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("City Not Found"))
-        );
-
-        moiEntity.setVrc(
-                vrcRepository.findById(ministryofInteriorRequestDto.getVrcId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("VRC Not Found"))
-        );
+        resolveAndSetForeignKeys(ministryofInteriorEntity, ministryofInteriorRequestDto);
 
         // 4. Generate code — only after all lookups succeeded
-        moiEntity.setMinistryofInteriorId(generateMinistryofInteriorNumber());
+        ministryofInteriorEntity.setMinistryofInteriorId(generateMinistryofInteriorNumber());
 
         // store photo AFTER portalUserId is generated
         String storedPhotoPath = fileStorageUtil.storePhoto(
                 photo,
                 PHOTO_SUB_FOLDER,
-                moiEntity.getMinistryofInteriorId()
+                ministryofInteriorEntity.getMinistryofInteriorId()
         );
-        moiEntity.setPhotoPath(storedPhotoPath);
+        ministryofInteriorEntity.setPhotoPath(storedPhotoPath);
 
-        MinistryofInterior aaqil = ministryofInteriorRepository.save(moiEntity);
-
-        return ministryMapper.toResponseDto(aaqil);
+        MinistryofInterior moi = ministryofInteriorRepository.save(ministryofInteriorEntity);
+        log.info("Ministry of interior created: ministryofInteriorId='{}'", moi.getMinistryofInteriorId());
+        return ministryMapper.toResponseDto(moi);
     }
 
     // ------------------------------------------------------------------ READ
@@ -159,14 +117,14 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
             String ministryofInteriorId,
             Boolean isActiveFlag) {
 
-        MinistryofInterior moi = findByMinistryofInteriorId(ministryofInteriorId);
+        MinistryofInterior ministryofInterior = findByMinistryofInteriorId(ministryofInteriorId);
 
-        moi.setIsActive(isActiveFlag);
+        ministryofInterior.setIsActive(isActiveFlag);
 
-        log.info("Moi status changed with id: {}", moi);
+        log.info("Moi status changed with id: {}", ministryofInterior);
 
         return ministryMapper.toResponseDto(
-                ministryofInteriorRepository.save(ministryofInteriorRepository.save(moi)));
+                ministryofInteriorRepository.save(ministryofInteriorRepository.save(ministryofInterior)));
     }
 
     //-------------------------------------------------------------Update
@@ -174,35 +132,37 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
     @Override
     @Transactional
     public MinistryofInteriorResponseDto updateMinistryofInterior(
-            String aaqilId,
+            String ministryofInteriorId,
             MinistryofInteriorRequestDto ministryofInteriorRequestDto,MultipartFile photo) {
+        log.info("Update ministry of interior request, ministryofInteriorId='{}'", ministryofInteriorId);
 
-        MinistryofInterior moi = findByMinistryofInteriorId(aaqilId);
+        MinistryofInterior ministryofInterior = findByMinistryofInteriorId(ministryofInteriorId);
 
         validateMinistryOfInteriorForUpdate(
                 ministryofInteriorRequestDto,
-                moi.getId()
+                ministryofInterior.getId()
         );
         // Only touch the photo if a new file was actually sent — otherwise
         // keep whatever is already on the entity.
         if (photo != null && !photo.isEmpty()) {
-            fileStorageUtil.deleteIfExists(moi.getPhotoPath());
+            fileStorageUtil.deleteIfExists(ministryofInterior.getPhotoPath());
 
             String newPhotoPath = fileStorageUtil.storePhoto(
                     photo,
                     PHOTO_SUB_FOLDER,
-                    moi.getMinistryofInteriorId()
+                    ministryofInterior.getMinistryofInteriorId()
             );
 
             ministryofInteriorRequestDto.setPhotoPath(newPhotoPath);
         }
 
         updateMinistryofInteriorEntity(
-                moi,
+                ministryofInterior,
                 ministryofInteriorRequestDto
         );
 
-        MinistryofInterior savedEntity = ministryofInteriorRepository.save(moi);
+        MinistryofInterior savedEntity = ministryofInteriorRepository.save(ministryofInterior);
+        log.info("Ministry of interior updated: ministryofInteriorId='{}'", savedEntity.getMinistryofInteriorId());
 
         return ministryMapper.toResponseDto(
                 savedEntity
@@ -223,7 +183,7 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
 
     // ------------------------------------------------------------------ Validation
 
-    private void validateMinistryOfInterior(MinistryofInteriorRequestDto ministryofInteriorRequestDto) {
+    public void validateMinistryOfInterior(MinistryofInteriorRequestDto ministryofInteriorRequestDto) {
 
         if (ministryofInteriorRepository.existsByEmail(ministryofInteriorRequestDto.getEmail()) ||
                 ministryofInteriorRepository.existsByPhone(ministryofInteriorRequestDto.getPhone())) {
@@ -257,80 +217,107 @@ public class MinistryofInteriorServiceImpl implements MinistryofInteriorService 
                                 MinistryofInteriorConstants.MINISTRY_OF_INTERIOR_NOT_FOUND + ministryofInteriorId));
     }
 
+    /**
+     * Shared FK resolution used by both {@code saveMinistryofInterior} and
+     */
+    public void resolveAndSetForeignKeys(
+            MinistryofInterior entity,
+            MinistryofInteriorRequestDto dto) {
+        log.debug("Resolving FKs for ministryofInteriorId='{}'", entity.getMinistryofInteriorId());
+
+        entity.setMoiTitle(
+                moiTitlesRepository.findById(dto.getMoiTitleId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Ministry of Interior Title not found with id: " + dto.getMoiTitleId()))
+        );
+
+        entity.setGender(
+                genderRepository.findById(dto.getGenderId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Gender not found with id: " + dto.getGenderId()))
+        );
+
+        ThirdPartyStatus pendingStatus =
+                statusRepository
+                        .findByCode("PENDING")
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "PENDING status not configured"));
+
+        entity.setStatus(pendingStatus);
+
+        entity.setRegion(
+                regionRepository.findById(dto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Region not found with id: " + dto.getRegionId()))
+        );
+
+        entity.setDistrict(
+                districtRepository.findById(dto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("District not found with id: " + dto.getDistrictId()))
+        );
+
+        entity.setCity(
+                cityRepository.findById(dto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("City not found with id: " + dto.getCityId()))
+        );
+
+        entity.setVrc(
+                vrcRepository.findById(dto.getVrcId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("VRC not found with id: " + dto.getVrcId()))
+        );
+    }
+
     public void updateMinistryofInteriorEntity(
             MinistryofInterior moi,
             MinistryofInteriorRequestDto moiRequestDto) {
 
-        if (moiRequestDto.getName() != null) {
-            moi.setName(moiRequestDto.getName());
-        }
+        moi.setName(moiRequestDto.getName());
 
-        if (moiRequestDto.getAge() != null) {
-            moi.setAge(moiRequestDto.getAge());
-        }
+        moi.setAge(moiRequestDto.getAge());
 
-        if (moiRequestDto.getPhone() != null) {
-            moi.setPhone(moiRequestDto.getPhone());
-        }
+        moi.setPhone(moiRequestDto.getPhone());
 
-        if (moiRequestDto.getEmail() != null) {
-            moi.setEmail(moiRequestDto.getEmail());
-        }
+        moi.setEmail(moiRequestDto.getEmail());
+        moi.setUpdatedBy(moiRequestDto.getUpdatedBy());
 
-        if (moiRequestDto.getMoiTitleId() != null) {
-            moi.setMoiTitle(
-                    moiTitlesRepository.findById(moiRequestDto.getMoiTitleId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Title not found"))
-            );
-        }
+        moi.setMoiTitle(
+                moiTitlesRepository.findById(moiRequestDto.getMoiTitleId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Title not found"))
+        );
 
-        if (moiRequestDto.getGenderId() != null) {
-            moi.setGender(
-                    genderRepository.findById(moiRequestDto.getGenderId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Gender not found"))
-            );
-        }
+        moi.setGender(
+                genderRepository.findById(moiRequestDto.getGenderId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Gender not found"))
+        );
 
-        if (moiRequestDto.getStatusId() != null) {
-            moi.setStatus(
-                    statusRepository.findById(moiRequestDto.getStatusId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Status not found"))
-            );
-        }
+        moi.setRegion(
+                regionRepository.findById(moiRequestDto.getRegionId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Region not found"))
+        );
 
-        if (moiRequestDto.getRegionId() != null) {
-            moi.setRegion(
-                    regionRepository.findById(moiRequestDto.getRegionId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("Region not found"))
-            );
-        }
+        moi.setDistrict(
+                districtRepository.findById(moiRequestDto.getDistrictId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("District not found"))
+        );
 
-        if (moiRequestDto.getDistrictId() != null) {
-            moi.setDistrict(
-                    districtRepository.findById(moiRequestDto.getDistrictId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("District not found"))
-            );
-        }
+        moi.setCity(
+                cityRepository.findById(moiRequestDto.getCityId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("City not found"))
+        );
 
-        if (moiRequestDto.getCityId() != null) {
-            moi.setCity(
-                    cityRepository.findById(moiRequestDto.getCityId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("City not found"))
-            );
-        }
-
-        if (moiRequestDto.getVrcId() != null) {
-            moi.setVrc(
-                    vrcRepository.findById(moiRequestDto.getVrcId())
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException("VRC not found"))
-            );
-        }
+        moi.setVrc(
+                vrcRepository.findById(moiRequestDto.getVrcId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("VRC not found"))
+        );
     }
 }

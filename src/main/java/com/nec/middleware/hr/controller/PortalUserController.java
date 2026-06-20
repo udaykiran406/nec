@@ -41,8 +41,10 @@ public class PortalUserController {
     public ResponseEntity<ApiResponse<PortalUserResponseDto>> savePortalUser(
             @Valid @ModelAttribute PortalUserRequestDto requestDto,
             @RequestParam("photo") MultipartFile photo) {
-
+        log.info("Create portal user request received, photo='{}'", photo != null ? photo.getOriginalFilename() : "none");
         PortalUserResponseDto response = portalUserService.createPortalUser(requestDto,photo);
+        log.info("Portal user created: portalUserId='{}'", response.getPortalUserId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(PortalUserConstants.USER_CREATED, response));
     }
@@ -84,6 +86,7 @@ public class PortalUserController {
             @PathVariable String portalUserId,
             @Valid @ModelAttribute PortalUserRequestDto requestDto,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
+        log.info("Update portal user request, portalUserId='{}'", portalUserId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -98,6 +101,7 @@ public class PortalUserController {
     public ResponseEntity<ApiResponse<PortalUserResponseDto>> changeStatus(
             @PathVariable String portalUserId,
             @RequestParam Boolean isActive) {
+        log.info("Change status request: portalUserId='{}', isActive={}", portalUserId, isActive);
 
         return ResponseEntity.ok(
                 ApiResponse.success(

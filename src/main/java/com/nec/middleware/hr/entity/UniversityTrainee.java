@@ -2,6 +2,7 @@ package com.nec.middleware.hr.entity;
 
 import com.nec.middleware.Lookups.entity.Genders;
 import com.nec.middleware.Lookups.entity.PaymentMethods;
+import com.nec.middleware.Lookups.entity.ThirdPartyStatus;
 import com.nec.middleware.masterdata.entity.MasterDataCity;
 import com.nec.middleware.masterdata.entity.MasterDataDistrict;
 import com.nec.middleware.masterdata.entity.MasterDataRegion;
@@ -59,8 +60,7 @@ public class UniversityTrainee extends AuditableEntity {
     @Column(name = "photo_path", length = 500)
     private String photoPath;
 
-    @Column(name = "status_id", nullable = false)
-    private Long statusId;
+
     // ------------------------------------------------------------------ LOOKUPS FKs
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gender_id", nullable = false)
@@ -69,6 +69,10 @@ public class UniversityTrainee extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_method_id", nullable = false)
     private PaymentMethods paymentMethod;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_id", nullable = false)
+    private ThirdPartyStatus status;
 
 // ------------------------------------------------------------------ MASTER DATA FKs
 

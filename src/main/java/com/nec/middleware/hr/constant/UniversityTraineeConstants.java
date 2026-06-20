@@ -12,6 +12,8 @@ public final class UniversityTraineeConstants {
     public static final String TRAINEE_FETCHED         = "University trainee fetched successfully";
     public static final String TRAINEE_ALREADY_EXISTS= "A trainee with the same email or phone already exists";
 
+    // Bulk operations
+    public static final String TRAINEE_BULK_UPLOAD_EMPTY = "Uploaded file is empty or could not be read";
 
     public static final String CODE_PREFIX = "UT";
 

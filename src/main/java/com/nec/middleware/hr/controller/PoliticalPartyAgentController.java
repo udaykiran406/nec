@@ -38,8 +38,11 @@ public class PoliticalPartyAgentController {
     public ResponseEntity<ApiResponse<PoliticalPartyAgentResponseDto>> createPartyAgent(
             @Valid @ModelAttribute PoliticalPartyAgentRequestDto PartyAgentRequestDto,
             @RequestParam ("photo") MultipartFile photo ) {
+        log.info("Create political party agent request received, photo='{}'", photo != null ? photo.getOriginalFilename() : "none");
 
         PoliticalPartyAgentResponseDto politicalPartyAgentResponseDto = politicalPartyAgentService.savePartyAgent(PartyAgentRequestDto,photo);
+        log.info("Political party agent created: partyAgentUserId='{}'", politicalPartyAgentResponseDto.getPoliticalPartyAgentUserId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created(PoliticalPartyAgentConstants.AGENT_CREATED, politicalPartyAgentResponseDto));
 
@@ -87,6 +90,8 @@ public class PoliticalPartyAgentController {
     public ResponseEntity<ApiResponse<PoliticalPartyAgentResponseDto>> changeStatus(
             @PathVariable String partyAgentUserId,
             @RequestParam Boolean isActive) {
+        log.info("Change status request: partyAgentUserId='{}', isActive={}", partyAgentUserId, isActive);
+
         return ResponseEntity.ok(
                 ApiResponse.success(
                         PoliticalPartyAgentConstants.AGENT_STATUS_CHANGED,
@@ -101,6 +106,7 @@ public class PoliticalPartyAgentController {
             @PathVariable String partyAgentUserId,
             @ModelAttribute PoliticalPartyAgentRequestDto requestDto,
             @RequestParam (value = "photo", required = false) MultipartFile photo) {
+        log.info("Update political party agent request, partyAgentUserId='{}'", partyAgentUserId);
 
         PoliticalPartyAgentResponseDto partyAgent =
                 politicalPartyAgentService.updatePoliticalPartyAgent(partyAgentUserId, requestDto, photo);

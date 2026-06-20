@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponseDto<T> {
 
-    private boolean success;
+    private  int status;
     private String message;
     private T data;
     private String errorCode;

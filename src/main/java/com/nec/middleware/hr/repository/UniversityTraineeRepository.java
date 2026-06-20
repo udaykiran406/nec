@@ -13,13 +13,6 @@ public interface UniversityTraineeRepository extends
         JpaRepository<UniversityTrainee, Long>,
         JpaSpecificationExecutor<UniversityTrainee> {
 
-//    // Active record finder
-//    Optional<UniversityTrainee> findByIdAndIsActiveTrue(Long id);
-//
-//    // Business ID finders
-//    Optional<UniversityTrainee> findByUniversityTraineeIdAndIsActiveTrue(
-//            String universityTraineeId
-//    );
 
     Optional<UniversityTrainee> findByUniversityTraineeId(
             String universityTraineeId
@@ -40,5 +33,6 @@ public interface UniversityTraineeRepository extends
             String phone,
             Long id
     );
+
 
 }

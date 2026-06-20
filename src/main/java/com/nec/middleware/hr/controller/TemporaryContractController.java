@@ -4,6 +4,7 @@ import com.nec.middleware.hr.dto.request.TemporaryContractRequestDto;
 import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.dto.response.TemporaryContractResponseDto;
 import com.nec.middleware.hr.service.TemporaryContractService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,19 +21,26 @@ import org.springframework.web.bind.annotation.RestController;
         description = "Temporary Contract Management APIs"
 )
 @RestController
-@RequestMapping("/api/hr/temporaryContract")
+@RequestMapping("/api/v1/hr/temporaryContract")
 @RequiredArgsConstructor
 public class TemporaryContractController {
 
     private final TemporaryContractService temporaryContractService;
+
+    @Operation(summary = "Create or Update Temporary Contract",
+            description = "Creates a new temporary contract or updates an existing one based on the provided details. " +
+                    "If the request contains an ID, it will attempt to update the corresponding contract; otherwise, it will create a new contract.")
     @PostMapping("/createOrUpdateTemporaryContract")
     public ResponseEntity<ApiResponse<TemporaryContractResponseDto>> createorUpdateTemporaryContract( @RequestBody @Valid TemporaryContractRequestDto requestDto) {
+        log.info("Create-or-update temporary contract request, id='{}'", requestDto.getContractId());
 
          return ResponseEntity.ok(
                 ApiResponse.success(
                         "Temporary Contract Created Successfully",
                         temporaryContractService
                                 .createOrUpdateContract(requestDto))
+
         );
+
     }
 }

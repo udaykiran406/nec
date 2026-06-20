@@ -1,7 +1,10 @@
 package com.nec.middleware.hr.util;
 
+import com.nec.middleware.bulkUpload.handler.BulkRowValidationException;
 import com.nec.middleware.exception.BadRequestException;
 import com.nec.middleware.exception.ValidationException;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -48,12 +51,20 @@ public class FileStorageUtil {
     @Value("${file.upload.base-dir:C:/nec-uploads}")
     private String baseDir;
 
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            ".jpg", ".jpeg", ".png", ".webp"
+    );
+
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "image/jpeg", "image/jpg", "image/png", "image/webp"
     );
 
     private static final long MAX_FILE_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
 
+    private static final int MAX_PHOTO_PATH_LENGTH = 1024;
+
+    /** Cap on the sanitized base-name portion, to keep final filenames reasonable on disk. */
+    private static final int MAX_BASE_NAME_LENGTH = 80;
     /**
      * Validates and stores an uploaded photo under {baseDir}/{subFolder}/.
      *
@@ -66,9 +77,11 @@ public class FileStorageUtil {
         validate(file);
 
         String extension = extractExtension(file.getOriginalFilename());
-        String fileName = UUID.randomUUID() + extension;
+        String baseName=sanitizeBaseName(file.getOriginalFilename(), extension);
+        String fileName = UUID.randomUUID() + "_" + baseName + extension;
 
-        String datedSubFolder = subFolder + "/" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"))+"/"+entityId;
+        String datedSubFolder = subFolder + "/" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM")) + "/" + entityId;
+
 
         try {
             Path targetDir = Paths.get(baseDir, datedSubFolder).normalize();
@@ -132,7 +145,7 @@ public class FileStorageUtil {
         }
 
         String extension = extractExtension(file.getOriginalFilename());
-        if (!List.of(".jpg", ".jpeg", ".png", ".webp").contains(extension.toLowerCase())) {
+        if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
             throw new BadRequestException("Invalid file extension");
         }
     }
@@ -142,5 +155,55 @@ public class FileStorageUtil {
             throw new BadRequestException("Uploaded file has no extension");
         }
         return originalFilename.substring(originalFilename.lastIndexOf('.'));
+    }
+//---------------------------------------------------------------------------PhotoPath Validation for bulk
+    /**
+     * Validates a photo path STRING supplied directly by the caller (bulk-upload mode).
+     * Unlike {@link #storePhoto}, no bytes are read or written — the uploader's path
+     * string is trusted as-is and persisted verbatim once it passes validation.
+     *
+     * @param photoPath relative or absolute path string from the bulk row
+     * @return the same {@code photoPath}, unchanged, for chaining into the entity setter
+     * @throws BulkRowValidationException if blank or extension is not in the allowed image set
+     */
+    public String validatePhotoPath(String photoPath) {
+        if (!StringUtils.hasText(photoPath)) {
+            throw new BulkRowValidationException("Photo path is required");
+        }
+        String trimmed = photoPath.trim();
+
+        if (trimmed.length() > MAX_PHOTO_PATH_LENGTH) {
+            throw new BulkRowValidationException("Photo path exceeds maximum length of " + MAX_PHOTO_PATH_LENGTH);
+        }
+
+        if (trimmed.contains("..")) {
+            throw new BulkRowValidationException("Photo path must not contain '..' segments");
+        }
+
+        String extension = extractExtension(photoPath);
+        if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
+            throw new BulkRowValidationException("Only JPG, JPEG, PNG, or WEBP image paths are allowed");
+        }
+
+        return photoPath;
+    }
+//---------------------------------------------------------File name helper
+    private String sanitizeBaseName(String originalFilename, String extension) {
+        String withoutExt = originalFilename.substring(0, originalFilename.length() - extension.length());
+
+        String sanitized = withoutExt
+                .replaceAll("[^a-zA-Z0-9._-]", "-")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^[.-]+|[.-]+$", "");
+
+        if (sanitized.isBlank()) {
+            sanitized = "photo";
+        }
+
+        if (sanitized.length() > MAX_BASE_NAME_LENGTH) {
+            sanitized = sanitized.substring(0, MAX_BASE_NAME_LENGTH);
+        }
+
+        return sanitized;
     }
 }

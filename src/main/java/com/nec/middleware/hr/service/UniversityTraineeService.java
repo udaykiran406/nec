@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface UniversityTraineeService {
+
     UniversityTraineeResponseDto createTrainee(UniversityTraineeRequestDto requestDto,MultipartFile photo);
 
     UniversityTraineeResponseDto getTraineeByUniversityTraineeId(String universityTraineeId);
