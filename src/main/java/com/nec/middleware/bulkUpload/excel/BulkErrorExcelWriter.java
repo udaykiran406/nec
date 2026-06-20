@@ -12,29 +12,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Builds a downloadable {@code .xlsx} "error report" for a failed bulk upload.
- *
- * <p>The report mirrors the original upload's columns (in the same order)
- * and appends one trailing <b>Error Reason</b> column. The user can fix the
- * flagged cells directly in this file and re-upload it — they do not need
- * to cross-reference row numbers against a separate JSON error list.
- *
- * <p>CORE component — moved here from {@code com.nec.middleware.hr.util}
- * because it was already module-agnostic (takes {@code String[]} headers
- * and {@code List<RowErrorDto>}, no DTO or entity imports). Living in
- * {@code bulkupload.excel} means Employee, Student, Vendor, and Contractor
- * bulk uploads no longer need to depend on the {@code hr} package just to
- * generate an error report.
- *
- * <p>The file is written to a temp directory on disk, returned as a
- * {@link File} for the controller to stream back as the HTTP response body,
- * and is expected to be deleted by the caller once the response has been
- * sent (see {@link #cleanup(File)}).
- */
 @Slf4j
 @Component
 public class BulkErrorExcelWriter {
@@ -44,17 +26,6 @@ public class BulkErrorExcelWriter {
 
     private static final String ERROR_REASON_HEADER = "Error Reason";
 
-    /**
-     * Write {@code errors} to a new temp {@code .xlsx} file.
-     *
-     * @param columnLabels header labels for the original data columns, in
-     *                     order (e.g. from {@code handler.expectedHeaders()})
-     * @param errors       failed rows to write back out, each carrying its
-     *                     original {@code rawData} and failure {@code message}
-     * @param baseFileName used to build a readable, unique temp filename,
-     *                     e.g. "university-trainee-bulk-errors"
-     * @return the written temp file, ready to be streamed and then deleted
-     */
     public File write(String[] columnLabels, List<RowErrorDto> errors, String baseFileName) {
 
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -134,7 +105,7 @@ public class BulkErrorExcelWriter {
     private File writeToTempFile(Workbook workbook, String baseFileName) throws IOException {
         Path tempDir = Files.createTempDirectory(TEMP_SUBFOLDER);
         // Unique suffix avoids collisions if multiple uploads fail concurrently.
-        String fileName = baseFileName + "-" + UUID.randomUUID() + ".xlsx";
+        String fileName = baseFileName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".xlsx";
         File outFile = new File(tempDir.toFile(), fileName);
 
         try (FileOutputStream fos = new FileOutputStream(outFile)) {

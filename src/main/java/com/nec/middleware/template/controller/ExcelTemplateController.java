@@ -1,9 +1,6 @@
 package com.nec.middleware.template.controller;
 
-import com.nec.middleware.hr.dto.request.MinistryofInteriorRequestDto;
-import com.nec.middleware.hr.dto.request.PoliticalPartyAgentRequestDto;
-import com.nec.middleware.hr.dto.request.PortalUserRequestDto;
-import com.nec.middleware.hr.dto.request.UniversityTraineeRequestDto;
+import com.nec.middleware.hr.dto.request.*;
 import com.nec.middleware.rbacAuth.rbac.dto.request.RbacUserBulkUploadDto;
 import com.nec.middleware.template.service.ExcelTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,6 +73,17 @@ public class ExcelTemplateController {
         return buildResponse(
                 MinistryofInteriorRequestDto.class,
                 "ministry_of_interior_template.xlsx"
+        );
+    }
+
+    @GetMapping("/temporaryContracts")
+    @Operation(
+            summary = "Download Temporary Contract Excel import template"
+    )
+    public ResponseEntity<byte[]> temporaryContractTemplate() throws Exception {
+        return buildResponse(
+                TemporaryContractRequestDto.class,
+                "temporary_contract_template.xlsx"
         );
     }
 

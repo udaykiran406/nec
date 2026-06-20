@@ -24,31 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Persists a single RbacUser row in its own independent {@code REQUIRES_NEW}
- * transaction during bulk upload.
- *
- * <h3>Why REQUIRES_NEW is necessary</h3>
- * Spring's {@code @Transactional} works via an AOP proxy that only intercepts
- * calls arriving from outside the bean. {@code persistSingleRow} is called from
- * {@code RbacUserBulkHandler.persist(dto)} — already an external call — so
- * {@code REQUIRES_NEW} here is honored correctly. Each row commits or rolls back
- * independently of every other row in the same upload; one bad row never undoes
- * rows already saved earlier in the batch.
- *
- * <h3>Bulk upload vs. regular user creation</h3>
- * This persister generates a secure cryptographic password and sets it in Keycloak
- * via the admin API. The password is marked as temporary, forcing the user to change
- * it on first login. After successful user creation, credentials are emailed to the
- * user. Email failures are logged but don't block the user creation.
- *
- * <p>Process:
- * 1. Validate business rules (duplicate email/phone, FK existence)
- * 2. Generate secure password (12+ chars with uppercase, lowercase, numbers, special chars)
- * 3. Create user in Keycloak with temporary password
- * 4. Save user to database
- * 5. Send credentials via email (graceful failure handling)
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor

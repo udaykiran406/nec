@@ -3,16 +3,6 @@ package com.nec.middleware.rbacAuth.keycloak;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
-/**
- * Keycloak connection settings bound from {@code keycloak.*} in application.yaml.
- *
- * <p>Property mapping:
- * <ul>
- *   <li>{@code keycloak.base-url} – required; server root, e.g. {@code http://localhost:8080}.</li>
- *   <li>{@code keycloak.server-url} – deprecated alias accepted for backward compatibility.</li>
- *   <li>{@code keycloak.admin-realm} – realm used for admin token; defaults to {@code master}.</li>
- * </ul>
- */
 @ConfigurationProperties(prefix = "keycloak")
 public record KeycloakProperties(
         String baseUrl,
