@@ -9,6 +9,7 @@ import com.nec.middleware.hr.dto.response.ApiResponse;
 import com.nec.middleware.hr.service.PortalUserService;
 import com.nec.middleware.hr.dto.response.PortalUserResponseDto;
 
+import com.nec.middleware.rbacAuth.auth.utils.Authorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -65,7 +66,7 @@ public class PortalUserController {
     // ------------------------------------------------------------------ GET: List
 
     @Operation(summary = "Get Paginated & Filtered Portal User List")
-    @PostMapping("/getAllPortalUsers")
+    @GetMapping("/getAllPortalUsers")
     public ResponseEntity<ApiResponse<Page<PortalUserResponseDto>>> getAllPortalUsers(
             @RequestBody(required = false) PortalUserFilterRequestDto filterDto, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -81,7 +82,7 @@ public class PortalUserController {
     @Operation(summary = "Update Portal User",
             description = "multipart/form-data only — same flat fields as create, 'photo' is optional (only send it when replacing the existing photo)."
     )
-    @PatchMapping(value = "/update/{portalUserId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/{portalUserId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PortalUserResponseDto>> updatePortalUser(
             @PathVariable String portalUserId,
             @Valid @ModelAttribute PortalUserRequestDto requestDto,

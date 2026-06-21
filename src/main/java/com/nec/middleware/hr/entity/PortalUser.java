@@ -2,9 +2,9 @@ package com.nec.middleware.hr.entity;
 
 import com.nec.middleware.Lookups.entity.Genders;
 import com.nec.middleware.Lookups.entity.PortalUserTypes;
-import com.nec.middleware.Lookups.entity.Roles;
 import com.nec.middleware.hr.Enum.MasterData;
 import com.nec.middleware.masterdata.entity.*;
+import com.nec.middleware.rbacAuth.rbac.entity.RbacRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,7 +62,8 @@ public class PortalUser extends AuditableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    private Roles role;
+    private RbacRole role;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portal_user_type_id")
     private PortalUserTypes portalUserType;

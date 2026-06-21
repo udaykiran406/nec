@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,21 +14,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
-/**
- * Builds a downloadable {@code .xlsx} "error report" for a failed bulk upload.
- *
- * <p>The report mirrors the original upload's columns (in the same order)
- * and appends one trailing <b>Error Reason</b> column. The user can fix the
- * flagged cells directly in this file and re-upload it — they do not need
- * to cross-reference row numbers against a separate JSON error list.
- *
- * <p>The file is written to a temp directory on disk, returned as a
- * {@link File} for the controller to stream back as the HTTP response body,
- * and is expected to be deleted by the caller once the response has been
- * sent (see {@link #cleanup(File)}).
- */
 @Slf4j
 @Component
 public class BulkErrorExcelWriter {
@@ -38,8 +23,6 @@ public class BulkErrorExcelWriter {
     private static final String TEMP_SUBFOLDER = "nec-bulk-errors";
 
     private static final String ERROR_REASON_HEADER = "Error Reason";
-
-
 
     public File write(String[] columnLabels, List<RowErrorDto> errors, String baseFileName) {
 

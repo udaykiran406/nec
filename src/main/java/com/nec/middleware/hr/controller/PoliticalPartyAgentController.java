@@ -63,7 +63,7 @@ public class PoliticalPartyAgentController {
 
     // ------------------------------------------------------------------ GET: List
     @Operation(summary = "Get All Political Party Agents")
-    @PostMapping("/getAllPoliticalPartyAgents")
+    @GetMapping("/getAllPoliticalPartyAgents")
     public ResponseEntity<ApiResponse<Page<PoliticalPartyAgentResponseDto>>> getAllPoliticalPartyAgent(
             @RequestBody(required = false) PoliticalPartyAgentFilterRequestDto filterDto,
             @RequestParam(defaultValue = "0") int page,
@@ -100,7 +100,7 @@ public class PoliticalPartyAgentController {
   //-----------------------------------------------------------------------Update
     @Operation(summary = "Update Political Party Agent",
             description = "multipart/form-data: flat fields + optional photo")
-    @PatchMapping(value="update/{partyAgentUserId}",
+    @PutMapping(value="update/{partyAgentUserId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PoliticalPartyAgentResponseDto>> updatePoliticalPartyAgent(
             @PathVariable String partyAgentUserId,
