@@ -46,14 +46,14 @@ public class GenericBulkUploadService {
 
         validateHeaderRow(rows, handler, errors);
 
-       int sucessCount=0;
+       int successCount=0;
         for (ParsedExcelRow parsedRow : rows) {
             int rowNumber = parsedRow.getRowNumber();
             try {
                 T dto = handler.map(parsedRow.getRawData());
                 handler.validate(dto);
                 R response = handler.persist(dto);
-                sucessCount++;
+                successCount++;
                 log.debug("Module '{}' row {}: saved", handler.moduleName(), rowNumber);
 
             } catch (BulkRowValidationException e) {
@@ -89,11 +89,11 @@ public class GenericBulkUploadService {
         int total = rows.size() + countRowlessStructuralErrors(errors);
 
         log.info("Bulk upload complete for module '{}' — total={}, success={}, failures={}",
-                handler.moduleName(), total, sucessCount, errors.size());
+                handler.moduleName(), total, successCount, errors.size());
 
         return BulkUploadResultDto.<R>builder()
                 .totalRows(total)
-                .successCount(sucessCount)
+                .successCount(successCount)
                 .failureCount(errors.size())
                 .errors(errors)
                 .build();
@@ -106,15 +106,9 @@ public class GenericBulkUploadService {
     /**
      * Fail fast with one clear error if the uploaded file's header row is
      * missing columns the handler expects — rather than letting every
-<<<<<<< HEAD
-=======
-     <<<<<<< HEAD
-     =======
      * single data row fail individually with a confusing "field is
      * required" message. Does not block processing; rows are still
      * attempted, since {@code map()} degrades missing columns to
-     >>>>>>> rbac
->>>>>>> rbac
      * {@code null} and {@code validate()} will report them per-row too if
      * this check is skipped or partially wrong.
      */
