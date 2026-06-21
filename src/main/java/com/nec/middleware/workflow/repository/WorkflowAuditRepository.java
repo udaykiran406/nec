@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WorkflowAuditRepository extends JpaRepository<WorkflowAudit, Long>, JpaSpecificationExecutor<WorkflowAudit> {
@@ -58,5 +59,21 @@ public interface WorkflowAuditRepository extends JpaRepository<WorkflowAudit, Lo
             ORDER BY w.actionDate DESC
             """)
     Page<WorkflowAudit> findRejectedForRequesterRole(@Param("role") String role, Pageable pageable);
+
+    @Query("""
+            select w
+            from WorkflowAudit w
+            where w.moduleName = :moduleName
+              and w.entityId = :entityId
+              and w.approvalRole = :approvalRole
+              and w.action = 'PENDING'
+              and w.revisionNo = (
+                    select max(w2.revisionNo)
+                    from WorkflowAudit w2
+                    where w2.moduleName = :moduleName
+                      and w2.entityId = :entityId
+              )
+            """)
+    Optional<WorkflowAudit> findCurrentPendingAudit(String moduleName, String entityId, String approvalRole);
 }
 

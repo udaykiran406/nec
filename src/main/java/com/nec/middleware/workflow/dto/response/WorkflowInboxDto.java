@@ -1,6 +1,5 @@
 package com.nec.middleware.workflow.dto.response;
 
-import com.nec.middleware.dto.IdValueDto;
 import lombok.*;
 
 import java.time.LocalDateTime;

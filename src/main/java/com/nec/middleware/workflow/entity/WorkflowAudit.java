@@ -17,9 +17,30 @@ import java.time.LocalDateTime;
 @Table(
         name = "workflow_audit",
         indexes = {
+                // Latest revision lookup
                 @Index(
-                        name = "idx_module_entity",
-                        columnList = "module_name, entity_id"
+                        name = "idx_audit_module_entity_revision",
+                        columnList = "module_name,entity_id,revision_no"
+                ),
+                // Inbox queries
+                @Index(
+                        name = "idx_audit_role_action_revision",
+                        columnList = "approval_role,action,revision_no"
+                ),
+                // Rejected workflows
+                @Index(
+                        name = "idx_audit_requester_role_action",
+                        columnList = "requested_role,action"
+                ),
+                // Escalation scheduler
+                @Index(
+                        name = "idx_audit_action_created",
+                        columnList = "action,created_at"
+                ),
+                // Process instance lookup
+                @Index(
+                        name = "idx_audit_process_instance",
+                        columnList = "process_instance_id"
                 )
         }
 )
@@ -63,4 +84,18 @@ public class WorkflowAudit {
     private LocalDateTime actionDate;
     @Column(name = "revision_no")
     private Integer revisionNo;
+    @Column(name = "reminder_count")
+    private Integer reminderCount;
+
+    @Column(name = "last_reminder_date")
+    private LocalDateTime lastReminderDate;
+
+    @Column(name = "escalated")
+    private Boolean escalated;
+
+    @Column(name = "escalated_to")
+    private String escalatedTo;
+
+    @Column(name = "escalated_date")
+    private LocalDateTime escalatedDate;
 }

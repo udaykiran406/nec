@@ -5,29 +5,75 @@
              xmlns:flowable="http://flowable.org/bpmn"
              targetNamespace="http://flowable.org/processdef">
 
-    <process id="approvalWorkflow"
-             name="Approval Workflow"
-             isExecutable="true">
-
-        <!-- Start -->
+    <process id="approvalWorkflow" name="Approval Workflow" isExecutable="true">
 
         <startEvent id="startEvent"/>
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="approvalTask"/>
 
-        <sequenceFlow id="flow1"
-                      sourceRef="startEvent"
-                      targetRef="approvalTask"/>
+        <!-- APPROVAL TASK -->
+        <userTask id="approvalTask" name="${currentApproval}" flowable:candidateGroups="${approvalRole}"/>
 
-        <!-- Approval Task -->
+        <!-- FIRST REMINDER -->
+        <boundaryEvent id="firstReminderTimer"
+                       attachedToRef="approvalTask"
+                       cancelActivity="false">
 
-        <userTask id="approvalTask"
-                  name="${currentApproval}"
-                  flowable:candidateGroups="${approvalRole}"/>
+            <timerEventDefinition>
+                <timeDuration>${reminderDuration}</timeDuration>
+            </timerEventDefinition>
 
+        </boundaryEvent>
+
+        <serviceTask id="sendReminderTask"
+                     name="Send Reminder"
+                     flowable:delegateExpression="${reminderDelegate}"/>
+
+        <sequenceFlow id="reminderFlow1"
+                      sourceRef="firstReminderTimer"
+                      targetRef="sendReminderTask"/>
+
+        <!-- SECOND REMINDER -->
+        <boundaryEvent id="secondReminderTimer"
+                       attachedToRef="approvalTask"
+                       cancelActivity="false">
+
+            <timerEventDefinition>
+                <timeDuration>${secondReminderDuration}</timeDuration>
+            </timerEventDefinition>
+
+        </boundaryEvent>
+
+        <serviceTask id="sendSecondReminderTask"
+                     name="Send Second Reminder"
+                     flowable:delegateExpression="${reminderDelegate}"/>
+
+        <sequenceFlow id="reminderFlow2"
+                      sourceRef="secondReminderTimer"
+                      targetRef="sendSecondReminderTask"/>
+
+        <!-- ESCALATION -->
+        <boundaryEvent id="escalationTimer"
+                       attachedToRef="approvalTask"
+                       cancelActivity="false">
+
+            <timerEventDefinition>
+                <timeDuration>${escalationDuration}</timeDuration>
+            </timerEventDefinition>
+
+        </boundaryEvent>
+
+        <serviceTask id="escalationTask"
+                     name="Escalate Workflow"
+                     flowable:delegateExpression="${escalationDelegate}"/>
+
+        <sequenceFlow id="escalationFlow"
+                      sourceRef="escalationTimer"
+                      targetRef="escalationTask"/>
+
+        <!-- APPROVE / REJECT -->
         <sequenceFlow id="flow2"
                       sourceRef="approvalTask"
                       targetRef="approvalDecision"/>
-
-        <!-- Approve / Reject -->
 
         <exclusiveGateway id="approvalDecision"/>
 
@@ -37,9 +83,9 @@
                       sourceRef="approvalDecision"
                       targetRef="checkNextLevel">
 
-            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
-                ${approved == true}
-            ]]></conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${approved == true}]]>
+            </conditionExpression>
 
         </sequenceFlow>
 
@@ -49,52 +95,44 @@
                       sourceRef="approvalDecision"
                       targetRef="requesterTask">
 
-            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
-                ${approved == false}
-            ]]></conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${approved == false}]]>
+            </conditionExpression>
 
         </sequenceFlow>
 
-        <!-- Check Next Level -->
-
+        <!-- NEXT LEVEL -->
         <serviceTask id="checkNextLevel"
-                     name="Check Next Approval Level"
+                     name="Check Next Level"
                      flowable:delegateExpression="${approvalLevelDelegate}"/>
 
         <sequenceFlow id="flow3"
                       sourceRef="checkNextLevel"
                       targetRef="hasNextLevelGateway"/>
 
-        <!-- Has Next Level -->
-
         <exclusiveGateway id="hasNextLevelGateway"/>
-
-        <!-- Next Level Exists -->
 
         <sequenceFlow id="flow4"
                       sourceRef="hasNextLevelGateway"
                       targetRef="approvalTask">
 
-            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
-                ${hasNextLevel == true}
-            ]]></conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hasNextLevel == true}]]>
+            </conditionExpression>
 
         </sequenceFlow>
-
-        <!-- Final Approval -->
 
         <sequenceFlow id="flow5"
                       sourceRef="hasNextLevelGateway"
                       targetRef="approvedEnd">
 
-            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
-                ${hasNextLevel == false}
-            ]]></conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${hasNextLevel == false}]]>
+            </conditionExpression>
 
         </sequenceFlow>
 
-        <!-- Requester Correction -->
-
+        <!-- REQUESTER CORRECTION -->
         <userTask id="requesterTask"
                   name="Requester Correction"
                   flowable:candidateGroups="${requestedRole}"/>
@@ -103,36 +141,30 @@
                       sourceRef="requesterTask"
                       targetRef="resubmitGateway"/>
 
-        <!-- Resubmit Decision -->
-
-        <exclusiveGateway id="resubmitGateway"/>
-
         <!-- RESUBMIT -->
+        <exclusiveGateway id="resubmitGateway"/>
 
         <sequenceFlow id="resubmitFlow"
                       sourceRef="resubmitGateway"
                       targetRef="resubmissionTask">
 
-            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
-                ${resubmitted == true}
-            ]]></conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${resubmitted == true}]]>
+            </conditionExpression>
 
         </sequenceFlow>
-
-        <!-- CANCEL -->
 
         <sequenceFlow id="cancelFlow"
                       sourceRef="resubmitGateway"
                       targetRef="rejectedEnd">
 
-            <conditionExpression xsi:type="tFormalExpression"><![CDATA[
-                ${resubmitted == false}
-            ]]></conditionExpression>
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${resubmitted == false}]]>
+            </conditionExpression>
 
         </sequenceFlow>
 
-        <!-- Resubmission Delegate -->
-
+        <!-- RESUBMISSION -->
         <serviceTask id="resubmissionTask"
                      name="Prepare Resubmission"
                      flowable:delegateExpression="${resubmissionDelegate}"/>
@@ -141,12 +173,9 @@
                       sourceRef="resubmissionTask"
                       targetRef="approvalTask"/>
 
-        <!-- End Events -->
-
+        <!-- END EVENTS -->
         <endEvent id="approvedEnd"/>
-
         <endEvent id="rejectedEnd"/>
 
     </process>
-
 </definitions>

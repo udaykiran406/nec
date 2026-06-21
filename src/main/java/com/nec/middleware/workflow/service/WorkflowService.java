@@ -2,18 +2,19 @@ package com.nec.middleware.workflow.service;
 
 import com.nec.middleware.constants.Constants;
 import com.nec.middleware.exception.ResourceNotFoundException;
-import com.nec.middleware.hr.repository.TemporaryContractRepository;
 import com.nec.middleware.masterdata.entity.ApprovalWorkflowLevel;
 import com.nec.middleware.masterdata.repository.ApprovalWorkflowLevelRepository;
 import com.nec.middleware.workflow.Enum.WorkflowAction;
 import com.nec.middleware.workflow.dto.request.WorkflowActionRequestDto;
 import com.nec.middleware.workflow.dto.response.WorkflowInboxDto;
 import com.nec.middleware.workflow.entity.WorkflowAudit;
+import com.nec.middleware.workflow.entity.WorkflowSlaConfiguration;
 import com.nec.middleware.workflow.factory.WorkflowEntityFactory;
 import com.nec.middleware.workflow.factory.WorkflowEntityService;
 import com.nec.middleware.workflow.factory.WorkflowModuleFactory;
 import com.nec.middleware.workflow.factory.WorkflowModuleHandler;
 import com.nec.middleware.workflow.repository.WorkflowAuditRepository;
+import com.nec.middleware.workflow.repository.WorkflowSlaConfigurationRepository;
 import com.nec.middleware.workflow.specification.WorkflowInboxSpecification;
 import lombok.RequiredArgsConstructor;
 import org.flowable.engine.RuntimeService;
@@ -41,7 +42,7 @@ public class WorkflowService {
     private final RuntimeService runtimeService;
     private final TaskService taskService;
 
-    private final TemporaryContractRepository temporaryContractRepository;
+    private final WorkflowSlaConfigurationRepository slaConfigurationRepository;
 
     private final ApprovalWorkflowLevelRepository approvalWorkflowLevelRepository;
 
@@ -53,8 +54,9 @@ public class WorkflowService {
 
     public String startApprovalWorkflow(ApprovalWorkflowLevel approverLevel, String entityId, String moduleName, String requestedBy, String requesterRole) {
 
+        WorkflowSlaConfiguration sla = slaConfigurationRepository.findByModuleName(moduleName)
+                .orElseThrow(() -> new ResourceNotFoundException("SLA configuration not found once the workflow is started for module name --> " + moduleName + " entity id --> " + entityId));
         Map<String, Object> variables = new HashMap<>();
-
         variables.put("currentApprovalLevel", approverLevel.getLevelOrder());
         variables.put("approvalRole", approverLevel.getApprovalRole());
         variables.put("currentApproval", approverLevel.getApprovalRole());
@@ -62,8 +64,11 @@ public class WorkflowService {
         variables.put("entityId", entityId);
         variables.put("requestedBy", requestedBy);
         variables.put("requestedRole", requesterRole);
+        variables.put("reminderDuration", sla.getReminderHours());
+        variables.put("secondReminderDuration", sla.getSecondReminderHours());
+        variables.put("escalationDuration", sla.getEscalationHours());
+//        variables.put("escalationDuration", "PT" + sla.getEscalationHours() + "H");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approvalWorkflow", variables);
-
         return processInstance.getProcessInstanceId();
     }
 
@@ -255,7 +260,7 @@ public class WorkflowService {
                         .findFirst()
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Current approval level not found"));
+                                        "Current approval level not found for entityID --> " + entityId + " module name --> " + moduleName));
         currentLevelRecord.setAction(Constants.WORKFLOW_APPROVED_STATUS);
         currentLevelRecord.setRemarks(remarks);
         currentLevelRecord.setActionBy(loggedInUser);

@@ -80,13 +80,19 @@ public class ResubmissionDelegate implements JavaDelegate {
                                 moduleName, entityId, maxRevisionNo);
 
         for (WorkflowAudit audit : latestAudits) {
-
             WorkflowAudit copy = new WorkflowAudit();
             BeanUtils.copyProperties(
                     audit,
                     copy,
                     "id");
             copy.setRevisionNo(nextRevision);
+            copy.setRemarks(null);
+            copy.setEscalated(null);
+            copy.setEscalatedTo(null);
+            copy.setEscalatedDate(null);
+            copy.setLastReminderDate(null);
+            copy.setReminderCount(null);
+            copy.setActionDate(null);
             copy.setAction(
                     copy.getApprovalLevel() == 1
                             ? Constants.WORKFLOW_PENDING_STATUS
