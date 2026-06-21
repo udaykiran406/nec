@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
     name = "nec_rbac_users",
+    schema = "keycloak",
     uniqueConstraints = {
         //@UniqueConstraint(name = "uq_nec_rbac_users_phone",            columnNames = "phone"),
         @UniqueConstraint(name = "uq_nec_rbac_users_email",            columnNames = "email"),

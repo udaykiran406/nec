@@ -10,7 +10,7 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "nec_lkp_training_types")
+@Table(name = "nec_lkp_training_types", schema = "NEC")
 @Getter
 @Setter
 @Builder

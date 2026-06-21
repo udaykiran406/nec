@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Entity
 @Table(
         name = "nec_hr_attendance_records",
+        schema = "NEC",
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_attendance_class_trainee_date",
                 columnNames = {

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "nec_lkp_budget_sub_heads")
+@Table(name = "nec_lkp_budget_sub_heads", schema = "NEC")
 @Getter
 @Setter
 @Builder

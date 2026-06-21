@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "nec_lkp_certification_types")
+@Table(name = "nec_lkp_certification_types", schema = "NEC")
 @Getter
 @Setter
 @Builder

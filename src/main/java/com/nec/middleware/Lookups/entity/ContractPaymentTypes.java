@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "nec_lkp_contract_payment_types")
+@Table(name = "nec_lkp_contract_payment_types", schema = "NEC")
 @Getter
 @Setter
 @Builder

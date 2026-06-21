@@ -23,7 +23,7 @@ import lombok.*;
  * Audit fields inherited from {@link AuditableEntity}.
  */
 @Entity
-@Table(name = "nec_hr_portal_users")
+@Table(name = "nec_hr_portal_users", schema = "NEC")
 @Getter
 @Setter
 @NoArgsConstructor

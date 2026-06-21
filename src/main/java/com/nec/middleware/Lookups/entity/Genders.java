@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "nec_lkp_genders")
+@Table(name = "nec_lkp_genders", schema = "NEC")
 @Getter @Setter @Builder
 @NoArgsConstructor
 public class Genders extends BaseLookupEntity {}

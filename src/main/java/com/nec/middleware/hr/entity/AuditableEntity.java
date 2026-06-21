@@ -26,7 +26,11 @@ public abstract class AuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = Boolean.TRUE;
-@CreatedBy
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = Boolean.FALSE;
+
+    @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 

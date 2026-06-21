@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "nec_lkp_lookups")
+@Table(name = "nec_lkp_lookups", schema = "NEC")
 public class LookupEntity {
 
     @Id

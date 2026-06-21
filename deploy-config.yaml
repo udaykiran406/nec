@@ -1,4 +1,5 @@
-deployment_name: nec-middleware-service
-container_name: nec-middleware
+deployment_name: nec-service
+container_name: nec
 build_type: maven
 spring_profile: dev
+

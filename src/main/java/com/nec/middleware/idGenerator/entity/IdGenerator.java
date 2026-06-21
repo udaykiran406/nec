@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "id_generator")
+@Table(name = "id_generator", schema = "NEC")
 @Getter
 @Setter
 public class IdGenerator {

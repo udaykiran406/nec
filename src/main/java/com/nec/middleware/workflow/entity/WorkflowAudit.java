@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "workflow_audit",
+        schema = "NEC",
         indexes = {
                 @Index(
                         name = "idx_module_entity",

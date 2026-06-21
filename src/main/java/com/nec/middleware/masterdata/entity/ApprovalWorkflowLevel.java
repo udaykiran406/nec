@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "approval_workflow_level")
+@Table(name = "approval_workflow_level", schema = "NEC")
 @Getter
 @Setter
 public class ApprovalWorkflowLevel {

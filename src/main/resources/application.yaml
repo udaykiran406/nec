@@ -7,7 +7,7 @@ spring:
   application:
     name: nec-middleware-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/nec_hr
+    url: jdbc:postgresql://localhost:5432/nec-middleware
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
@@ -22,12 +22,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        hbm2ddl:
+          create_namespaces: true
 
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 7
+    create-schemas: true
 
   main:
     allow-bean-definition-overriding: true
