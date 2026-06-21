@@ -29,7 +29,7 @@ public class TrainingScheduleController {
     private final TrainingScheduleService trainingScheduleService;
 
     @Operation(summary = "Create Training Schedule")
-    @PostMapping("/create")
+    @PostMapping("/createSchedule")
     public ResponseEntity<ApiResponse<TrainingScheduleResponseDto>> createSchedule(
             @Valid @RequestBody TrainingScheduleRequestDto request) {
 
@@ -60,20 +60,7 @@ public class TrainingScheduleController {
         );
     }
 
-    @Operation(summary = "Get Training Schedule By Schedule Code")
-    @GetMapping("/{scheduleCode}")
-    public ResponseEntity<ApiResponse<TrainingScheduleResponseDto>> getScheduleByCode(
-            @PathVariable String scheduleCode) {
 
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        TrainingScheduleConstants.SCHEDULE_FETCHED,
-                        trainingScheduleService.getScheduleByScheduleCode(
-                                scheduleCode
-                        )
-                )
-        );
-    }
 
     @Operation(summary = "Get All Training Schedules")
     @PostMapping("/getAllTrainingSchedules")

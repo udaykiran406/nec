@@ -2,7 +2,7 @@
   "info": {
     "name": "NEC - Training Attendance API",
     "_postman_id": "nec-training-attendance-collection",
-    "description": "Training Attendance API endpoints for NEC Middleware.\n\nBase URL: http://localhost:8080/nec\nClass-level path: /api/training/attendance\n\nNOTE: The Create Attendance endpoint uses multipart/form-data (not JSON body).\nMax file size: 20MB, Max request size: 50MB.\n\nResponse wrapper:\n{\n  \"status\": 200 | 201,\n  \"message\": \"...\",\n  \"data\": { ... }\n}",
+    "description": "Training Attendance API endpoints for NEC Middleware.\n\nBase URL: http://localhost:8080/nec\nClass-level path: /api/training/attendance\n\nResponse wrapper (all endpoints):\n{\n  \"status\": 200 | 201,\n  \"message\": \"...\",\n  \"data\": { ... }\n}\n\nNOTES:\n- /createAttendance and /upload-signed-sheet use multipart/form-data.\n- Max file size: 20MB, Max request size: 50MB.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -24,9 +24,9 @@
         "method": "POST",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/training/attendance/create",
+          "raw": "{{baseUrl}}/api/training/attendance/createAttendance",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "training", "attendance", "create"]
+          "path": ["api", "training", "attendance", "createAttendance"]
         },
         "body": {
           "mode": "formdata",
@@ -39,26 +39,66 @@
             },
             {
               "key": "attendanceDate",
-              "value": "2026-06-18",
+              "value": "2026-06-21",
               "description": "LocalDate (required) — format: YYYY-MM-DD",
               "type": "text"
             },
             {
               "key": "attendanceRecords",
               "value": "[{\"universityTraineeId\": 1, \"isPresent\": true}, {\"universityTraineeId\": 2, \"isPresent\": false}]",
-              "description": "String (required) — JSON array of attendance records. Each item: { universityTraineeId: Long, isPresent: Boolean }",
+              "description": "String (required) — JSON array. Each item: { universityTraineeId: Long, isPresent: Boolean }",
               "type": "text"
             },
             {
               "key": "signedSheet",
               "value": "",
-              "description": "File (optional) — Signed attendance sheet (max 20MB). Leave empty if not uploading.",
+              "description": "File (optional) — Signed attendance sheet (PDF/image, max 20MB).",
               "type": "file",
               "disabled": true
             }
           ]
         },
-        "description": "Creates a new training attendance record.\n\nThis endpoint uses multipart/form-data (NOT JSON body).\n\nForm fields:\n- trainingClassId: Long (required)\n- attendanceDate: LocalDate (required) — format YYYY-MM-DD\n- attendanceRecords: String (required) — JSON array string, e.g.:\n  [{\"universityTraineeId\": 1, \"isPresent\": true}, {\"universityTraineeId\": 2, \"isPresent\": false}]\n- signedSheet: MultipartFile (optional) — PDF/image of signed sheet, max 20MB\n\nReturns HTTP 201 on success."
+        "description": "Creates a new training attendance record.\n\nUses multipart/form-data (NOT JSON body).\n\nForm fields:\n- trainingClassId: Long (required)\n- attendanceDate: LocalDate (required) — format: YYYY-MM-DD\n- attendanceRecords: String (required) — JSON array, e.g.:\n  [{\"universityTraineeId\": 1, \"isPresent\": true}]\n- signedSheet: MultipartFile (optional) — max 20MB\n\nReturns HTTP 201 on success."
+      }
+    },
+    {
+      "name": "Get Attendance Grid",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/attendance",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "attendance"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"universityId\": 1,\n  \"classId\": 1\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Returns an attendance grid for a specific university and training class.\n\nResponse data shape:\n{\n  \"classId\": Long,\n  \"className\": String,\n  \"universityId\": { \"id\": Long, \"value\": String },\n  \"scheduleDates\": [\"YYYY-MM-DD\", ...],\n  \"trainees\": [\n    {\n      \"trainee\": { \"id\": Long, \"value\": String },\n      \"attendanceRecords\": [ ... ]\n    }\n  ]\n}\n\nRequest body fields (both required):\n- universityId: Long\n- classId: Long\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Save Attendance",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/attendance/saveAttendance",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "attendance", "saveAttendance"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classId\": 1,\n  \"universityId\": 1,\n  \"markedBy\": \"admin\",\n  \"attendanceEntries\": [\n    {\n      \"traineeId\": 1,\n      \"attendanceRecords\": [\n        {\n          \"attendanceDate\": \"2026-06-21\",\n          \"status\": \"Present\"\n        },\n        {\n          \"attendanceDate\": \"2026-06-22\",\n          \"status\": \"Absent\"\n        }\n      ]\n    },\n    {\n      \"traineeId\": 2,\n      \"attendanceRecords\": [\n        {\n          \"attendanceDate\": \"2026-06-21\",\n          \"status\": \"Present\"\n        }\n      ]\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Saves attendance records for multiple trainees in a training class.\n\nRequest body fields:\n- classId: Long (required)\n- universityId: Long (required)\n- markedBy: String (optional)\n- attendanceEntries: Array (required, non-empty)\n  Each entry:\n  - traineeId: Long (required)\n  - attendanceRecords: Array (required, non-empty)\n    Each record:\n    - attendanceDate: LocalDate (required) — format: YYYY-MM-DD\n    - status: String (required) — e.g. 'Present', 'Absent'\n\nResponse data shape:\n{\n  \"success\": Boolean,\n  \"message\": String,\n  \"summary\": { ... }\n}\n\nReturns HTTP 200 on success."
       }
     },
     {
@@ -82,7 +122,7 @@
           "raw": "{\n  \"trainingClassId\": null,\n  \"traineeId\": null,\n  \"fromDate\": null,\n  \"toDate\": null,\n  \"isPresent\": null,\n  \"isActive\": null\n}",
           "options": { "raw": { "language": "json" } }
         },
-        "description": "Returns a paginated list of training attendance records, sorted by createdAt DESC.\n\nQuery params:\n- page: int (default 0)\n- size: int (default 10)\n\nRequest body (all fields optional — send {} or null to get all):\n- trainingClassId: Long\n- traineeId: Long\n- fromDate: LocalDate (format: YYYY-MM-DD)\n- toDate: LocalDate (format: YYYY-MM-DD)\n- isPresent: Boolean\n- isActive: Boolean\n\nReturns HTTP 200 on success."
+        "description": "Returns a paginated list of training attendance records sorted by createdAt DESC.\n\nQuery params:\n- page: int (default 0)\n- size: int (default 10)\n\nRequest body (all fields optional — send {} to get all records):\n- trainingClassId: Long\n- traineeId: Long\n- fromDate: LocalDate (format: YYYY-MM-DD)\n- toDate: LocalDate (format: YYYY-MM-DD)\n- isPresent: Boolean\n- isActive: Boolean\n\nReturns HTTP 200 on success."
       }
     },
     {
@@ -91,14 +131,45 @@
         "method": "PATCH",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/training/attendance/status/{{attendanceId}}?isActive=true",
+          "raw": "{{baseUrl}}/api/training/attendance/changeAttendenceStatus/{{attendanceId}}?isActive=true",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "training", "attendance", "status", "{{attendanceId}}"],
+          "path": ["api", "training", "attendance", "changeAttendenceStatus", "{{attendanceId}}"],
           "query": [
             { "key": "isActive", "value": "true" }
           ]
         },
         "description": "Activates or deactivates a training attendance record by its numeric DB ID.\n\nPath variable:\n- id: Long — the attendance record's database ID\n\nQuery param:\n- isActive: Boolean (required) — true to activate, false to deactivate\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Upload Signed Attendance Sheet",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/attendance/upload-signed-sheet",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "attendance", "upload-signed-sheet"]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "request",
+              "value": "{\n  \"trainingClassId\": 1,\n  \"universityId\": 1,\n  \"fromDate\": \"2026-06-21\",\n  \"toDate\": \"2026-06-25\",\n  \"uploadedBy\": \"admin\"\n}",
+              "description": "JSON part (required) — UploadSignedAttendanceRequestDto:\n  trainingClassId: Long (required)\n  universityId: Long (required)\n  fromDate: LocalDate (required) — format: YYYY-MM-DD\n  toDate: LocalDate (required) — format: YYYY-MM-DD\n  uploadedBy: String (optional)",
+              "type": "text",
+              "contentType": "application/json"
+            },
+            {
+              "key": "signedSheet",
+              "value": "",
+              "description": "File (required) — The signed attendance sheet file (PDF/image, max 20MB).",
+              "type": "file"
+            }
+          ]
+        },
+        "description": "Uploads a signed attendance sheet for a training class.\n\nUses multipart/form-data with two parts:\n\n1. 'request' (application/json part):\n   - trainingClassId: Long (required)\n   - universityId: Long (required)\n   - fromDate: LocalDate (required) — format: YYYY-MM-DD\n   - toDate: LocalDate (required) — format: YYYY-MM-DD\n   - uploadedBy: String (optional)\n\n2. 'signedSheet' (file part, required) — PDF or image, max 20MB\n\nResponse data shape:\n{\n  \"id\": Long,\n  \"trainingClassId\": Long,\n  \"universityId\": Long,\n  \"fromDate\": \"YYYY-MM-DD\",\n  \"toDate\": \"YYYY-MM-DD\",\n  \"filePath\": String,\n  \"uploadedBy\": String\n}\n\nReturns HTTP 201 on success."
       }
     }
   ]

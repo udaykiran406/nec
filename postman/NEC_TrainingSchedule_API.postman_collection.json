@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "NEC - Training Schedule API",
+    "_postman_id": "nec-training-schedule-collection",
+    "description": "Training Schedule API endpoints for NEC Middleware.\n\nBase URL: http://localhost:8080/nec\nClass-level path: /api/training/schedules\n\nResponse wrapper (all endpoints):\n{\n  \"status\": 200 | 201,\n  \"message\": \"...\",\n  \"data\": { ... }\n}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/nec",
+      "type": "string"
+    },
+    {
+      "key": "scheduleCode",
+      "value": "TS-001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Training Schedule",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/schedules/createSchedule",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "schedules", "createSchedule"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"trainingClassId\": 1,\n  \"fromDate\": \"2026-07-01\",\n  \"toDate\": \"2026-07-05\",\n  \"timeSlot\": \"08:00 AM - 12:00 PM\",\n  \"venue\": \"Kampala Conference Hall\",\n  \"location\": \"Kampala, Uganda\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Creates a new training schedule.\n\nRequest body fields:\n- trainingClassId: Long (required)\n- fromDate: LocalDate (required) — format: YYYY-MM-DD\n- toDate: LocalDate (required) — format: YYYY-MM-DD\n- timeSlot: String (required, max 100 chars)\n- venue: String (required, max 200 chars)\n- location: String (required, max 200 chars)\n\nResponse data shape:\n{\n  \"id\": Long,\n  \"scheduleCode\": String,\n  \"trainingClass\": { \"id\": Long, \"value\": String },\n  \"fromDate\": \"YYYY-MM-DD\",\n  \"toDate\": \"YYYY-MM-DD\",\n  \"duration\": Integer,\n  \"timeSlot\": String,\n  \"venue\": String,\n  \"location\": String,\n  \"isActive\": Boolean,\n  \"createdBy\": String,\n  \"createdAt\": LocalDateTime,\n  \"updatedBy\": String,\n  \"updatedAt\": LocalDateTime\n}\n\nReturns HTTP 201 on success."
+      }
+    },
+    {
+      "name": "Update Training Schedule",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/schedules/update/{{scheduleCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "schedules", "update", "{{scheduleCode}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"trainingClassId\": 1,\n  \"fromDate\": \"2026-07-01\",\n  \"toDate\": \"2026-07-07\",\n  \"timeSlot\": \"09:00 AM - 01:00 PM\",\n  \"venue\": \"Kampala Conference Hall Room B\",\n  \"location\": \"Kampala, Uganda\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Updates an existing training schedule by its schedule code.\n\nPath variable:\n- scheduleCode: String (e.g. TS-001)\n\nRequest body fields (all required):\n- trainingClassId: Long (required)\n- fromDate: LocalDate (required) — format: YYYY-MM-DD\n- toDate: LocalDate (required) — format: YYYY-MM-DD\n- timeSlot: String (required, max 100 chars)\n- venue: String (required, max 200 chars)\n- location: String (required, max 200 chars)\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Get All Training Schedules (Paginated + Filtered)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/schedules/getAllTrainingSchedules?page=0&size=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "schedules", "getAllTrainingSchedules"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "10" }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"scheduleCode\": null,\n  \"trainingClassId\": null,\n  \"fromDate\": null,\n  \"toDate\": null,\n  \"venue\": null,\n  \"location\": null,\n  \"isActive\": null\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Returns a paginated list of training schedules with optional filters.\n\nQuery params:\n- page: int (default 0)\n- size: int (default 10)\n\nRequest body (all fields optional — send {} to get all records):\n- scheduleCode: String\n- trainingClassId: Long\n- fromDate: LocalDate (format: YYYY-MM-DD)\n- toDate: LocalDate (format: YYYY-MM-DD)\n- venue: String\n- location: String\n- isActive: Boolean\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Change Training Schedule Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/schedules/status/{{scheduleCode}}?isActive=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "schedules", "status", "{{scheduleCode}}"],
+          "query": [
+            { "key": "isActive", "value": "true" }
+          ]
+        },
+        "description": "Activates or deactivates a training schedule by its schedule code.\n\nPath variable:\n- scheduleCode: String (e.g. TS-001)\n\nQuery param:\n- isActive: Boolean (required) — true to activate, false to deactivate\n\nReturns HTTP 200 on success."
+      }
+    }
+  ]
+}

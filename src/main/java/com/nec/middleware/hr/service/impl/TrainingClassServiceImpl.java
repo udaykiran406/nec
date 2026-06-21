@@ -67,7 +67,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                 .orElseThrow(() -> new ResourceNotFoundException("Training class not found"));
 
         //this check is to ensure that when updating,
-        //if in case the the classname is already assigned to another code no updation should happen
+        //if in case  the classname is already assigned to another code no updation should happen
         if (trainingClassRepository.existsByClassNameIgnoreCaseAndClassCodeNot(
                 request.getClassName(),
                 classCode

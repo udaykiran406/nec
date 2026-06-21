@@ -38,6 +38,7 @@ public class TrainingClassMapper {
         }
 
         return TrainingClassResponse.builder()
+                .id(entity.getId())
                 .classCode(entity.getClassCode())
                 .className(entity.getClassName())
                 .capacity(entity.getCapacity())

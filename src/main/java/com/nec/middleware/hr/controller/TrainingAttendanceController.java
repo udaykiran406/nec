@@ -37,7 +37,7 @@ public class TrainingAttendanceController {
 
     @Operation(summary = "Create Training Attendance")
     @PostMapping(
-            value = "/create",
+            value = "/createAttendance",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ApiResponse<TrainingAttendanceResponseDto>> createAttendance(
@@ -77,7 +77,7 @@ public class TrainingAttendanceController {
     }
 
     @Operation(summary = "Activate or Deactivate Training Attendance")
-    @PatchMapping("/status/{id}")
+    @PatchMapping("/changeAttendenceStatus/{id}")
     public ResponseEntity<ApiResponse<TrainingAttendanceResponseDto>> changeStatus(
             @PathVariable Long id,
             @RequestParam Boolean isActive) {
@@ -106,7 +106,7 @@ public class TrainingAttendanceController {
     }
 
     @Operation(summary = "Save Training Attendance")
-    @PostMapping("/save")
+    @PostMapping("/saveAttendance")
     public ResponseEntity<ApiResponse<SaveTrainingAttendanceResponseDto>> saveAttendance(
             @Valid @RequestBody TrainingAttendanceRequestDtos request) {
 
