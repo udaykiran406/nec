@@ -33,7 +33,7 @@ import lombok.*;
 public class ApiResponse<T> {
 
     /** {@code true} when the operation succeeded; {@code false} otherwise. */
-    private boolean success;
+    private int statusCode;
 
     /** Human-readable description of the operation result. */
     private String message;
@@ -53,9 +53,9 @@ public class ApiResponse<T> {
      * @param <T>     the payload type
      * @return a populated success {@link ApiResponse}
      */
-    public static <T> ApiResponse<T> success(String message, T data) {
+    public static <T> ApiResponse<T> success(int statusCode,String message, T data) {
         return ApiResponse.<T>builder()
-                .success(true)
+                .statusCode(statusCode)
                 .message(message)
                 .data(data)
                 .build();
@@ -68,9 +68,9 @@ public class ApiResponse<T> {
      * @param <T>     the payload type (typically {@link Void})
      * @return a success {@link ApiResponse} with {@code data = null}
      */
-    public static <T> ApiResponse<T> success(String message) {
+    public static <T> ApiResponse<T> success(int statusCode,String message) {
         return ApiResponse.<T>builder()
-                .success(true)
+                .statusCode(statusCode)
                 .message(message)
                 .data(null)
                 .build();
@@ -83,9 +83,9 @@ public class ApiResponse<T> {
      * @param <T>     the payload type
      * @return an error {@link ApiResponse} with {@code data = null}
      */
-    public static <T> ApiResponse<T> error(String message) {
+    public static <T> ApiResponse<T> error(int statusCode,String message) {
         return ApiResponse.<T>builder()
-                .success(false)
+                .statusCode(statusCode)
                 .message(message)
                 .data(null)
                 .build();

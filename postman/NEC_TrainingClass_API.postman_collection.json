@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "NEC - Training Class API",
+    "_postman_id": "nec-training-class-collection",
+    "description": "Training Class API endpoints for NEC Middleware.\n\nBase URL: http://localhost:8080/nec\nClass-level path: /api/training/classes\n\nResponse wrapper (all endpoints):\n{\n  \"status\": 200 | 201,\n  \"message\": \"...\",\n  \"data\": { ... }\n}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/nec",
+      "type": "string"
+    },
+    {
+      "key": "classCode",
+      "value": "TC-001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Training Class",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/classes/create",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "classes", "create"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"className\": \"Voter Registration Training Batch 1\",\n  \"capacity\": 50,\n  \"trainingTypeId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"universityId\": 1,\n  \"trainerTotId\": 1,\n  \"statusId\": 1,\n  \"location\": \"Kampala Conference Hall\",\n  \"description\": \"Initial voter registration training for batch 1.\",\n  \"preRequests\": \"Bring national ID and registration form.\",\n  \"createdBy\": \"admin\",\n  \"updatedBy\": null\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Creates a new training class.\n\nRequest body fields:\n- className: String (required)\n- capacity: Integer (required, must be > 0)\n- trainingTypeId: Long (required)\n- regionId: Long (required)\n- districtId: Long (required)\n- cityId: Long (required)\n- universityId: Long (required)\n- trainerTotId: Long (required)\n- statusId: Long (required)\n- location: String (required)\n- description: String (optional)\n- preRequests: String (optional)\n- createdBy: String (optional)\n- updatedBy: String (optional)\n\nReturns HTTP 201 on success."
+      }
+    },
+    {
+      "name": "Update Training Class",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/classes/update/{{classCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "classes", "update", "{{classCode}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"className\": \"Voter Registration Training Batch 1 - Updated\",\n  \"capacity\": 60,\n  \"trainingTypeId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"universityId\": 1,\n  \"trainerTotId\": 1,\n  \"statusId\": 2,\n  \"location\": \"Kampala Conference Hall Room B\",\n  \"description\": \"Updated description.\",\n  \"preRequests\": \"Bring national ID.\",\n  \"createdBy\": \"admin\",\n  \"updatedBy\": \"admin\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Updates an existing training class identified by its class code.\n\nPath variable:\n- classCode: String (e.g. TC-001)\n\nRequest body fields (same as create — all required fields must be provided):\n- className: String (required)\n- capacity: Integer (required, must be > 0)\n- trainingTypeId: Long (required)\n- regionId: Long (required)\n- districtId: Long (required)\n- cityId: Long (required)\n- universityId: Long (required)\n- trainerTotId: Long (required)\n- statusId: Long (required)\n- location: String (required)\n- description: String (optional)\n- preRequests: String (optional)\n- createdBy: String (optional)\n- updatedBy: String (optional)\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Get Training Class By Code",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/classes/{{classCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "classes", "{{classCode}}"]
+        },
+        "description": "Fetches a single training class by its class code.\n\nPath variable:\n- classCode: String (e.g. TC-001)\n\nResponse data shape:\n{\n  \"id\": Long,\n  \"classCode\": String,\n  \"className\": String,\n  \"capacity\": Integer,\n  \"location\": String,\n  \"description\": String,\n  \"preRequests\": String,\n  \"trainingType\": { \"id\": Long, \"value\": String },\n  \"region\": { \"id\": Long, \"value\": String },\n  \"district\": { \"id\": Long, \"value\": String },\n  \"city\": { \"id\": Long, \"value\": String },\n  \"university\": { \"id\": Long, \"value\": String },\n  \"trainerTot\": { \"id\": Long, \"value\": String },\n  \"status\": { \"id\": Long, \"value\": String },\n  \"isActive\": Boolean,\n  \"createdBy\": String,\n  \"createdAt\": LocalDateTime,\n  \"updatedBy\": String,\n  \"updatedAt\": LocalDateTime\n}\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Get All Training Classes (Paginated + Filtered)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/classes/getAllTrainingClasses?page=0&size=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "classes", "getAllTrainingClasses"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "10" }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classCode\": null,\n  \"className\": null,\n  \"location\": null,\n  \"trainingTypeId\": null,\n  \"statusId\": null,\n  \"regionId\": null,\n  \"districtId\": null,\n  \"cityId\": null,\n  \"universityId\": null,\n  \"trainerTotId\": null\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "description": "Returns a paginated list of training classes with optional filters.\n\nQuery params:\n- page: int (default 0)\n- size: int (default 10)\n\nRequest body (all fields optional — send {} or omit body to get all records):\n- classCode: String\n- className: String\n- location: String\n- trainingTypeId: Long\n- statusId: Long\n- regionId: Long\n- districtId: Long\n- cityId: Long\n- universityId: Long\n- trainerTotId: Long\n\nReturns HTTP 200 on success."
+      }
+    },
+    {
+      "name": "Change Training Class Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/training/classes/status/{{classCode}}?isActive=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "training", "classes", "status", "{{classCode}}"],
+          "query": [
+            { "key": "isActive", "value": "true" }
+          ]
+        },
+        "description": "Activates or deactivates a training class by its class code.\n\nPath variable:\n- classCode: String (e.g. TC-001)\n\nQuery param:\n- isActive: Boolean (required) — true to activate, false to deactivate\n\nReturns HTTP 200 on success."
+      }
+    }
+  ]
+}

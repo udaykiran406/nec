@@ -46,12 +46,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -61,6 +63,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllRegions()));
     }
@@ -71,6 +74,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getRegionById(id)));
     }
@@ -88,12 +92,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -103,6 +109,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllDistricts(filterDto)));
     }
@@ -115,6 +122,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getDistrictById(id)));
     }
@@ -132,12 +140,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -147,6 +157,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllCities(filterDto)));
     }
@@ -159,6 +170,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getCityById(id)));
     }
@@ -176,12 +188,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -192,6 +206,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllPollingStations(filterDto)
                 )
@@ -205,6 +220,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getPollingStationById(id)));
     }
@@ -223,12 +239,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.CREATED.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -240,6 +258,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllVoterRegistrationCenters(filterDto)
                 )
@@ -254,6 +273,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getVoterRegistrationCenterById(id)));
     }
@@ -271,23 +291,30 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
 
     @GetMapping("/universities/list")
-    public ResponseEntity<ApiResponse<List<UniversityResponse>>> getAllUniversities() {
+    public ResponseEntity<ApiResponse<Page<UniversityResponse>>>
+    getAllUniversities(
+            UniversityListRequestDto filterDto) {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
-                        service.getAllUniversities()));
+                        service.getAllUniversities(filterDto)
+                )
+        );
     }
 
 
@@ -297,6 +324,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getUniversityById(id)));
     }
@@ -314,12 +342,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -330,6 +360,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllWarehouses(filterDto)
                 )
@@ -344,6 +375,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getWarehouseById(id)));
     }
@@ -361,12 +393,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -378,6 +412,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllWarehouseSubStores(filterDto)
                 )
@@ -392,6 +427,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getWarehouseSubStoreById(id)));
     }
@@ -409,12 +445,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -424,6 +462,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllPoliticalParties()));
     }
@@ -434,6 +473,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getPoliticalPartyById(id)));
     }
@@ -451,12 +491,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -467,6 +509,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllBankAccounts(filterDto)
                 )
@@ -481,6 +524,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getBankAccountById(id)));
     }
@@ -498,12 +542,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -513,6 +559,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllDeploymentRoles()));
     }
@@ -524,6 +571,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getDeploymentRoleById(id)));
     }
@@ -542,12 +590,14 @@ public class MasterDataController {
         if (request.getId() == null) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(
+                            HttpStatus.OK.value(),
                             MasterDataConstants.RECORD_CREATED,
                             response));
         }
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_UPDATED,
                         response));
     }
@@ -557,6 +607,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORDS_FETCHED,
                         service.getAllHrTrainerTots()));
     }
@@ -569,6 +620,7 @@ public class MasterDataController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        HttpStatus.OK.value(),
                         MasterDataConstants.RECORD_FETCHED,
                         service.getHrTrainerTotById(id)));
     }

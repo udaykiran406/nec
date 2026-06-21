@@ -16,6 +16,18 @@ public class UniversityRequest {
     @Size(max = 200, message = "University name must not exceed 200 characters")
     private String universityName;
 
+    @NotNull(message = "Region ID must not be null")
+    @Min(value = 1, message = "Region ID must be a positive number")
+    private Long regionId;
+
+    @NotNull(message = "District ID must not be null")
+    @Min(value = 1, message = "District ID must be a positive number")
+    private Long districtId;
+
+    @NotNull(message = "City ID must not be null")
+    @Min(value = 1, message = "City ID must be a positive number")
+    private Long cityId;
+
     @NotBlank(message = "Location must not be blank")
     @Size(max = 200, message = "Location must not exceed 200 characters")
     private String location;

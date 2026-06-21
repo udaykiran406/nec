@@ -29,6 +29,15 @@ public class MasterDataUniversity {
     @Column(name = "university_name", nullable = false, length = 200)
     private String universityName;
 
+    @Column(name = "region_id", nullable = false)
+    private Long regionId;
+
+    @Column(name = "district_id", nullable = false)
+    private Long districtId;
+
+    @Column(name = "city_id", nullable = false)
+    private Long cityId;
+
     @Column(name = "location", nullable = false, length = 200)
     private String location;
 
