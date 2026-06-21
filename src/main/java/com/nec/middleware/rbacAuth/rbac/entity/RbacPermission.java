@@ -118,7 +118,7 @@ public class RbacPermission {
     /**
      * ID of the user who created this record.
      */
-    @Column(name = "created_by_user_id", nullable = false)
+    @Column(name = "created_by_user_id")
     private Long createdByUserId;
 
     /**

@@ -93,7 +93,7 @@ public class RbacPermissionGroup {
     @Builder.Default
     private Integer isDeleted = 0;
 
-    @Column(name = "created_by_user_id", nullable = false)
+    @Column(name = "created_by_user_id")
     private Long createdByUserId;
 
     /**

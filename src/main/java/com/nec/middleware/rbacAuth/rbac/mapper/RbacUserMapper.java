@@ -26,7 +26,7 @@ public class RbacUserMapper {
                 .districtId(request.getDistrictId())
                 .cityId(request.getCityId())
                 .isActive(request.getIsActive() != null ? request.getIsActive() : RbacConstants.IS_ACTIVE_TRUE)
-                .createdBy(request.getCreatedBy())
+                .createdBy(request.getCreatedBy() != null ? String.valueOf(request.getCreatedBy()) : null)
                 .passwordToBeChanged(request.getPasswordToBeChanged() != null
                     ? request.getPasswordToBeChanged() : false)
                 .emailVerified(request.getEmailVerified() != null

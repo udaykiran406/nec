@@ -219,7 +219,7 @@ public class RoleServiceImpl implements RoleService {
         role.setStatus(status.toUpperCase());
         String actingUserId = resolveActingUserId();
         if (org.springframework.util.StringUtils.hasText(actingUserId)) {
-            role.setModifiedByUserId(actingUserId);
+            role.setUpdatedBy(actingUserId);
         }
 
         RbacRole savedEntity = roleRepository.saveAndFlush(role);

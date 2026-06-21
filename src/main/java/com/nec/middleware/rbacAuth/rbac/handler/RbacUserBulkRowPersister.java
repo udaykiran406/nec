@@ -248,7 +248,7 @@ public class RbacUserBulkRowPersister {
                 .mobileVerified(false)
                 .failedLoginAttempts(0)
                 .status(status)  // Now synced with isActive
-                .createdBy(1L) // Bulk upload system user — adjust as needed
+                .createdBy("SYSTEM")
                 .isDeleted(RbacConstants.IS_DELETED_FALSE)
                 .build();
     }

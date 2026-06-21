@@ -23,10 +23,15 @@ public class NecUserContextDTO {
     private String email;
     private String phone;
 
-    // Location
+    // Location (IDs)
     private Long regionId;
     private Long districtId;
     private Long cityId;
+
+    // Location (Names)
+    private String region;
+    private String district;
+    private String city;
 
     // Status & Audit
     private String status;           // ACTIVE, INACTIVE, SUSPENDED
@@ -43,7 +48,7 @@ public class NecUserContextDTO {
     // Audit Fields
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long createdBy;
+    private String createdBy;
     private String updatedBy;
 
     // Token Context (optional)

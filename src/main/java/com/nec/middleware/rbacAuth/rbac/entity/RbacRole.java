@@ -100,27 +100,27 @@ public class RbacRole {
     /**
      * ID of the user who created this record.
      */
-    @Column(name = "created_by_user_id", nullable = false)
-    private Long createdByUserId;
+    @Column(name = "created_by", length = 100)
+    private String createdBy;
 
     /**
      * Timestamp automatically set on INSERT.
      */
     @CreationTimestamp
-    @Column(name = "created_date", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     /**
      * ID of the user who last updated this record (Keycloak UUID).
      */
-    @Column(name = "modified_by_user_id", length = 36)
-    private String modifiedByUserId;
+    @Column(name = "updated_by", length = 36)
+    private String updatedBy;
 
     /**
      * Timestamp automatically updated on each UPDATE.
      */
     @UpdateTimestamp
-    @Column(name = "modified_date")
+    @Column(name = "updated_at")
     private LocalDateTime modifiedDate;
 
     // ==================== SOFT DELETE ====================

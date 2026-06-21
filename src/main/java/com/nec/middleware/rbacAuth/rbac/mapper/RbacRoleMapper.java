@@ -22,8 +22,8 @@ public class RbacRoleMapper {
                 .approvalLimit(request.getApprovalLimit())
                 .isParentRole(request.getIsParentRole() != null ? request.getIsParentRole() : false)
                 .status(request.getStatus() != null ? request.getStatus() : "ACTIVE")
-                .createdByUserId(request.getCreatedByUserId())
-                .modifiedByUserId(RbacUtil.toAuditUserId(request.getModifiedByUserId()))
+                .createdBy(request.getCreatedByUserId() != null ? String.valueOf(request.getCreatedByUserId()) : null)
+                .updatedBy(RbacUtil.toAuditUserId(request.getModifiedByUserId()))
                 .build();
     }
 
@@ -62,7 +62,7 @@ public class RbacRoleMapper {
             entity.setStatus(request.getStatus());
         }
         if (request.getModifiedByUserId() != null) {
-            entity.setModifiedByUserId(RbacUtil.toAuditUserId(request.getModifiedByUserId()));
+            entity.setUpdatedBy(RbacUtil.toAuditUserId(request.getModifiedByUserId()));
         }
     }
 

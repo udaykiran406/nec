@@ -1,0 +1,494 @@
+{
+  "info": {
+    "name": "NEC RBAC API",
+    "_postman_id": "nec-rbac-collection-v2",
+    "description": "Complete RBAC & Auth API collection for NEC Middleware (base: http://localhost:8081/nec)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",      "value": "http://localhost:8081/nec" },
+    { "key": "accessToken",  "value": "" },
+    { "key": "refreshToken", "value": "" }
+  ],
+  "item": [
+
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "if (json.data) {",
+                "  pm.collectionVariables.set('accessToken',  json.data.accessToken  || '');",
+                "  pm.collectionVariables.set('refreshToken', json.data.refreshToken || '');",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"admin@nec.go.tz\",\n  \"password\": \"Admin@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "refresh-token", "value": "{{refreshToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","refresh"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "refresh-token",  "value": "{{refreshToken}}" },
+              { "key": "Authorization",  "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","logout"] }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","forgot-password"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@nec.go.tz\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/reset-password", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","reset-password"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<reset-token-from-email>\",\n  \"newPassword\": \"NewPass@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/update-password", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","update-password"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"OldPass@123\",\n  \"newPassword\": \"NewPass@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get User Context",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/user-context", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","user-context"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Administrator role with full access\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": true,\n  \"approvalLimit\": null,\n  \"parentRoleId\": null,\n  \"createdByUserId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleName\": \"Administrator\",\n  \"description\": \"Updated description\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": true,\n  \"approvalLimit\": 100000.00,\n  \"parentRoleId\": null,\n  \"createdByUserId\": 1,\n  \"modifiedByUserId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Role By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","1"] }
+          }
+        },
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/all", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","all"] }
+          }
+        },
+        {
+          "name": "Get Roles By Status",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/status/ACTIVE", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","status","ACTIVE"] }
+          }
+        },
+        {
+          "name": "Get Child Roles",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/parent/1/children", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","parent","1","children"] }
+          }
+        },
+        {
+          "name": "Change Role Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/1/status", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","1","status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INACTIVE\",\n  \"modifiedByUserId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/roles/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","roles","1"] }
+          }
+        },
+        {
+          "name": "List Roles (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role/list", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role","list"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"roleName\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"status\": \"ACTIVE\",\n  \"isParentRole\": null,\n  \"fromDate\": null,\n  \"toDate\": null\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Permission Groups",
+      "item": [
+        {
+          "name": "Create Permission Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/permission-groups", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","permission-groups"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modules\": [\n    {\n      \"moduleCode\": \"HR\",\n      \"moduleName\": \"Human Resource\",\n      \"description\": \"HR Module\",\n      \"displayOrder\": 1,\n      \"status\": \"ACTIVE\",\n      \"createdByUserId\": 1,\n      \"groups\": [\n        {\n          \"groupCode\": \"STAFF_MGT\",\n          \"groupName\": \"Staff Management\",\n          \"description\": \"Staff management group\",\n          \"displayOrder\": 1,\n          \"status\": \"ACTIVE\",\n          \"createdByUserId\": 1,\n          \"permissions\": [\n            {\n              \"permissionCode\": \"CREATE_STAFF\",\n              \"permissionName\": \"Create Staff\",\n              \"description\": \"Create new staff\",\n              \"displayOrder\": 1,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": false,\n              \"createdByUserId\": 1\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Permission Group",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/permission-groups", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","permission-groups"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleCode\": \"HR\",\n      \"moduleName\": \"Human Resource\",\n      \"description\": \"Updated HR Module\",\n      \"displayOrder\": 1,\n      \"status\": \"ACTIVE\",\n      \"createdByUserId\": 1,\n      \"modifiedByUserId\": 1,\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupCode\": \"STAFF_MGT\",\n          \"groupName\": \"Staff Management\",\n          \"description\": \"Updated group\",\n          \"displayOrder\": 1,\n          \"status\": \"ACTIVE\",\n          \"createdByUserId\": 1,\n          \"modifiedByUserId\": 1,\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionCode\": \"CREATE_STAFF\",\n              \"permissionName\": \"Create Staff\",\n              \"description\": \"Create new staff\",\n              \"displayOrder\": 1,\n              \"status\": \"ACTIVE\",\n              \"isSideMenu\": false,\n              \"createdByUserId\": 1,\n              \"modifiedByUserId\": 1\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Permission Groups",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/permission-group/all", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","permission-group","all"] }
+          }
+        },
+        {
+          "name": "Get Permission Group By Module ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/permission-group/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","permission-group","1"] }
+          }
+        },
+        {
+          "name": "List Permission Groups (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/permission-group/list", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","permission-group","list"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"moduleName\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"status\": \"ACTIVE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Modules (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/module/list", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","module","list"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"moduleName\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"status\": \"ACTIVE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Groups (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/group/list", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","group","list"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"groupName\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"status\": \"ACTIVE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Role Permissions",
+      "item": [
+        {
+          "name": "Assign Role Permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role-permission", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role-permission"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleId\": 1,\n  \"roleName\": \"Administrator\",\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleName\": \"Human Resource\",\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupName\": \"Staff Management\",\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionName\": \"Create Staff\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Role Permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role-permission", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role-permission"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleId\": 1,\n  \"roleName\": \"Administrator\",\n  \"modules\": [\n    {\n      \"moduleId\": 1,\n      \"moduleName\": \"Human Resource\",\n      \"groups\": [\n        {\n          \"groupId\": 1,\n          \"groupName\": \"Staff Management\",\n          \"permissions\": [\n            {\n              \"permissionId\": 1,\n              \"permissionName\": \"Create Staff\"\n            },\n            {\n              \"permissionId\": 2,\n              \"permissionName\": \"Edit Staff\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Role Permissions By Role ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role-permission/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role-permission","1"] }
+          }
+        },
+        {
+          "name": "Get All Role Permissions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role-permission/get-all", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role-permission","get-all"] }
+          }
+        },
+        {
+          "name": "List Role Permissions (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role-permission/list", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role-permission","list"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"createdDate\",\n  \"sortDirection\": \"DESC\",\n  \"search\": \"\",\n  \"roleId\": null,\n  \"moduleId\": null,\n  \"status\": \"ACTIVE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Role Permission",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/role-permission/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","role-permission","1"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"John Doe\",\n  \"genderId\": 1,\n  \"roleId\": 1,\n  \"phone\": \"+255700000001\",\n  \"email\": \"john.doe@nec.go.tz\",\n  \"photoPath\": null,\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"password\": \"SecurePass@123\",\n  \"passwordToBeChanged\": false,\n  \"emailVerified\": false,\n  \"mobileVerified\": false,\n  \"isActive\": 1,\n  \"createdBy\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users/<user-uuid>", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users","<user-uuid>"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"John Doe Updated\",\n  \"genderId\": 1,\n  \"roleId\": 1,\n  \"phone\": \"+255700000002\",\n  \"email\": \"john.doe@nec.go.tz\",\n  \"departmentId\": 1,\n  \"regionId\": 1,\n  \"districtId\": 1,\n  \"cityId\": 1,\n  \"isActive\": 1,\n  \"createdBy\": 1,\n  \"updatedBy\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users/<user-uuid>", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users","<user-uuid>"] }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users/all", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users","all"] }
+          }
+        },
+        {
+          "name": "Get Users By Role ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users/role/1", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users","role","1"] }
+          }
+        },
+        {
+          "name": "Change User Active Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rbac/users/<user-uuid>/status?isActive=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","v1","rbac","users","<user-uuid>","status"],
+              "query": [{ "key": "isActive", "value": "0", "description": "1 = active, 0 = inactive" }]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users/<user-uuid>", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users","<user-uuid>"] }
+          }
+        },
+        {
+          "name": "Restore User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/users/<user-uuid>/restore", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","users","<user-uuid>","restore"] }
+          }
+        },
+        {
+          "name": "List Users (Paginated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/rbac/user/list", "host": ["{{baseUrl}}"], "path": ["api","v1","rbac","user","list"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"userName\",\n  \"sortDirection\": \"ASC\",\n  \"search\": \"\",\n  \"roleId\": null,\n  \"departmentId\": null,\n  \"isActive\": null,\n  \"fromDate\": null,\n  \"toDate\": null\n}"
+            }
+          }
+        }
+      ]
+    }
+
+  ]
+}

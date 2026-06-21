@@ -201,8 +201,8 @@ public class RbacUser implements Persistable<String> {
     // ==================== AUDIT FIELDS ====================
 
     /** ID of the user who created this record. */
-    @Column(name = "created_by", nullable = false)
-    private Long createdBy;
+    @Column(name = "created_by", length = 100)
+    private String createdBy;
 
     /** Timestamp automatically set on INSERT. */
     @CreationTimestamp
