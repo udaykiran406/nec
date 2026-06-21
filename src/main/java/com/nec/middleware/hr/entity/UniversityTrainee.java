@@ -23,7 +23,7 @@ import lombok.*;
  * are inherited from {@link AuditableEntity}.
  */
 @Entity
-@Table(name = "nec_hr_university_trainees")
+@Table(name = "nec_hr_university_trainees", schema = "NEC")
 @Getter
 @Setter
 @NoArgsConstructor

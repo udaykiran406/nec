@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
     name = "nec_districts",
+    schema = "NEC",
     uniqueConstraints = @UniqueConstraint(name = "uq_district_name_region", columnNames = {"district_name", "region_id"})
 )
 @Getter

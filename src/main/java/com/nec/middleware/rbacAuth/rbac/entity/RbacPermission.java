@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
     name = "nec_rbac_permission",
+    schema = "keycloak",
     uniqueConstraints = {
         @UniqueConstraint(name = "uq_rbac_permission_code", columnNames = {"module_id", "permission_code"})
     },

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "nec_universities",
+        schema = "NEC",
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_university_name",
                 columnNames = "university_name"

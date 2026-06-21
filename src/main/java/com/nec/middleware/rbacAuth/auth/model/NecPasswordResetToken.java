@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "nec_password_reset_tokens")
+@Table(name = "nec_password_reset_tokens", schema = "keycloak")
 public class NecPasswordResetToken {
 
     @Id

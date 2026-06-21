@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "nec_hr_ministry_of_interiors")
+@Table(name = "nec_hr_ministry_of_interiors", schema = "NEC")
 @Getter
 @Setter
 @NoArgsConstructor

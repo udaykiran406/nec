@@ -1,14 +1,18 @@
 server:
-  port: 8080
+  port: 8081
   servlet:
-    context-path: /ams
+    context-path: /nec
+
 spring:
+  application:
+    name: nec-middleware-service
   datasource:
-    url: jdbc:mysql://mysql.database.svc.cluster.local:3306/emis?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&createDatabaseIfNotExist=true
-    username: appuser
-    password: AppUserPwd
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://nec-dev-postgres-do-user-37512687-0.l.db.ondigitalocean.com:25060/nec_dev?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:nec_user}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
     hikari:
+      maximum-pool-size: 10
       initialization-fail-timeout: 0
 
   jpa:
@@ -18,7 +22,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        hbm2ddl:
+          create_namespaces: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 7
+    create-schemas: true
 
   main:
     allow-bean-definition-overriding: true
@@ -29,6 +41,11 @@ spring:
       max-file-size: 20MB
       max-request-size: 50MB
 
+  flowable:
+    database-schema-update: true
+    history-level: full
+    db-history-used: true
+
   jackson:
     default-property-inclusion: NON_NULL
     serialization:
@@ -37,13 +54,39 @@ spring:
       fail-on-unknown-properties: false
       accept-empty-string-as-null-object: false
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/NEC-DEV}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/NEC-DEV/protocol/openid-connect/certs}
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 logging:
   level:
-    com.nec.middleware: INFO
-    com.nec.middleware.controller: INFO
-    com.nec.middleware.service: INFO
-    com.nec.middleware.repository: DEBUG
+    com.nec.middleware: DEBUG
+    com.nec.middleware.rbacAuth.rbac.handler.RbacUserBulkRowPersister: DEBUG
+    com.nec.middleware.rbacAuth.rbac.service.BulkUploadEmailService: DEBUG
+    com.nec.middleware.rbacAuth.keycloak: DEBUG
     org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
@@ -53,27 +96,75 @@ logging:
 management:
   endpoints:
     web:
-      base-path: /actuator
       exposure:
-        include: health,info,metrics
+        include:
+          - health
+          - info
+      base-path: /actuator
   endpoint:
     health:
+      show-details: always
       probes:
         enabled: true
-      show-details: always
   health:
     livenessState:
       enabled: true
     readinessState:
       enabled: true
 
-# Admin Registration API Configuration
 admin:
   registration:
     api:
-      url: https://api-dev.moeplstate.so/auth/api/v1/users/admin-register
+      url: http://api-dev.moeplstate.so/auth/api/v1/users/admin-register
 
-
-# File Upload – VM path for dev environment
 file:
-  upload-dir: /opt/app/uploads/aams
+  upload-dir: C:/Users/hp/Downloads/nec-middleware-uploads
+  ofbiz:
+    base-url: https://localhost:8443
+    username: admin
+    password: ofbiz
+    trust-self-signed: true
+
+keycloak:
+  base-url: http://localhost:8080
+  realm-name: NEC-DEV
+  admin-realm: master
+  grant-type: password
+  admin-client-id: admin-cli
+  admin-client-secret: mbD3hQJFr39bm8bkWE6ZSBubpOmqgKsc
+  admin-username: admin
+  admin-password: admin123
+  web-client-id: nec-web
+  web-client-secret: 1abefLKB9ezHPGieYGZXtH6ZmCCphEZS
+
+jwt:
+  secret: ${JWT_SECRET:NEC-Middleware-JWT-Secret-Key-Must-Be-At-Least-256-Bits-Long-For-HS256}
+  access-token-expiration: ${JWT_ACCESS_EXPIRY:900000}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRY:604800000}
+  issuer: nec-middleware
+
+app:
+  password-reset:
+    url: http://localhost:3000/reset-password
+    token-validity-minutes: 30
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - https://your-frontend.example.com
+  security:
+    max-failed-attempts: ${MAX_FAILED_ATTEMPTS:5}
+    lock-duration-minutes: ${LOCK_DURATION_MINUTES:30}
+    password-expiry-days: ${PASSWORD_EXPIRY_DAYS:90}
+  mail:
+    from-email: ${MAIL_FROM_EMAIL:techlead@aakrutisolutions.com}
+    from-name: ${MAIL_FROM_NAME:NEC Authentication System}
+  auth-url: ${AUTH_URL:http://localhost:3000/login}
+  support-email: ${SUPPORT_EMAIL:support@nec.go.tz}
+
+mailjet:
+  api:
+    key: ${MAILJET_API_KEY:1991683a505cb9f5ad27ebd107e77686}
+    secret: ${MAILJET_API_SECRET:30fc0bf9c24081e67c9d2967923dd968}
+  from:
+    email: ${MAILJET_FROM_EMAIL:techlead@aakrutisolutions.com}
+    name: ${MAILJET_FROM_NAME:NEC Support}
